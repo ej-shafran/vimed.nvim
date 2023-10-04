@@ -12,10 +12,18 @@ end
 local function display()
 	local lines = vim.fn.split(utils.command("ls -l"), "\n") --[[@as table]]
 	local header = table.remove(lines, 1)
-	M.buffer = utils.dir_contents({
+	local path = vim.fn.getcwd()
+	assert(path ~= nil, "no cwd")
+
+	utils.dir_contents(path, {
 		lines = lines,
 		header = header,
 	}, utils.parse_ls_l)
+	table.insert(M.buffer, path .. ":")
+	table.insert(M.buffer, header)
+	for _, line in pairs(lines) do
+		table.insert(M.buffer, line)
+	end
 end
 
 local function flush()

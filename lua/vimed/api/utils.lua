@@ -43,27 +43,15 @@ function M.parse_ls_l(line, path)
 end
 
 ---Render dir contents into `buffer`, while updating the `utils` data.
+---@param path string
 ---@param contents DirContents
 ---@param parse_line fun(string, string): FsEntry
----@return string[]
-function M.dir_contents(contents, parse_line)
-	local buffer = {}
-
-	local path = vim.fn.getcwd()
-	assert(path ~= nil, "no cwd")
-
-	table.insert(buffer, path .. ":")
-	table.insert(buffer, contents.header)
-
+function M.dir_contents(path, contents, parse_line)
 	---@type FsEntry[]
-	local line_tables = {}
+	M.lines = {}
 	for _, line in ipairs(contents.lines) do
-		table.insert(buffer, line)
-		table.insert(line_tables, parse_line(line, path))
+		table.insert(M.lines, parse_line(line, path))
 	end
-
-	M.lines = line_tables
-	return buffer
 end
 
 ---Whether the current buffer is a Vimed buffer.
