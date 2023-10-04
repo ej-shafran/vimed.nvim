@@ -1,0 +1,94 @@
+#+title: Vimed
+#+author: EJ Shafran
+
+* TODOs
+
+** Plugin Architecture
+*** TODO Set up a Neovim plugin development environment.
+*** TODO Create the necessary Lua modules and directories.
+*** TODO Define the overall architecture of the plugin.
+ 
+** Basic Functionality
+*** TODO Implement a file listing view within Neovim.
+*** TODO Enable basic file navigation (move cursor, open files, etc.).
+*** TODO Add keybindings to mimic `dired` mode functionality.
+*** TODO Display file details (permissions, size, modification time, etc.).
+ 
+** Navigation and Actions
+*** TODO Implement keybindings for common file operations (copy, move, delete, rename).
+*** TODO Provide options for sorting and filtering files.
+*** TODO Allow for marking files for batch operations.
+*** TODO Implement common file actions (create directory, open in terminal, etc.).
+ 
+** File Operations
+*** TODO Implement file copy functionality.
+*** TODO Implement file move functionality.
+*** TODO Implement file deletion functionality.
+*** TODO Implement file renaming functionality.
+ 
+** Additional Features
+*** TODO Add search functionality within the file list.
+*** TODO Implement file permission editing.
+*** TODO Allow for customizable themes and appearances.
+*** TODO Provide user configuration options.
+ 
+** Documentation
+*** TODO Write clear and comprehensive documentation.
+*** TODO Include installation instructions.
+*** TODO Create usage examples and tutorials.
+ 
+** Testing and Debugging
+*** TODO Implement unit tests for critical functions.
+*** TODO Perform extensive testing to ensure stability.
+*** TODO Debug and resolve any issues or bugs that arise.
+ 
+** User Feedback and Improvements
+*** TODO Gather user feedback and feature requests.
+*** TODO Continuously improve the plugin based on user input.
+ 
+** Release and Distribution
+*** TODO Prepare the plugin for release.
+*** TODO Publish the plugin on the Neovim plugin repository.
+*** TODO Announce the plugin to the Neovim community.
+ 
+** Maintenance and Updates
+*** TODO Stay updated with Neovim's development and make necessary adjustments.
+*** TODO Address compatibility issues with newer Neovim versions.
+*** TODO Provide ongoing support for users.
+ 
+** Marketing and Promotion
+*** TODO Promote the plugin through social media, forums, and developer communities.
+*** TODO Encourage user contributions and collaborations.
+ 
+** Long-term Goals
+*** TODO Consider expanding the plugin's capabilities based on user demand.
+*** TODO Explore integration with other Neovim plugins and workflows.
+ 
+** Project Completion
+*** TODO Confirm that all planned features are implemented and working.
+*** TODO Ensure comprehensive test coverage and stability.
+*** TODO Celebrate the successful completion of the Neovim Dired Clone Plugin!
+ 
+
+* Deadlines and Milestones
+** TODO Initial Development Phase
+   DEADLINE: <2023-10-07 Sat 22:00>
+** TODO Testing and Debugging Phase
+   DEADLINE: <2023-10-07 Sat 22:00>
+** TODO Documentation and Release Phase
+   DEADLINE: <2023-10-14 Sat 22:00>
+** TODO Ongoing Maintenance and Updates
+   DEADLINE: <2023-10-14 Sat 22:00>
+
+* Resources
+** TODO Neovim Lua Plugin Development Guide
+** TODO Neovim Plugin API Documentation
+** TODO Emacs `dired` Mode Documentation
+** TODO Neovim Community and Forums
+
+* Notes and Ideas
+  Record any ideas or notes that come up during development.
+
+* References
+  Keep a list of helpful articles, tutorials, and code snippets.
+
