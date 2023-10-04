@@ -48,6 +48,28 @@ function M.setup(config)
 		pattern = "vimed",
 		callback = M.setup_keymaps,
 	})
+
+	local vimed_group = vim.api.nvim_create_augroup("dired", { clear = true })
+
+	-- open vimed when opening a directory
+	vim.api.nvim_create_autocmd("BufEnter", {
+		pattern = "*",
+		command = "if isdirectory(expand('%')) && !&modified | execute 'lua require(\"vimed\").open_vimed()' | endif",
+		group = vimed_group,
+	})
+
+	vim.api.nvim_create_autocmd("VimEnter", {
+		pattern = "*",
+		command = "if exists('#FileExplorer') | execute 'autocmd! FileExplorer *' | endif",
+		group = vimed_group,
+	})
+
+	vim.api.nvim_create_autocmd("VimEnter", {
+		pattern = "*",
+		command = "if exists('#NERDTreeHijackNetrw') | exe 'au! NERDTreeHijackNetrw *' | endif",
+		group = vimed_group,
+	})
+	vim.cmd([[if exists('#FileExplorer') | execute 'autocmd! FileExplorer *' | endif]])
 end
 
 return M
