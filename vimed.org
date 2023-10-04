@@ -12,7 +12,8 @@
     CLOSED: [2023-10-04 Wed 22:15]
  
 ** Basic Functionality
-*** TODO Implement a file listing view within Neovim.
+*** DONE Implement a file listing view within Neovim.
+    CLOSED: [2023-10-04 Wed 23:06]
 *** TODO Enable basic file navigation (move cursor, open files, etc.).
 *** TODO Add keybindings to mimic `dired` mode functionality.
 *** TODO Display file details (permissions, size, modification time, etc.).
