@@ -27,6 +27,18 @@ end
 ---@param config Config
 function M.setup(config)
 	colors.setup(vim.tbl_extend("force", {
+		perm_dir = {
+			foreground = "#2222bb",
+		},
+		perm_read = {
+			foreground = "#bbbb22",
+		},
+		perm_write = {
+			foreground = "#bb2222",
+		},
+		perm_execute = {
+			foreground = "#22bb22",
+		},
 		day = {},
 		time = {},
 		group = {},

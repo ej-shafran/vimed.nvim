@@ -4,9 +4,13 @@ local M = {}
 ---@alias HighlightStyle { background: string?, foreground: string?, gui: string? }
 
 ---@alias HighlightGroups
----| { link_count: HighlightStyle?, group: HighlightStyle?, owner: HighlightStyle?, month: HighlightStyle?, day: HighlightStyle?, time: HighlightStyle?, file_name: HighlightStyle?, header: HighlightStyle?, dir_name: HighlightStyle? }
+---| { link_count: HighlightStyle?, group: HighlightStyle?, owner: HighlightStyle?, month: HighlightStyle?, day: HighlightStyle?, time: HighlightStyle?, file_name: HighlightStyle?, header: HighlightStyle?, dir_name: HighlightStyle?, total: HighlightStyle?, perm_dir: HighlightStyle?, perm_read: HighlightStyle?, perm_write: HighlightStyle?, perm_group: HighlightStyle?, }
 
 M.hl = {
+	perm_dir = "VimedPermDir",
+	perm_read = "VimedPermRead",
+	perm_write = "VimedPermWrite",
+	perm_execute = "VimedPermExecute",
 	link_count = "VimedLinkCount",
 	group = "VimedGroup",
 	owner = "VimedOwner",
@@ -16,6 +20,7 @@ M.hl = {
 	file_name = "VimedFileName",
 	dir_name = "VimedDirName",
 	header = "VimedHeader",
+	total = "VimedTotal",
 }
 
 ---If the given highlight group is not defined, define it.

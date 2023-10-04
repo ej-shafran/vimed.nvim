@@ -2,8 +2,12 @@
 
 local M = {}
 
+---@alias Date { month: string, day: string, time: string, }
+---@alias UserPermissions { read: boolean, write: boolean, execute: boolean }
+---@alias Permissions { is_dir: boolean, user: UserPermissions, group: UserPermissions, owner: UserPermissions }
+
 ---@alias FsEntry
----| { permissions: string, link_count: string, owner: string, group: string, size: string, date: { month: string, day: string, time: string, }, path: string }
+---| { permissions: Permissions, link_count: string, owner: string, group: string, size: string, date: Date, path: string }
 
 ---@alias DirContents
 ---| { header: string, lines: string[] }
@@ -22,13 +26,44 @@ function M.command(cmd)
 	return result
 end
 
+local function parse_user_permissions(read, write, exec)
+	return {
+		read = read == "r",
+		write = write == "w",
+		execute = exec == "x",
+	}
+end
+
+---@param permissions string
+---@return Permissions
+function M.parse_permissions(permissions)
+	local perm_table = {}
+	for c in string.gmatch(permissions, ".") do
+		table.insert(perm_table, c)
+	end
+
+	local raw_is_dir = perm_table[1]
+	local is_dir = raw_is_dir == "d"
+
+	local u_read, u_write, u_exec = unpack(perm_table, 2, 4)
+	local o_read, o_write, o_exec = unpack(perm_table, 5, 7)
+	local g_read, g_write, g_exec = unpack(perm_table, 8, 10)
+
+	return {
+		is_dir = is_dir,
+		user = parse_user_permissions(u_read, u_write, u_exec),
+		owner = parse_user_permissions(o_read, o_write, o_exec),
+		group = parse_user_permissions(g_read, g_write, g_exec),
+	}
+end
+
 ---@param line string
 ---@param path string
 ---@return FsEntry
 function M.parse_ls_l(line, path)
 	local sections = vim.fn.split(line) --[[@as table]]
 	return {
-		permissions = sections[1],
+		permissions = M.parse_permissions(sections[1]),
 		link_count = sections[2],
 		owner = sections[3],
 		group = sections[4],

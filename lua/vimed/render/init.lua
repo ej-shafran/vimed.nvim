@@ -12,6 +12,42 @@ local function clear()
 	vim.api.nvim_buf_set_lines(0, 0, -1, false, {})
 end
 
+---@param nline any
+---@param u_permissions UserPermissions
+local function render_user_permissions(nline, u_permissions)
+	if u_permissions.read then
+		nline:append("r", colors.hl.perm_read)
+	else
+		nline:append("-")
+	end
+
+	if u_permissions.write then
+		nline:append("w", colors.hl.perm_write)
+	else
+		nline:append("-")
+	end
+
+	if u_permissions.execute then
+		nline:append("x", colors.hl.perm_execute)
+	else
+		nline:append("-")
+	end
+end
+
+---@param nline any
+---@param permissions Permissions
+local function render_permissions(nline, permissions)
+	if permissions.is_dir then
+		nline:append("d", colors.hl.perm_dir)
+	else
+		nline:append("-")
+	end
+
+	render_user_permissions(nline, permissions.user)
+	render_user_permissions(nline, permissions.group)
+	render_user_permissions(nline, permissions.owner)
+end
+
 local function display()
 	local lines = vim.fn.split(utils.command("ls -l"), "\n") --[[@as table]]
 	local header = table.remove(lines, 1)
@@ -19,7 +55,7 @@ local function display()
 	assert(path ~= nil, "no cwd")
 
 	table.insert(M.buffer, NuiLine({ NuiText(path .. ":", colors.hl.header) }))
-	table.insert(M.buffer, NuiLine({ NuiText(header, colors.hl.header) }))
+	table.insert(M.buffer, NuiLine({ NuiText(header, colors.hl.total) }))
 
 	local line_objs = utils.dir_contents(path, {
 		lines = lines,
@@ -27,7 +63,8 @@ local function display()
 	}, utils.parse_ls_l)
 	for _, line in pairs(line_objs) do
 		local nline = NuiLine()
-		nline:append(NuiText(line.permissions .. " ", colors.hl.header))
+		render_permissions(nline, line.permissions)
+		nline:append(" ")
 		nline:append(NuiText(line.link_count .. " ", colors.hl.link_count))
 		nline:append(NuiText(line.group .. " ", colors.hl.group))
 		nline:append(NuiText(line.owner .. " ", colors.hl.owner))
