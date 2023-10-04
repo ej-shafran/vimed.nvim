@@ -27,6 +27,10 @@ end
 ---@param config Config
 function M.setup(config)
 	colors.setup(vim.tbl_extend("force", {
+		header = {
+			foreground = "#6666ff",
+			gui = "bold",
+		},
 		perm_dir = {
 			foreground = "#2222bb",
 		},
@@ -39,26 +43,36 @@ function M.setup(config)
 		perm_execute = {
 			foreground = "#22bb22",
 		},
-		day = {},
-		time = {},
+		link_count = {
+			foreground = "#ffbb44",
+		},
+		day = {
+			foreground = "#55cc55",
+		},
+		time = {
+			foreground = "#55cc55",
+		},
+		month = {
+			foreground = "#55cc55",
+		},
 		group = {},
-		month = {},
 		owner = {},
-		header = {
-			foreground = "#ff0000",
+		size = {
+			foreground = "#ffbb44",
 		},
-		file_name = {
-			foreground = "#00ff00",
-		},
+		file_name = {},
 		dir_name = {
-			foreground = "#0000ff",
+			foreground = "#6666ff",
 		},
-		link_count = {},
 	}, config.colors or {}))
+
 	vim.api.nvim_create_user_command("Vimed", M.open_vimed, {})
 	vim.api.nvim_create_autocmd("FileType", {
 		pattern = "vimed",
-		callback = M.setup_keymaps,
+		callback = function ()
+			vim.cmd.setlocal("nonumber norelativenumber")
+			M.setup_keymaps()
+		end
 	})
 
 	local vimed_group = vim.api.nvim_create_augroup("dired", { clear = true })

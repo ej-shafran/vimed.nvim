@@ -49,7 +49,7 @@ local function render_permissions(nline, permissions)
 end
 
 local function display()
-	local lines = vim.fn.split(utils.command("ls -l"), "\n") --[[@as table]]
+	local lines = vim.fn.split(utils.command("ls -lh"), "\n") --[[@as table]]
 	local header = table.remove(lines, 1)
 	local path = vim.fn.getcwd()
 	assert(path ~= nil, "no cwd")
@@ -68,6 +68,8 @@ local function display()
 		nline:append(NuiText(line.link_count .. " ", colors.hl.link_count))
 		nline:append(NuiText(line.group .. " ", colors.hl.group))
 		nline:append(NuiText(line.owner .. " ", colors.hl.owner))
+		local size = string.format("%4s", line.size)
+		nline:append(NuiText(size .. " ", colors.hl.size))
 		nline:append(NuiText(line.date.month .. " ", colors.hl.month))
 		nline:append(NuiText(line.date.day .. " ", colors.hl.day))
 		nline:append(NuiText(line.date.time .. " ", colors.hl.time))
