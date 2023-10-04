@@ -18,6 +18,7 @@ function M.setup_keymaps()
 
 	nmap("q", api.commands.quit)
 	nmap("<CR>", api.commands.enter)
+	nmap("-", api.commands.back)
 end
 
 return M

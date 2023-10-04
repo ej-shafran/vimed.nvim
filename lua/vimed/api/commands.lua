@@ -26,4 +26,13 @@ function M.enter()
 	end
 end
 
+function M.back()
+	local cwd = vim.fn.getcwd()
+	assert(cwd ~= nil, "no cwd")
+
+	local dir = vim.fs.dirname(cwd)
+	vim.api.nvim_set_current_dir(dir)
+	render.init()
+end
+
 return M
