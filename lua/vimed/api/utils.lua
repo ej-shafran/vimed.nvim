@@ -1,10 +1,12 @@
+-- local NuiText = require("nui.text")
+
 local M = {}
 
----@alias Date
----| { month: string, day: string, time: string }
-
 ---@alias FsEntry
----| { permissions: string, link_count: string, owner: string, group: string, size: string, date: Date, path: string }
+---| { path: string }
+
+---@alias DirContents
+---| { header: string, lines: string[] }
 
 ---@type FsEntry[]
 M.lines = {}
@@ -40,20 +42,17 @@ function M.parse_ls_l(line, path)
 	}
 end
 
----@alias DirContents
----| { header: string, lines: string[] }
-
----Get dir contents (in `ls -l` format)
----@param buffer table
----@param get_dir_contents fun(): DirContents
+---Render dir contents into `buffer`, while updating the `utils` data.
+---@param contents DirContents
 ---@param parse_line fun(string, string): FsEntry
 ---@return string[]
-function M.dir_contents(buffer, get_dir_contents, parse_line)
+function M.dir_contents(contents, parse_line)
+	local buffer = {}
+
 	local path = vim.fn.getcwd()
 	assert(path ~= nil, "no cwd")
-	table.insert(buffer, path .. ":")
 
-	local contents = get_dir_contents()
+	table.insert(buffer, path .. ":")
 	table.insert(buffer, contents.header)
 
 	---@type FsEntry[]
@@ -64,7 +63,7 @@ function M.dir_contents(buffer, get_dir_contents, parse_line)
 	end
 
 	M.lines = line_tables
-	return contents.lines
+	return buffer
 end
 
 ---Whether the current buffer is a Vimed buffer.
