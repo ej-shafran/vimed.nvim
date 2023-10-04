@@ -17,7 +17,7 @@ function M.enter()
 		return
 	end
 
-	local path = utils.lines[r - 2].name
+	local path = utils.lines[r - 2].path
 	if vim.fn.isdirectory(path) == 0 then
 		vim.cmd.e(path)
 	else

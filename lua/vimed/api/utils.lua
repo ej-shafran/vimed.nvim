@@ -4,7 +4,7 @@ local M = {}
 ---| { month: string, day: string, time: string }
 
 ---@alias FsEntry
----| { permissions: string, link_count: string, owner: string, group: string, size: string, date: Date, name: string }
+---| { permissions: string, link_count: string, owner: string, group: string, size: string, date: Date, path: string }
 
 ---@type FsEntry[]
 M.lines = {}
@@ -36,7 +36,7 @@ function M.parse_ls_l(line, path)
 			day = sections[7],
 			time = sections[8],
 		},
-		name = path .. "/" .. sections[9],
+		path = path .. "/" .. sections[9],
 	}
 end
 
