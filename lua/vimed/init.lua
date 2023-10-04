@@ -23,7 +23,23 @@ function M.setup_keymaps()
 end
 
 function M.setup()
-	colors.setup()
+	colors.setup({
+		day = {},
+		time = {},
+		group = {},
+		month = {},
+		owner = {},
+		header = {
+			foreground = "#ff0000",
+		},
+		file_name = {
+			foreground = "#00ff00",
+		},
+		dir_name = {
+			foreground = "#0000ff",
+		},
+		link_count = {},
+	})
 	vim.api.nvim_create_user_command("Vimed", M.open_vimed, {})
 	vim.api.nvim_create_autocmd("FileType", {
 		pattern = "vimed",

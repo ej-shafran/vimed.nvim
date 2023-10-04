@@ -18,15 +18,29 @@ local function display()
 	local path = vim.fn.getcwd()
 	assert(path ~= nil, "no cwd")
 
-	utils.dir_contents(path, {
+	table.insert(M.buffer, NuiLine({ NuiText(path .. ":", colors.hl.header) }))
+	table.insert(M.buffer, NuiLine({ NuiText(header, colors.hl.header) }))
+
+	local line_objs = utils.dir_contents(path, {
 		lines = lines,
 		header = header,
 	}, utils.parse_ls_l)
-	table.insert(M.buffer, NuiLine({ NuiText(path .. ":", colors.DIM_TEXT) }))
-	table.insert(M.buffer, NuiLine({ NuiText(header, colors.DIM_TEXT) }))
-	for _, line in pairs(lines) do
+	for _, line in pairs(line_objs) do
 		local nline = NuiLine()
-		nline:append(NuiText(line, colors.NORMAL))
+		nline:append(NuiText(line.permissions .. " ", colors.hl.header))
+		nline:append(NuiText(line.link_count .. " ", colors.hl.link_count))
+		nline:append(NuiText(line.group .. " ", colors.hl.group))
+		nline:append(NuiText(line.owner .. " ", colors.hl.owner))
+		nline:append(NuiText(line.date.month .. " ", colors.hl.month))
+		nline:append(NuiText(line.date.day .. " ", colors.hl.day))
+		nline:append(NuiText(line.date.time .. " ", colors.hl.time))
+
+		local file_hl = colors.hl.file_name
+		if vim.fn.isdirectory(line.path) ~= 0 then
+			file_hl = colors.hl.dir_name
+		end
+		nline:append(NuiText(vim.fs.basename(line.path), file_hl))
+
 		table.insert(M.buffer, nline)
 	end
 end

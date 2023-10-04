@@ -3,7 +3,7 @@
 local M = {}
 
 ---@alias FsEntry
----| { path: string }
+---| { permissions: string, link_count: string, owner: string, group: string, size: string, date: { month: string, day: string, time: string, }, path: string }
 
 ---@alias DirContents
 ---| { header: string, lines: string[] }
@@ -52,6 +52,7 @@ function M.dir_contents(path, contents, parse_line)
 	for _, line in ipairs(contents.lines) do
 		table.insert(M.lines, parse_line(line, path))
 	end
+	return M.lines
 end
 
 ---Whether the current buffer is a Vimed buffer.
