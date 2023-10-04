@@ -22,8 +22,11 @@ function M.setup_keymaps()
 	nmap("-", api.commands.back)
 end
 
-function M.setup()
-	colors.setup({
+---@alias Config { colors: HighlightGroups? }
+
+---@param config Config
+function M.setup(config)
+	colors.setup(vim.tbl_extend("force", {
 		day = {},
 		time = {},
 		group = {},
@@ -39,7 +42,7 @@ function M.setup()
 			foreground = "#0000ff",
 		},
 		link_count = {},
-	})
+	}, config.colors or {}))
 	vim.api.nvim_create_user_command("Vimed", M.open_vimed, {})
 	vim.api.nvim_create_autocmd("FileType", {
 		pattern = "vimed",

@@ -4,7 +4,7 @@ local M = {}
 ---@alias HighlightStyle { background: string?, foreground: string?, gui: string? }
 
 ---@alias HighlightGroups
----| { link_count: HighlightStyle, group: HighlightStyle, owner: HighlightStyle, month: HighlightStyle, day: HighlightStyle, time: HighlightStyle, file_name: HighlightStyle, header: HighlightStyle, dir_name: HighlightStyle }
+---| { link_count: HighlightStyle?, group: HighlightStyle?, owner: HighlightStyle?, month: HighlightStyle?, day: HighlightStyle?, time: HighlightStyle?, file_name: HighlightStyle?, header: HighlightStyle?, dir_name: HighlightStyle? }
 
 M.hl = {
 	link_count = "VimedLinkCount",
