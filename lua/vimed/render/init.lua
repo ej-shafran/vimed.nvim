@@ -10,10 +10,15 @@ local function clear()
 end
 
 local function display()
-	local lines = vim.fn.split(utils.command("ls -l"), "\n") --[[@as table]]
-	for _, line in pairs(lines) do
-		table.insert(M.buffer, line)
-	end
+	utils.dir_contents(M.buffer, function()
+		---@type string[]
+		local lines = vim.fn.split(utils.command("ls -l"), "\n") --[[@as table]]
+		local header = table.remove(lines, 1)
+		return {
+			lines = lines,
+			header = header,
+		}
+	end, utils.parse_ls_l)
 end
 
 local function flush()
