@@ -1,4 +1,7 @@
 local utils = require("vimed.api.utils")
+local colors = require("vimed.render.colors")
+local NuiLine = require("nui.line")
+local NuiText = require("nui.text")
 
 local M = {}
 
@@ -19,10 +22,12 @@ local function display()
 		lines = lines,
 		header = header,
 	}, utils.parse_ls_l)
-	table.insert(M.buffer, path .. ":")
-	table.insert(M.buffer, header)
+	table.insert(M.buffer, NuiLine({ NuiText(path .. ":", colors.DIM_TEXT) }))
+	table.insert(M.buffer, NuiLine({ NuiText(header, colors.DIM_TEXT) }))
 	for _, line in pairs(lines) do
-		table.insert(M.buffer, line)
+		local nline = NuiLine()
+		nline:append(NuiText(line, colors.NORMAL))
+		table.insert(M.buffer, nline)
 	end
 end
 
@@ -30,7 +35,10 @@ local function flush()
 	local undolevels = vim.bo.undolevels
 	vim.bo.undolevels = -1
 	-- TODO: fancier rendering
-	vim.api.nvim_buf_set_lines(0, 0, -1, true, M.buffer)
+	-- vim.api.nvim_buf_set_lines(0, 0, -1, true, M.buffer)
+	for i, line in ipairs(M.buffer) do
+		line:render(0, -1, i)
+	end
 	vim.bo.undolevels = undolevels
 	vim.bo.modified = false
 end

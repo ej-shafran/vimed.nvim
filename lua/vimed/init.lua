@@ -1,5 +1,6 @@
 local api = require("vimed.api")
 local render = require("vimed.render")
+local colors = require("vimed.render.colors")
 
 local M = {}
 
@@ -19,6 +20,15 @@ function M.setup_keymaps()
 	nmap("q", api.commands.quit)
 	nmap("<CR>", api.commands.enter)
 	nmap("-", api.commands.back)
+end
+
+function M.setup()
+	colors.setup()
+	vim.api.nvim_create_user_command("Vimed", M.open_vimed, {})
+	vim.api.nvim_create_autocmd("FileType", {
+		pattern = "vimed",
+		callback = M.setup_keymaps,
+	})
 end
 
 return M
