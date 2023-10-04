@@ -4,9 +4,12 @@
 * TODOs
 
 ** Plugin Architecture
-*** TODO Set up a Neovim plugin development environment.
-*** TODO Create the necessary Lua modules and directories.
-*** TODO Define the overall architecture of the plugin.
+*** DONE Set up a Neovim plugin development environment.
+    CLOSED: [2023-10-04 Wed 22:13]
+*** DONE Create the necessary Lua modules and directories.
+    CLOSED: [2023-10-04 Wed 22:15]
+*** DONE Define the overall architecture of the plugin.
+    CLOSED: [2023-10-04 Wed 22:15]
  
 ** Basic Functionality
 *** TODO Implement a file listing view within Neovim.
