@@ -1,18 +1,3 @@
--- local NuiText = require("nui.text")
-
-local M = {}
-
-M.show_hidden = false
-
----@return string
-function M.get_command()
-	local cmd = "ls -lh"
-	if M.show_hidden then
-		cmd = cmd .. "a"
-	end
-	return cmd
-end
-
 ---@alias Date { month: string, day: string, time: string, }
 ---@alias UserPermissions { read: boolean, write: boolean, execute: boolean }
 ---@alias Permissions { is_dir: boolean, user: UserPermissions, group: UserPermissions, owner: UserPermissions }
@@ -23,20 +8,52 @@ end
 ---@alias DirContents
 ---| { header: string, lines: string[] }
 
+local M = {}
+
+---@type boolean
+M.show_hidden = false
 ---@type FsEntry[]
 M.lines = {}
 
+---Whether the current buffer is a Vimed buffer.
+---@return boolean
+function M.is_vimed()
+	return vim.bo.filetype == "vimed"
+end
+
 ---Run a shell command and get its output as a string.
----@param cmd string command to run
+---@param cmd string|table either a full string of the command or a table to be joined with spaces
 ---@return string
 function M.command(cmd)
-	local handle = io.popen(cmd)
+	local cmd_string
+	if type(cmd) == "table" then
+		cmd_string = vim.fn.join(cmd, " ") --[[@as string]]
+	else
+		cmd_string = cmd
+	end
+
+	local handle = io.popen(cmd_string)
 	assert(handle ~= nil, "`popen` failed")
 	local result = handle:read("*a")
 	handle:close()
 	return result
 end
 
+---Get the `ls` command to run.
+---@return string
+local function run_command()
+	local cmd = "ls -lh"
+	if M.show_hidden then
+		cmd = cmd .. "a"
+	end
+	return M.command(cmd)
+end
+
+---Get a user/group's `UserPermissions` object from a `rwx` string.
+---@param read string
+---@param write string
+---@param exec string
+---@return UserPermissions
 local function parse_user_permissions(read, write, exec)
 	return {
 		read = read == "r",
@@ -45,9 +62,10 @@ local function parse_user_permissions(read, write, exec)
 	}
 end
 
+---Get a full `Permissions` object from a `drwxrwxrwx` string.
 ---@param permissions string
 ---@return Permissions
-function M.parse_permissions(permissions)
+local function parse_permissions(permissions)
 	local perm_table = {}
 	for c in string.gmatch(permissions, ".") do
 		table.insert(perm_table, c)
@@ -68,13 +86,14 @@ function M.parse_permissions(permissions)
 	}
 end
 
+---Get an `FsEntry` object from a line of `ls -l` output.
 ---@param line string
 ---@param path string
 ---@return FsEntry
-function M.parse_ls_l(line, path)
+local function parse_ls_line(line, path)
 	local sections = vim.fn.split(line) --[[@as table]]
 	return {
-		permissions = M.parse_permissions(sections[1]),
+		permissions = parse_permissions(sections[1]),
 		link_count = sections[2],
 		owner = sections[3],
 		group = sections[4],
@@ -88,24 +107,18 @@ function M.parse_ls_l(line, path)
 	}
 end
 
----@param command string
+---Get a list of `FsEntry` objects and a header string from a directory path.
 ---@param path string
 ---@return FsEntry[], string
-function M.dir_contents(command, path)
-	local lines = vim.fn.split(M.command(command), "\n") --[[@as table]]
+function M.dir_contents(path)
+	local lines = vim.fn.split(run_command(), "\n") --[[@as table]]
 	local header = table.remove(lines, 1)
 	---@type FsEntry[]
 	M.lines = {}
 	for _, line in ipairs(lines) do
-		table.insert(M.lines, M.parse_ls_l(line, path))
+		table.insert(M.lines, parse_ls_line(line, path))
 	end
 	return M.lines, header
-end
-
----Whether the current buffer is a Vimed buffer.
----@return boolean
-function M.is_vimed()
-	return vim.bo.filetype == "vimed"
 end
 
 return M

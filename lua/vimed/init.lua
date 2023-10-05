@@ -1,6 +1,6 @@
 local api = require("vimed.api")
 local render = require("vimed.render")
-local colors = require("vimed.render.colors")
+local hls = require("vimed.render.highlights")
 
 local M = {}
 
@@ -23,49 +23,11 @@ function M.setup_keymaps()
 	nmap(".", api.commands.toggle_hidden)
 end
 
----@alias Config { colors: HighlightGroups? }
+---@alias Config { styles: GroupStyles? }
 
 ---@param config Config
 function M.setup(config)
-	colors.setup(vim.tbl_extend("force", {
-		header = {
-			foreground = "#6666ff",
-			gui = "bold",
-		},
-		perm_dir = {
-			foreground = "#2222bb",
-		},
-		perm_read = {
-			foreground = "#bbbb22",
-		},
-		perm_write = {
-			foreground = "#bb2222",
-		},
-		perm_execute = {
-			foreground = "#22bb22",
-		},
-		link_count = {
-			foreground = "#ffbb44",
-		},
-		day = {
-			foreground = "#55cc55",
-		},
-		time = {
-			foreground = "#55cc55",
-		},
-		month = {
-			foreground = "#55cc55",
-		},
-		group = {},
-		owner = {},
-		size = {
-			foreground = "#ffbb44",
-		},
-		file_name = {},
-		dir_name = {
-			foreground = "#6666ff",
-		},
-	}, config.colors or {}))
+	hls.setup(vim.tbl_extend("force", hls.default_styles, config.styles or {}))
 
 	vim.api.nvim_create_user_command("Vimed", M.open_vimed, {})
 	vim.api.nvim_create_autocmd("FileType", {

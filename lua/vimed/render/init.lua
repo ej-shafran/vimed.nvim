@@ -1,5 +1,5 @@
 local utils = require("vimed.api.utils")
-local colors = require("vimed.render.colors")
+local hls = require("vimed.render.highlights")
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
 
@@ -16,14 +16,14 @@ end
 ---@param buffer any[]
 ---@param path string
 local function display_header(buffer, path)
-	local text = NuiText(path .. ":", colors.hl.header)
+	local text = NuiText(path .. ":", hls.groups.header)
 	table.insert(buffer, NuiLine({ text }))
 end
 
 ---@param buffer any[]
 ---@param total string
 local function display_total(buffer, total)
-	local text = NuiText(total, colors.hl.total)
+	local text = NuiText(total, hls.groups.total)
 	table.insert(buffer, NuiLine({ text }))
 end
 
@@ -31,19 +31,19 @@ end
 ---@param permissions UserPermissions
 local function display_user_permissions(nline, permissions)
 	if permissions.read then
-		nline:append("r", colors.hl.perm_read)
+		nline:append("r", hls.groups.perm_read)
 	else
 		nline:append("-")
 	end
 
 	if permissions.write then
-		nline:append("w", colors.hl.perm_write)
+		nline:append("w", hls.groups.perm_write)
 	else
 		nline:append("-")
 	end
 
 	if permissions.execute then
-		nline:append("x", colors.hl.perm_execute)
+		nline:append("x", hls.groups.perm_execute)
 	else
 		nline:append("-")
 	end
@@ -53,7 +53,7 @@ end
 ---@param permissions Permissions
 local function display_permissions(nline, permissions)
 	if permissions.is_dir then
-		nline:append("d", colors.hl.perm_dir)
+		nline:append("d", hls.groups.perm_dir)
 	else
 		nline:append("-")
 	end
@@ -67,48 +67,48 @@ end
 ---@param nline any
 ---@param link_count string
 local function display_link_count(nline, link_count)
-	nline:append(string.format("%2s", link_count), colors.hl.link_count)
+	nline:append(string.format("%2s", link_count), hls.groups.link_count)
 	nline:append(" ")
 end
 
 ---@param nline any
 ---@param group string
 local function display_group(nline, group)
-	nline:append(group, colors.hl.group)
+	nline:append(group, hls.groups.group)
 	nline:append(" ")
 end
 
 ---@param nline any
 ---@param owner string
 local function display_owner(nline, owner)
-	nline:append(owner, colors.hl.owner)
+	nline:append(owner, hls.groups.owner)
 	nline:append(" ")
 end
 
 ---@param nline any
 ---@param size string
 local function display_size(nline, size)
-	nline:append(string.format("%4s", size), colors.hl.size)
+	nline:append(string.format("%4s", size), hls.groups.size)
 	nline:append(" ")
 end
 
 ---@param nline any
 ---@param date Date
 local function display_date(nline, date)
-	nline:append(date.month, colors.hl.month)
+	nline:append(date.month, hls.groups.month)
 	nline:append(" ")
-	nline:append(date.day, colors.hl.day)
+	nline:append(date.day, hls.groups.day)
 	nline:append(" ")
-	nline:append(date.time, colors.hl.time)
+	nline:append(date.time, hls.groups.time)
 	nline:append(" ")
 end
 
 ---@param nline any
 ---@param path string
 local function display_path(nline, path)
-	local hl = colors.hl.file_name
+	local hl = hls.groups.file_name
 	if vim.fn.isdirectory(path) ~= 0 then
-		hl = colors.hl.dir_name
+		hl = hls.groups.dir_name
 	end
 
 	nline:append(vim.fs.basename(path), hl)
@@ -118,7 +118,7 @@ local function display()
 	local path = vim.fn.getcwd()
 	assert(path ~= nil, "no cwd")
 
-	local entries, header = utils.dir_contents(utils.get_command(), path)
+	local entries, header = utils.dir_contents(path)
 	display_header(M.buffer, path)
 	display_total(M.buffer, header)
 	for _, entry in pairs(entries) do

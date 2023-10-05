@@ -3,6 +3,8 @@ local render = require("vimed.render")
 
 local M = {}
 
+---Reset the cursor to the previous row `r` after re-rendering the screen.
+---@param r integer
 local function reset_cursor(r)
 	local last_line = vim.fn.line("w$")
 	if r > last_line then
@@ -11,6 +13,8 @@ local function reset_cursor(r)
 	vim.api.nvim_win_set_cursor(0, { r, 0 })
 end
 
+---[COMMAND]
+---Closes the current Vimed buffer.
 function M.quit()
 	if not utils.is_vimed() then
 		return
@@ -19,6 +23,9 @@ function M.quit()
 	vim.cmd.bp()
 end
 
+---[COMMAND]
+---If the line under the cursor is a file path, edit that file.
+---If the line under the cursor is a directory path, change the current directory to it and re-render the Vimed buffer.
 function M.enter()
 	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
 	if r < 3 then
@@ -35,6 +42,8 @@ function M.enter()
 	end
 end
 
+---[COMMAND]
+---Go up one directory level and re-render the Vimed buffer.
 function M.back()
 	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
 	local cwd = vim.fn.getcwd()
@@ -46,6 +55,8 @@ function M.back()
 	reset_cursor(r)
 end
 
+---[COMMAND]
+---Toggle the showing of hidden files.
 function M.toggle_hidden()
 	utils.show_hidden = not utils.show_hidden
 	render.render()
