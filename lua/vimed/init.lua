@@ -22,6 +22,7 @@ function M.setup_keymaps()
 	nmap("-", api.commands.back)
 	nmap(".", api.commands.toggle_hidden)
 	nmap("r", api.commands.redisplay)
+	nmap("o", api.commands.toggle_sort)
 end
 
 ---@alias Config { styles: GroupStyles? }

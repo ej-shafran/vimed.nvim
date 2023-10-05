@@ -3,16 +3,6 @@ local render = require("vimed.render")
 
 local M = {}
 
----Reset the cursor to the previous row `r` after re-rendering the screen.
----@param r integer
-local function reset_cursor(r)
-	local last_line = vim.fn.line("w$")
-	if r > last_line then
-		r = last_line --[[@as number]]
-	end
-	vim.api.nvim_win_set_cursor(0, { r, 0 })
-end
-
 ---[COMMAND]
 ---Closes the current Vimed buffer.
 function M.quit()
@@ -41,8 +31,7 @@ function M.enter()
 		vim.cmd.e(path)
 	else
 		vim.api.nvim_set_current_dir(path)
-		render.init()
-		reset_cursor(r)
+		M.redisplay()
 	end
 end
 
@@ -53,14 +42,12 @@ function M.back()
 		return
 	end
 
-	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
 	local cwd = vim.fn.getcwd()
 	assert(cwd ~= nil, "no cwd")
 
 	local dir = vim.fs.dirname(cwd)
 	vim.api.nvim_set_current_dir(dir)
-	render.init()
-	reset_cursor(r)
+	M.redisplay()
 end
 
 ---[COMMAND]
@@ -71,15 +58,40 @@ function M.toggle_hidden()
 	end
 
 	utils.show_hidden = not utils.show_hidden
-	render.render()
+	M.redisplay()
 end
 
+---[COMMAND]
+---Re-render the Vimed display.
 function M.redisplay()
 	if not utils.is_vimed() then
 		return
 	end
 
+	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
+
 	render.render()
+
+	local last_line = vim.fn.line("w$") --[[@as number]]
+	if r > last_line then
+		r = last_line
+	end
+	vim.api.nvim_win_set_cursor(0, { r, 0 })
+end
+
+---[COMMAND]
+---Toggle between "date" and "name" sorts.
+function M.toggle_sort()
+	if not utils.is_vimed() then
+		return
+	end
+
+	if utils.sort_kind == "date" then
+		utils.sort_kind = "name"
+	else
+		utils.sort_kind = "date"
+	end
+	M.redisplay()
 end
 
 return M
