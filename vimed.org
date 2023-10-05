@@ -23,7 +23,10 @@
  
 ** Navigation and Actions
 *** TODO Implement keybindings for common file operations (copy, move, delete, rename).
-*** TODO Provide options for sorting and filtering files.
+*** TODO Provide options for sorting and filtering files. [1/2]
+**** TODO Filtering
+**** DONE Sorting
+     CLOSED: [2023-10-06 Fri 02:23]
 *** TODO Allow for marking files for batch operations.
 *** TODO Implement common file actions (create directory, open in terminal, etc.).
  
