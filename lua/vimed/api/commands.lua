@@ -3,7 +3,7 @@ local render = require("vimed.render")
 
 local M = {}
 
----[COMMAND]
+---[COMMAND - +dired/quit-all]
 ---Closes the current Vimed buffer.
 function M.quit()
 	if not utils.is_vimed() then
@@ -13,7 +13,7 @@ function M.quit()
 	vim.cmd.bp()
 end
 
----[COMMAND]
+---[COMMAND - dired-find-file]
 ---If the line under the cursor is a file path, edit that file.
 ---If the line under the cursor is a directory path, change the current directory to it and re-render the Vimed buffer.
 function M.enter()
@@ -35,7 +35,7 @@ function M.enter()
 	end
 end
 
----[COMMAND]
+---[COMMAND - dired-up-directory]
 ---Go up one directory level and re-render the Vimed buffer.
 function M.back()
 	if not utils.is_vimed() then
@@ -61,7 +61,7 @@ function M.toggle_hidden()
 	M.redisplay()
 end
 
----[COMMAND]
+---[COMMAND - dired-do-redisplay]
 ---Re-render the Vimed display.
 function M.redisplay()
 	if not utils.is_vimed() then
@@ -79,7 +79,7 @@ function M.redisplay()
 	vim.api.nvim_win_set_cursor(0, { r, 0 })
 end
 
----[COMMAND]
+---[COMMAND - dired-sort-toggle-or-edit]
 ---Toggle between "date" and "name" sorts.
 function M.toggle_sort()
 	if not utils.is_vimed() then
@@ -94,7 +94,7 @@ function M.toggle_sort()
 	M.redisplay()
 end
 
----[COMMAND]
+---[COMMAND - dired-create-directory]
 ---Prompt for a directory name and create it.
 function M.create_dir()
 	if not utils.is_vimed() then
