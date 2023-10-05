@@ -86,11 +86,7 @@ function M.toggle_sort()
 		return
 	end
 
-	if utils.sort_kind == "date" then
-		utils.sort_kind = "name"
-	else
-		utils.sort_kind = "date"
-	end
+	utils.sort_by_time = not utils.sort_by_time
 	M.redisplay()
 end
 

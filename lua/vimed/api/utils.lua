@@ -12,8 +12,8 @@ local M = {}
 
 ---@type boolean
 M.show_hidden = false
----@type "name"|"date"
-M.sort_kind = "name"
+---@type boolean
+M.sort_by_time = false
 ---@type FsEntry[]
 M.lines = {}
 
@@ -44,9 +44,12 @@ end
 ---Get the `ls` command to run.
 ---@return string
 local function run_command()
-	local cmd = "ls -lh"
+	local cmd = "ls --group-directories-first -lh"
 	if M.show_hidden then
-		cmd = cmd .. "a"
+		cmd = cmd .. " -a"
+	end
+	if M.sort_by_time then
+		cmd = cmd .. " --sort=time"
 	end
 	return M.command(cmd)
 end
@@ -109,95 +112,6 @@ local function parse_ls_line(line, path)
 	}
 end
 
----@param lhs FsEntry
----@param rhs FsEntry
-local function sort_by_name(lhs, rhs)
-	local left = vim.fs.dirname(lhs.path)
-	local right = vim.fs.dirname(rhs.path)
-	return left:lower() < right:lower()
-end
-
-local months = {
-	"Jan",
-	"Feb",
-	"Mar",
-	"Apr",
-	"May",
-	"Jun",
-	"Jul",
-	"Aug",
-	"Sep",
-	"Oct",
-	"Nov",
-	"Dec",
-}
-
----@param lhs FsEntry
----@param rhs FsEntry
----@return integer
----@return integer
-local function sort_by_month(lhs, rhs)
-	local left_index = 0
-	for i, month in ipairs(months) do
-		if month == lhs.date.month then
-			left_index = i
-			break
-		end
-	end
-	local right_index = 0
-	for i, month in ipairs(months) do
-		if month == rhs.date.month then
-			right_index = i
-			break
-		end
-	end
-	return left_index, right_index
-end
-
----TODO: get this by stating the file
----@param lhs FsEntry
----@param rhs FsEntry
-local function sort_by_date(lhs, rhs)
-	local left_month, right_month = sort_by_month(lhs, rhs)
-	if left_month ~= right_month then
-		return left_month > right_month
-	end
-
-	local left_day = tonumber(lhs.date.day)
-	local right_day = tonumber(rhs.date.day)
-	if left_day ~= right_day then
-		return left_day > right_day
-	end
-
-	local left_hour, left_min = string.match(lhs.date.time, "(%d+):(%d+)")
-	local right_hour, right_min = string.match(lhs.date.time, "(%d+):(%d+)")
-	left_hour = tonumber(left_hour)
-	right_hour = tonumber(right_hour)
-	if left_hour ~= right_hour then
-		return left_hour > right_hour
-	end
-
-	left_min = tonumber(left_min)
-	right_min = tonumber(right_min)
-	return left_min > right_min
-end
-
----@param sort_fn fun(FsEntry, FsEntry): boolean
-local function sort_with_dirs(sort_fn)
-	---@param lhs FsEntry
-	---@param rhs FsEntry
-	return function(lhs, rhs)
-		if lhs.permissions.is_dir ~= rhs.permissions.is_dir then
-			return lhs.permissions.is_dir
-		else
-			return sort_fn(lhs, rhs)
-		end
-	end
-end
-
-local sort_by_name_with_dirs = sort_with_dirs(sort_by_name)
-local sort_by_date_with_dirs = sort_with_dirs(sort_by_date)
-
 ---Get a list of `FsEntry` objects and a header string from a directory path.
 ---@param path string
 ---@return FsEntry[], string
@@ -211,9 +125,6 @@ function M.dir_contents(path)
 		table.insert(M.lines, parse_ls_line(line, path))
 	end
 
-	print(M.sort_kind)
-	local sort = M.sort_kind == "date" and sort_by_date_with_dirs or sort_by_name_with_dirs
-	table.sort(M.lines, sort)
 	return M.lines, header
 end
 
