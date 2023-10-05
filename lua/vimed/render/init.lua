@@ -97,7 +97,7 @@ end
 local function display_date(nline, date)
 	nline:append(date.month, hls.groups.month)
 	nline:append(" ")
-	nline:append(date.day, hls.groups.day)
+	nline:append(string.format("%2s", date.day), hls.groups.day)
 	nline:append(" ")
 	nline:append(date.time, hls.groups.time)
 	nline:append(" ")
