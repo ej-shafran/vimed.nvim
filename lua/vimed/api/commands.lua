@@ -27,6 +27,10 @@ end
 ---If the line under the cursor is a file path, edit that file.
 ---If the line under the cursor is a directory path, change the current directory to it and re-render the Vimed buffer.
 function M.enter()
+	if not utils.is_vimed() then
+		return
+	end
+
 	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
 	if r < 3 then
 		return
@@ -45,6 +49,10 @@ end
 ---[COMMAND]
 ---Go up one directory level and re-render the Vimed buffer.
 function M.back()
+	if not utils.is_vimed() then
+		return
+	end
+
 	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
 	local cwd = vim.fn.getcwd()
 	assert(cwd ~= nil, "no cwd")
@@ -58,7 +66,19 @@ end
 ---[COMMAND]
 ---Toggle the showing of hidden files.
 function M.toggle_hidden()
+	if not utils.is_vimed() then
+		return
+	end
+
 	utils.show_hidden = not utils.show_hidden
+	render.render()
+end
+
+function M.redisplay()
+	if not utils.is_vimed() then
+		return
+	end
+
 	render.render()
 end
 

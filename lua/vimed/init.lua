@@ -21,6 +21,7 @@ function M.setup_keymaps()
 	nmap("<CR>", api.commands.enter)
 	nmap("-", api.commands.back)
 	nmap(".", api.commands.toggle_hidden)
+	nmap("r", api.commands.redisplay)
 end
 
 ---@alias Config { styles: GroupStyles? }
