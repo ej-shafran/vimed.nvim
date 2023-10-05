@@ -94,4 +94,19 @@ function M.toggle_sort()
 	M.redisplay()
 end
 
+---[COMMAND]
+---Prompt for a directory name and create it.
+function M.create_dir()
+	if not utils.is_vimed() then
+		return
+	end
+
+	vim.ui.input({
+		prompt = "Create directory: ",
+	}, function(dirname)
+		vim.fn.mkdir(dirname, "p")
+		M.redisplay()
+	end)
+end
+
 return M
