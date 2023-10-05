@@ -20,6 +20,7 @@ function M.setup_keymaps()
 	nmap("q", api.commands.quit)
 	nmap("<CR>", api.commands.enter)
 	nmap("-", api.commands.back)
+	nmap(".", api.commands.toggle_hidden)
 end
 
 ---@alias Config { colors: HighlightGroups? }
@@ -69,10 +70,10 @@ function M.setup(config)
 	vim.api.nvim_create_user_command("Vimed", M.open_vimed, {})
 	vim.api.nvim_create_autocmd("FileType", {
 		pattern = "vimed",
-		callback = function ()
+		callback = function()
 			vim.cmd.setlocal("nonumber norelativenumber")
 			M.setup_keymaps()
-		end
+		end,
 	})
 
 	local vimed_group = vim.api.nvim_create_augroup("dired", { clear = true })

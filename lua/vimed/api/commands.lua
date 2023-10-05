@@ -46,4 +46,9 @@ function M.back()
 	reset_cursor(r)
 end
 
+function M.toggle_hidden()
+	utils.show_hidden = not utils.show_hidden
+	render.render()
+end
+
 return M

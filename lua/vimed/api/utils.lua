@@ -2,6 +2,17 @@
 
 local M = {}
 
+M.show_hidden = false
+
+---@return string
+function M.get_command()
+	local cmd = "ls -lh"
+	if M.show_hidden then
+		cmd = cmd .. "a"
+	end
+	return cmd
+end
+
 ---@alias Date { month: string, day: string, time: string, }
 ---@alias UserPermissions { read: boolean, write: boolean, execute: boolean }
 ---@alias Permissions { is_dir: boolean, user: UserPermissions, group: UserPermissions, owner: UserPermissions }
@@ -77,17 +88,18 @@ function M.parse_ls_l(line, path)
 	}
 end
 
----Render dir contents into `buffer`, while updating the `utils` data.
+---@param command string
 ---@param path string
----@param contents DirContents
----@param parse_line fun(string, string): FsEntry
-function M.dir_contents(path, contents, parse_line)
+---@return FsEntry[], string
+function M.dir_contents(command, path)
+	local lines = vim.fn.split(M.command(command), "\n") --[[@as table]]
+	local header = table.remove(lines, 1)
 	---@type FsEntry[]
 	M.lines = {}
-	for _, line in ipairs(contents.lines) do
-		table.insert(M.lines, parse_line(line, path))
+	for _, line in ipairs(lines) do
+		table.insert(M.lines, M.parse_ls_l(line, path))
 	end
-	return M.lines
+	return M.lines, header
 end
 
 ---Whether the current buffer is a Vimed buffer.
