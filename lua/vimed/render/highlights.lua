@@ -3,7 +3,7 @@ local M = {}
 ---@alias HighlightStyle { background: string?, foreground: string?, gui: string? }
 
 ---@alias GroupStyles
----| { link_count: HighlightStyle?, size: HighlightStyle?, group: HighlightStyle?, owner: HighlightStyle?, month: HighlightStyle?, day: HighlightStyle?, time: HighlightStyle?, file_name: HighlightStyle?, header: HighlightStyle?, dir_name: HighlightStyle?, total: HighlightStyle?, perm_dir: HighlightStyle?, perm_read: HighlightStyle?, perm_write: HighlightStyle?, perm_group: HighlightStyle?, }
+---| { link_count: HighlightStyle?, size: HighlightStyle?, group: HighlightStyle?, owner: HighlightStyle?, month: HighlightStyle?, day: HighlightStyle?, time: HighlightStyle?, file_name: HighlightStyle?, header: HighlightStyle?, dir_name: HighlightStyle?, total: HighlightStyle?, perm_dir: HighlightStyle?, perm_read: HighlightStyle?, perm_write: HighlightStyle?, perm_group: HighlightStyle?, delete_flagged: HighlightStyle? }
 
 M.groups = {
 	perm_dir = "VimedPermDir",
@@ -21,6 +21,7 @@ M.groups = {
 	dir_name = "VimedDirName",
 	header = "VimedHeader",
 	total = "VimedTotal",
+	delete_flagged = "VimedDeleteFlagged",
 }
 
 ---@type GroupStyles
@@ -62,32 +63,34 @@ M.default_styles = {
 	dir_name = {
 		foreground = "#6666ff",
 	},
+	delete_flagged = {
+		foreground = "#e47482",
+		background = "#462d3a",
+	}
 }
 
 ---If the given highlight group is not defined, define it.
 ---@param group_name string
----@param guibg string|nil
----@param guifg string?
----@param gui table|string?
-local function create_hlgroup(group_name, guibg, guifg, gui)
+---@param styles HighlightStyle
+local function create_hlgroup(group_name, styles)
 	---@diagnostic disable-next-line: undefined-field
 	local success, existing = pcall(vim.api.nvim_get_hl_by_name, group_name, true)
 
 	if not success or not existing.foreground or not existing.background then
 		local hlgroup = "default " .. group_name
 
-		if guibg then
-			hlgroup = hlgroup .. " guibg=" .. guibg
+		if styles.background then
+			hlgroup = hlgroup .. " guibg=" .. styles.background
 		end
 
-		if guifg then
-			hlgroup = hlgroup .. " guifg=" .. guifg
+		if styles.foreground then
+			hlgroup = hlgroup .. " guifg=" .. styles.foreground
 		else
 			hlgroup = hlgroup .. " guifg=NONE"
 		end
 
-		if gui then
-			hlgroup = hlgroup .. " gui=" .. gui
+		if styles.gui then
+			hlgroup = hlgroup .. " gui=" .. styles.gui
 		end
 
 		vim.cmd.highlight(hlgroup)
@@ -101,7 +104,7 @@ function M.setup(styles)
 			value = {}
 		end
 
-		create_hlgroup(M.groups[key], value.background, value.foreground, value.gui)
+		create_hlgroup(M.groups[key], value)
 	end
 end
 

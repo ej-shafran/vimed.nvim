@@ -16,102 +16,124 @@ end
 ---@param buffer any[]
 ---@param path string
 local function display_header(buffer, path)
-	local text = NuiText(path .. ":", hls.groups.header)
+	local text = NuiText("  " .. path .. ":", hls.groups.header)
 	table.insert(buffer, NuiLine({ text }))
 end
 
 ---@param buffer any[]
 ---@param total string
 local function display_total(buffer, total)
-	local text = NuiText(total, hls.groups.total)
+	local text = NuiText("  " .. total, hls.groups.total)
 	table.insert(buffer, NuiLine({ text }))
 end
 
 ---@param nline any
----@param permissions UserPermissions
-local function display_user_permissions(nline, permissions)
-	if permissions.read then
-		nline:append("r", hls.groups.perm_read)
+---@param path string
+---@return string?
+local function display_flag(nline, path)
+	local flag = utils.flags[path]
+	if flag ~= nil then
+		nline:append(flag .. " ", hls.groups.delete_flagged)
+		return hls.groups.delete_flagged
 	else
-		nline:append("-")
+		nline:append("  ")
+		return nil
+	end
+end
+
+---@param nline any
+---@param permissions UserPermissions
+---@param hlgroup string?
+local function display_user_permissions(nline, permissions, hlgroup)
+	if permissions.read then
+		nline:append("r", hlgroup or hls.groups.perm_read)
+	else
+		nline:append("-", hlgroup)
 	end
 
 	if permissions.write then
-		nline:append("w", hls.groups.perm_write)
+		nline:append("w", hlgroup or hls.groups.perm_write)
 	else
-		nline:append("-")
+		nline:append("-", hlgroup)
 	end
 
 	if permissions.execute then
-		nline:append("x", hls.groups.perm_execute)
+		nline:append("x", hlgroup or hls.groups.perm_execute)
 	else
-		nline:append("-")
+		nline:append("-", hlgroup)
 	end
 end
 
 ---@param nline any
 ---@param permissions Permissions
-local function display_permissions(nline, permissions)
+---@param hlgroup string?
+local function display_permissions(nline, permissions, hlgroup)
 	if permissions.is_dir then
-		nline:append("d", hls.groups.perm_dir)
+		nline:append("d", hlgroup or hls.groups.perm_dir)
 	else
-		nline:append("-")
+		nline:append("-", hlgroup)
 	end
 
-	display_user_permissions(nline, permissions.user)
-	display_user_permissions(nline, permissions.group)
-	display_user_permissions(nline, permissions.owner)
-	nline:append(" ")
+	display_user_permissions(nline, permissions.user, hlgroup)
+	display_user_permissions(nline, permissions.group, hlgroup)
+	display_user_permissions(nline, permissions.owner, hlgroup)
+	nline:append(" ", hlgroup)
 end
 
 ---@param nline any
 ---@param link_count string
-local function display_link_count(nline, link_count)
-	nline:append(string.format("%2s", link_count), hls.groups.link_count)
-	nline:append(" ")
+---@param hlgroup string?
+local function display_link_count(nline, link_count, hlgroup)
+	nline:append(string.format("%2s", link_count), hlgroup or hls.groups.link_count)
+	nline:append(" ", hlgroup)
 end
 
 ---@param nline any
 ---@param group string
-local function display_group(nline, group)
-	nline:append(group, hls.groups.group)
-	nline:append(" ")
+---@param hlgroup string?
+local function display_group(nline, group, hlgroup)
+	nline:append(group, hlgroup or hls.groups.group)
+	nline:append(" ", hlgroup)
 end
 
 ---@param nline any
 ---@param owner string
-local function display_owner(nline, owner)
-	nline:append(owner, hls.groups.owner)
-	nline:append(" ")
+---@param hlgroup string?
+local function display_owner(nline, owner, hlgroup)
+	nline:append(owner, hlgroup or hls.groups.owner)
+	nline:append(" ", hlgroup)
 end
 
 ---@param nline any
 ---@param size string
-local function display_size(nline, size)
-	nline:append(string.format("%4s", size), hls.groups.size)
-	nline:append(" ")
+---@param hlgroup string?
+local function display_size(nline, size, hlgroup)
+	nline:append(string.format("%4s", size), hlgroup or hls.groups.size)
+	nline:append(" ", hlgroup)
 end
 
 ---@param nline any
 ---@param date Date
-local function display_date(nline, date)
-	nline:append(date.month, hls.groups.month)
-	nline:append(" ")
-	nline:append(string.format("%2s", date.day), hls.groups.day)
-	nline:append(" ")
-	nline:append(date.time, hls.groups.time)
-	nline:append(" ")
+---@param hlgroup string?
+local function display_date(nline, date, hlgroup)
+	nline:append(date.month, hlgroup or hls.groups.month)
+	nline:append(" ", hlgroup)
+	nline:append(string.format("%2s", date.day), hlgroup or hls.groups.day)
+	nline:append(" ", hlgroup)
+	nline:append(date.time, hlgroup or hls.groups.time)
+	nline:append(" ", hlgroup)
 end
 
 ---@param nline any
 ---@param path string
-local function display_path(nline, path)
+---@param hlgroup string?
+local function display_path(nline, path, hlgroup)
 	local hl = hls.groups.file_name
 	if vim.fn.isdirectory(path) ~= 0 then
 		hl = hls.groups.dir_name
 	end
 
-	nline:append(vim.fs.basename(path), hl)
+	nline:append(vim.fs.basename(path), hlgroup or hl)
 end
 
 local function display()
@@ -124,13 +146,14 @@ local function display()
 	for _, entry in pairs(entries) do
 		local nline = NuiLine()
 
-		display_permissions(nline, entry.permissions)
-		display_link_count(nline, entry.link_count)
-		display_group(nline, entry.group)
-		display_owner(nline, entry.owner)
-		display_size(nline, entry.size)
-		display_date(nline, entry.date)
-		display_path(nline, entry.path)
+		local hlgroup = display_flag(nline, entry.path)
+		display_permissions(nline, entry.permissions, hlgroup)
+		display_link_count(nline, entry.link_count, hlgroup)
+		display_group(nline, entry.group, hlgroup)
+		display_owner(nline, entry.owner, hlgroup)
+		display_size(nline, entry.size, hlgroup)
+		display_date(nline, entry.date, hlgroup)
+		display_path(nline, entry.path, hlgroup)
 
 		table.insert(M.buffer, nline)
 	end

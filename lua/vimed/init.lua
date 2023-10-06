@@ -10,13 +10,13 @@ function M.open_vimed()
 	end
 end
 
-function M.setup_keymaps()
-	---@param lhs string
-	---@param rhs string|function
-	local function nmap(lhs, rhs)
-		vim.keymap.set("n", lhs, rhs, { buffer = 0 })
-	end
+---@param lhs string
+---@param rhs string|function
+local function nmap(lhs, rhs)
+	vim.keymap.set("n", lhs, rhs, { buffer = 0 })
+end
 
+function M.setup_keymaps()
 	nmap("q", api.commands.quit)
 	nmap("<CR>", api.commands.enter)
 	nmap("-", api.commands.back)
@@ -25,6 +25,9 @@ function M.setup_keymaps()
 	nmap("+", api.commands.create_dir)
 	nmap("r", api.commands.redisplay)
 	nmap("o", api.commands.toggle_sort)
+	nmap("d", api.commands.flag_d)
+	nmap("x", api.commands.delete_flagged)
+	nmap("u", api.commands.unmark)
 end
 
 ---@alias Config { styles: GroupStyles? }

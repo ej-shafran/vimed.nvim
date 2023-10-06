@@ -63,12 +63,15 @@ end
 
 ---[COMMAND - dired-do-redisplay]
 ---Re-render the Vimed display.
-function M.redisplay()
+---@param r integer? row to place cursor at
+function M.redisplay(r)
 	if not utils.is_vimed() then
 		return
 	end
 
-	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
+	if r == nil then
+		r, _ = unpack(vim.api.nvim_win_get_cursor(0))
+	end
 
 	render.render()
 
@@ -103,6 +106,74 @@ function M.create_dir()
 		vim.fn.mkdir(dirname, "p")
 		M.redisplay()
 	end)
+end
+
+---[COMMAND - dired-flag-file-deletion]
+---Toggle whether the path under the cursor is flagged to be deleted.
+function M.flag_d()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
+	if r < 3 then
+		return
+	end
+
+	local path = utils.lines[r - 2].path
+	utils.flags[path] = "D"
+
+	M.redisplay(r + 1)
+end
+
+---[COMMAND - dired-do-flagged-delete]
+---Delete all files that are flagged for deletion.
+function M.delete_flagged()
+	if not utils.is_vimed() then
+		return
+	end
+
+	---@type string[]
+	local files = {}
+	for k, v in pairs(utils.flags) do
+		if v == "D" then
+			table.insert(files, k)
+		end
+	end
+
+	local prompt
+	if #files == 1 then
+		prompt = "Delete " .. vim.fs.basename(files[1])
+	else
+		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), "\n") --[[@as string]]
+		prompt = files_str .. "\nDelete D [" .. #files .. " files]"
+	end
+	local choice = vim.fn.confirm(prompt, "&Yes\n&No") --[[@as integer]]
+	if choice == 1 then
+		for _, path in ipairs(files) do
+			vim.fn.delete(path)
+		end
+	end
+
+	M.redisplay()
+end
+
+---[COMMAND - dired-unmark]
+---Remove flag for the path under the cursor.
+function M.unmark()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
+	if r < 3 then
+		return
+	end
+
+	local path = utils.lines[r - 2].path
+	utils.flags[path] = nil
+
+	M.redisplay()
 end
 
 return M
