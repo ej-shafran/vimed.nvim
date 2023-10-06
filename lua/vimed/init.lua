@@ -16,6 +16,10 @@ local function nmap(lhs, rhs)
 	vim.keymap.set("n", lhs, rhs, { buffer = 0 })
 end
 
+local function xmap(lhs, rhs)
+	vim.keymap.set("x", lhs, rhs, { buffer = 0 })
+end
+
 function M.setup_keymaps()
 	nmap("q", api.commands.quit)
 	nmap("<CR>", api.commands.enter)
@@ -28,6 +32,7 @@ function M.setup_keymaps()
 	nmap("d", api.commands.flag_d)
 	nmap("x", api.commands.delete_flagged)
 	nmap("u", api.commands.unmark)
+	xmap("d", api.commands.flag_d)
 end
 
 ---@alias Config { styles: GroupStyles? }

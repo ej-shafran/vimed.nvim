@@ -108,6 +108,37 @@ function M.create_dir()
 	end)
 end
 
+local function flag_one(flag)
+	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
+	if r < 3 then
+		return
+	end
+
+	local path = utils.lines[r - 2].path
+	utils.flags[path] = flag
+
+	return r + 1
+end
+
+local function flag_many(flag)
+	vim.cmd.normal("")
+
+	local vstart = vim.fn.getpos("'<")
+	assert(vstart ~= nil)
+	local vend = vim.fn.getpos("'>")
+	assert(vend ~= nil)
+
+	local line_start = vstart[2]
+	local line_end = vend[2]
+
+	for r = line_start, line_end do
+		if r >= 3 then
+			local path = utils.lines[r - 2].path
+			utils.flags[path] = flag
+		end
+	end
+end
+
 ---[COMMAND - dired-flag-file-deletion]
 ---Toggle whether the path under the cursor is flagged to be deleted.
 function M.flag_d()
@@ -115,15 +146,14 @@ function M.flag_d()
 		return
 	end
 
-	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
-	if r < 3 then
-		return
+	local mode = vim.fn.mode() --[[@as string]]
+	if mode:lower() == "v" then
+		flag_many("D")
+		M.redisplay()
+	else
+		local r = flag_one("D")
+		M.redisplay(r)
 	end
-
-	local path = utils.lines[r - 2].path
-	utils.flags[path] = "D"
-
-	M.redisplay(r + 1)
 end
 
 ---[COMMAND - dired-do-flagged-delete]
@@ -142,7 +172,9 @@ function M.delete_flagged()
 	end
 
 	local prompt
-	if #files == 1 then
+	if #files < 1 then
+		return
+	elseif #files == 1 then
 		prompt = "Delete " .. vim.fs.basename(files[1])
 	else
 		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), "\n") --[[@as string]]
