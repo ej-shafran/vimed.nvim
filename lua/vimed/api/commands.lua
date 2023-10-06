@@ -197,15 +197,14 @@ function M.unmark()
 		return
 	end
 
-	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
-	if r < 3 then
-		return
+	local mode = vim.fn.mode() --[[@as string]]
+	if mode:lower() == "v" then
+		flag_many(nil)
+		M.redisplay()
+	else
+		local r = flag_one(nil)
+		M.redisplay(r)
 	end
-
-	local path = utils.lines[r - 2].path
-	utils.flags[path] = nil
-
-	M.redisplay()
 end
 
 return M

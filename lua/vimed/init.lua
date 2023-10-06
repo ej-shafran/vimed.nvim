@@ -33,6 +33,7 @@ function M.setup_keymaps()
 	nmap("x", api.commands.delete_flagged)
 	nmap("u", api.commands.unmark)
 	xmap("d", api.commands.flag_d)
+	xmap("u", api.commands.unmark)
 end
 
 ---@alias Config { styles: GroupStyles? }
