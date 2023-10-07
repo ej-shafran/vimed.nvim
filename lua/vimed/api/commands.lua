@@ -355,4 +355,44 @@ function M.goto_file()
 	end
 end
 
+---[COMMAND - dired-do-chmod]
+---Prompt for a mode change and apply it using `chmod` to the marked files, or the file under the cursor if there are none.
+function M.chmod()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local files = marked_files()
+	if #files == 0 then
+		local path = cursor_path()
+		if path == nil then
+			vim.notify("No files specified")
+			return
+		end
+
+		files = { path }
+	end
+
+	local prompt
+	if #files == 1 then
+		prompt = "Change mode of " .. vim.fs.basename(files[1]) .. " to: "
+	else
+		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), "\n") --[[@as string]]
+		prompt = files_str .. "\nChange mode of * [" .. #files .. " files] to: "
+	end
+
+	local mode_change = vim.fn.input({
+		prompt = prompt,
+	})
+	if mode_change == "" then
+		return
+	end
+
+	local cmd = { "chmod", mode_change }
+	vim.list_extend(cmd, files)
+	os.execute(vim.fn.join(cmd, " "))
+
+	M.redisplay()
+end
+
 return M

@@ -104,7 +104,8 @@
 *** DONE J - `dired-goto-file`
     CLOSED: [2023-10-07 Sat 23:38]
 *** TODO L - `dired-do-load`
-*** TODO M - `dired-do-chmod`
+*** DONE M - `dired-do-chmod`
+    CLOSED: [2023-10-07 Sat 23:50]
 *** TODO O - `dired-do-chown`
 *** TODO P - `dired-do-print`
 *** TODO Q - `dired-do-find-regexp-and-replace`
