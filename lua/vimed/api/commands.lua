@@ -108,57 +108,51 @@ function M.create_dir()
 	end)
 end
 
-local function flag_one(flag)
-	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
-	if r < 3 then
-		return
-	end
-
-	local path = utils.lines[r - 2].path
-	utils.flags[path] = flag
-
-	return r + 1
-end
-
-local function flag_many(flag)
-	vim.cmd.normal("")
-
-	local vstart = vim.fn.getpos("'<")
-	assert(vstart ~= nil)
-	local vend = vim.fn.getpos("'>")
-	assert(vend ~= nil)
-
-	local line_start = vstart[2]
-	local line_end = vend[2]
-
-	for r = line_start, line_end do
-		if r >= 3 then
-			local path = utils.lines[r - 2].path
-			utils.flags[path] = flag
-		end
-	end
-end
-
----[COMMAND - dired-flag-file-deletion]
----Toggle whether the path under the cursor is flagged to be deleted.
-function M.flag_d()
+local function mark(flag)
 	if not utils.is_vimed() then
 		return
 	end
 
 	local mode = vim.fn.mode() --[[@as string]]
 	if mode:lower() == "v" then
-		flag_many("D")
+		vim.cmd.normal("")
+
+		local vstart = vim.fn.getpos("'<")
+		local vend = vim.fn.getpos("'>")
+		assert(vstart ~= nil)
+		assert(vend ~= nil)
+
+		local line_start = vstart[2]
+		local line_end = vend[2]
+		for r = line_start, line_end do
+			if r >= 3 then
+				local path = utils.lines[r - 2].path
+				utils.flags[path] = flag
+			end
+		end
+
 		M.redisplay()
 	else
-		local r = flag_one("D")
-		M.redisplay(r)
+		local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
+		if r < 3 then
+			return
+		end
+
+		local path = utils.lines[r - 2].path
+		utils.flags[path] = flag
+		M.redisplay(r + 1)
 	end
+end
+
+---[COMMAND - dired-flag-file-deletion]
+---Toggle whether the path(s) under the cursor is flagged to be deleted.
+function M.flag_file_deletion()
+	mark("D")
 end
 
 ---[COMMAND - dired-do-flagged-delete]
 ---Delete all files that are flagged for deletion.
-function M.delete_flagged()
+function M.flagged_delete()
 	if not utils.is_vimed() then
 		return
 	end
@@ -173,6 +167,7 @@ function M.delete_flagged()
 
 	local prompt
 	if #files < 1 then
+		vim.notify("(No deletions requested)")
 		return
 	elseif #files == 1 then
 		prompt = "Delete " .. vim.fs.basename(files[1])
@@ -193,33 +188,13 @@ end
 ---[COMMAND - dired-unmark]
 ---Remove flag for the path under the cursor.
 function M.unmark()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local mode = vim.fn.mode() --[[@as string]]
-	if mode:lower() == "v" then
-		flag_many(nil)
-		M.redisplay()
-	else
-		local r = flag_one(nil)
-		M.redisplay(r)
-	end
+	mark(nil)
 end
 
+---[COMMAND - dired-mark]
+---Toggle whether the path(s) under the cursor is marked for actions.
 function M.mark()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local mode = vim.fn.mode() --[[@as string]]
-	if mode:lower() == "v" then
-		flag_many("*")
-		M.redisplay()
-	else
-		local r = flag_one("*")
-		M.redisplay(r)
-	end
+	mark("*")
 end
 
 return M
