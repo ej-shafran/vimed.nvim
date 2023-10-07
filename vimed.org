@@ -97,7 +97,8 @@
 *** TODO A - `dired-do-find-regexp`
 *** TODO B - `dired-do-byte-compile`
 *** TODO C - `dired-do-copy`
-*** TODO D - `dired-do-delete`
+*** DONE D - `dired-do-delete`
+    CLOSED: [2023-10-07 Sat 23:21]
 *** TODO H - `dired-do-hardlink`
 *** TODO I - `dired-maybe-insert-subdir`
 *** TODO J - `dired-goto-file`
@@ -128,8 +129,10 @@
     CLOSED: [2023-10-07 Sat 22:56]
 *** DONE q - `+dired/quit-all`
     CLOSED: [2023-10-07 Sat 22:56]
-*** TODO r - `dired-do-redisplay`
-*** TODO t - `dired-toggle-marks`
+*** DONE r - `dired-do-redisplay`
+    CLOSED: [2023-10-07 Sat 23:19]
+*** DONE t - `dired-toggle-marks`
+    CLOSED: [2023-10-07 Sat 23:19]
 *** DONE u - `dired-unmark`
     CLOSED: [2023-10-07 Sat 22:56]
 *** DONE x - `dired-do-flagged-delete`

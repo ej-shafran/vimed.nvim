@@ -3,6 +3,31 @@ local render = require("vimed.render")
 
 local M = {}
 
+---Get the path under the cursor, or `nil` if there isn't one.
+---@return string|nil
+---@return integer r current row in the buffer
+local function cursor_path()
+	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
+	if r < 3 then
+		return nil, r
+	end
+
+	return utils.lines[r - 2].path, r
+end
+
+---Get the marked files in the current Vimed buffer.
+---@return string[]
+local function marked_files()
+	local files = {}
+	local cwd = vim.fn.getcwd()
+	for path, flag in pairs(utils.flags) do
+		if flag == "*" and vim.fs.dirname(path) == cwd then
+			table.insert(files, path)
+		end
+	end
+	return files
+end
+
 ---Get count of buffers that aren't the current Vimed buffer.
 ---@return integer
 local function count_buffers()
@@ -43,12 +68,11 @@ function M.enter()
 		return
 	end
 
-	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
-	if r < 3 then
+	local path = cursor_path()
+	if path == nil then
 		return
 	end
 
-	local path = utils.lines[r - 2].path
 	if vim.fn.isdirectory(path) == 0 then
 		vim.cmd.e(path)
 	else
@@ -156,12 +180,11 @@ local function mark(flag)
 
 		M.redisplay()
 	else
-		local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
-		if r < 3 then
+		local path, r = cursor_path()
+		if path == nil then
 			return
 		end
 
-		local path = utils.lines[r - 2].path
 		local basename = vim.fs.basename(path)
 		if basename ~= "." and basename ~= ".." then
 			utils.flags[path] = flag
@@ -229,19 +252,6 @@ function M.flagged_delete()
 	M.redisplay()
 end
 
----Get the marked files in the current Vimed buffer.
----@return string[]
-local function marked_files()
-	local files = {}
-	local cwd = vim.fn.getcwd()
-	for path, flag in pairs(utils.flags) do
-		if flag == "*" and vim.fs.dirname(path) == cwd then
-			table.insert(files, path)
-		end
-	end
-	return files
-end
-
 ---[COMMAND - dired-do-delete]
 ---Delete either the marked files or the file under the cursor.
 function M.delete()
@@ -251,12 +261,11 @@ function M.delete()
 
 	local files = marked_files()
 	if #files == 0 then
-		local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
-		if r < 3 then
+		local path = cursor_path()
+		if path == nil then
 			return
 		end
 
-		local path = utils.lines[r - 2].path
 		files = { path }
 	end
 
@@ -291,12 +300,32 @@ function M.unmark_all()
 		return
 	end
 
-	local cwd = vim.fn.getcwd()
-	for flagged, _ in pairs(utils.flags) do
-		if vim.fs.dirname(flagged) == cwd then
-			utils.flags[flagged] = nil
+	local files = marked_files()
+	for _, path in ipairs(files) do
+		utils.flags[path] = nil
+	end
+
+	vim.notify(#files .. " marks removed")
+
+	M.redisplay()
+end
+
+---[COMMAND - dired-toggle-marks]
+---Unmark all files marked with "*" and mark all unmarked files with "*".
+function M.toggle_marks()
+	if not utils.is_vimed() then
+		return
+	end
+
+	for _, line in pairs(utils.lines) do
+		local path = line.path
+		if utils.flags[path] == "*" then
+			utils.flags[path] = nil
+		elseif not utils.flags[path] then
+			utils.flags[path] = "*"
 		end
 	end
+
 	M.redisplay()
 end
 
