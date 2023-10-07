@@ -80,7 +80,8 @@
 *** TODO Celebrate the successful completion of the Neovim Dired Clone Plugin!
 
 ** Commands
-*** TODO SPC . - `find-file`
+*** DONE SPC . - `find-file`
+    CLOSED: [2023-10-08 Sun 02:24]
 *** DONE ! - `dired-do-shell-command`
     CLOSED: [2023-10-08 Sun 02:04]
 *** TODO # - `dired-flag-auto-save-files`
@@ -118,7 +119,8 @@
 *** DONE U - `dired-unmark-all-marks`
     CLOSED: [2023-10-07 Sat 22:56]
 *** TODO W - `browse-url-of-dired-file`
-*** TODO X - `dired-do-shell-command`
+*** DONE X - `dired-do-shell-command`
+    CLOSED: [2023-10-08 Sun 02:23]
 *** TODO Y - `dired-copy-filename-as-kill`
 *** TODO Z - `dired-do-compress`
 *** DONE ^ - `dired-up-directory`
