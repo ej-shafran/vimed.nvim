@@ -15,15 +15,24 @@ local function cursor_path()
 	return utils.lines[r - 2].path, r
 end
 
----Get the marked files in the current Vimed buffer.
----@return string[]
-local function marked_files()
+---Get either the marked files or the file under the cursor if there aren't any.
+---@return string[]|nil
+local function target_files()
 	local files = {}
 	local cwd = vim.fn.getcwd()
 	for path, flag in pairs(utils.flags) do
 		if flag == "*" and vim.fs.dirname(path) == cwd then
 			table.insert(files, path)
 		end
+	end
+
+	if #files == 0 then
+		local path = cursor_path()
+		if path == nil then
+			return
+		end
+
+		files = { path }
 	end
 	return files
 end
@@ -259,14 +268,10 @@ function M.delete()
 		return
 	end
 
-	local files = marked_files()
-	if #files == 0 then
-		local path = cursor_path()
-		if path == nil then
-			return
-		end
-
-		files = { path }
+	local files = target_files()
+	if files == nil then
+		vim.notify("No files on this line")
+		return
 	end
 
 	delete_files(files)
@@ -366,15 +371,10 @@ function M.chmod()
 		return
 	end
 
-	local files = marked_files()
-	if #files == 0 then
-		local path = cursor_path()
-		if path == nil then
-			vim.notify("No files specified")
-			return
-		end
-
-		files = { path }
+	local files = target_files()
+	if files == nil then
+		vim.notify("No files specified")
+		return
 	end
 
 	local prompt
@@ -406,14 +406,10 @@ function M.rename()
 		return
 	end
 
-	local files = marked_files()
-	if #files == 0 then
-		local path = cursor_path()
-		if path == nil then
-			vim.notify("No files specified")
-			return
-		end
-		files = { path }
+	local files = target_files()
+	if files == nil then
+		vim.notify("No files specified")
+		return
 	end
 
 	local prompt
@@ -445,15 +441,10 @@ function M.shell_command()
 		return
 	end
 
-	local files = marked_files()
-	if #files == 0 then
-		local path = cursor_path()
-		if path == nil then
-			vim.notify("No files specified")
-			return
-		end
-
-		files = { path }
+	local files = target_files()
+	if files == nil then
+		vim.notify("No files specified")
+		return
 	end
 
 	local prompt
