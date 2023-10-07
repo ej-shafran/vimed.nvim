@@ -37,6 +37,32 @@ local function target_files()
 	return files
 end
 
+---Create a prompt for an operation which can be done on marked files or the file under the cursor.
+---@param files string[]
+---@param opts {operation: string, flag: string, suffix: string?, multi_operation: string?}
+---@return string
+local function prompt_for_files(files, opts)
+	local prompt
+	if #files == 1 then
+		prompt = opts.operation .. " " .. vim.fs.basename(files[1])
+	else
+		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), "\n") --[[@as string]]
+		prompt = files_str
+			.. "\n"
+			.. (opts.multi_operation or opts.operation)
+			.. " "
+			.. opts.flag
+			.. " ["
+			.. #files
+			.. " files]"
+	end
+
+	if opts.suffix ~= nil then
+		prompt = prompt .. opts.suffix
+	end
+	return prompt
+end
+
 ---Get count of buffers that aren't the current Vimed buffer.
 ---@return integer
 local function count_buffers()
@@ -216,16 +242,11 @@ end
 ---*Does not* rerender the Vimed buffer.
 ---@param files string[]
 local function delete_files(files)
-	local prompt
-	if #files < 1 then
-		vim.notify("(No deletions requested)")
-		return
-	elseif #files == 1 then
-		prompt = "Delete " .. vim.fs.basename(files[1])
-	else
-		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), "\n") --[[@as string]]
-		prompt = files_str .. "\nDelete D [" .. #files .. " files]"
-	end
+	local prompt = prompt_for_files(files, {
+		operation = "Delete",
+		flag = "D",
+		if_none = "(No deletions requested)",
+	})
 
 	local choice = vim.fn.confirm(prompt, "&Yes\n&No") --[[@as integer]]
 	if choice ~= 1 then
@@ -256,6 +277,11 @@ function M.flagged_delete()
 	files = vim.tbl_filter(function(value)
 		return vim.fs.dirname(value) == cwd
 	end, files)
+
+	if #files == 0 then
+		vim.notify("No files specified")
+		return
+	end
 
 	delete_files(files)
 	M.redisplay()
@@ -377,14 +403,11 @@ function M.chmod()
 		return
 	end
 
-	local prompt
-	if #files == 1 then
-		prompt = "Change mode of " .. vim.fs.basename(files[1]) .. " to: "
-	else
-		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), "\n") --[[@as string]]
-		prompt = files_str .. "\nChange mode of * [" .. #files .. " files] to: "
-	end
-
+	local prompt = prompt_for_files(files, {
+		operation = "Change mode of",
+		suffix = " to: ",
+		flag = "*",
+	})
 	local mode_change = vim.fn.input({
 		prompt = prompt,
 	})
@@ -412,14 +435,12 @@ function M.rename()
 		return
 	end
 
-	local prompt
-	if #files == 1 then
-		prompt = "Rename " .. vim.fs.basename(files[1]) .. " to: "
-	else
-		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), "\n") --[[@as string]]
-		prompt = files_str .. "\nMove * [" .. #files .. " files] to: "
-	end
-
+	local prompt = prompt_for_files(files, {
+		operation = "Rename",
+		multi_operation = "Move",
+		suffix = " to: ",
+		flag = "*",
+	})
 	local location = vim.fn.input({
 		prompt = prompt,
 		completion = "file",
@@ -447,14 +468,11 @@ function M.shell_command()
 		return
 	end
 
-	local prompt
-	if #files == 1 then
-		prompt = "! on " .. vim.fs.basename(files[1]) .. ": "
-	else
-		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), "\n") --[[@as string]]
-		prompt = files_str .. "\n! on * [" .. #files .. " files]: "
-	end
-
+	local prompt = prompt_for_files(files, {
+		operation = "! on ",
+		flag = "*",
+		suffix = ": ",
+	})
 	local command = vim.fn.input({
 		prompt = prompt,
 		completion = "shellcmd",
