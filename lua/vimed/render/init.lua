@@ -32,13 +32,16 @@ end
 ---@return string?
 local function display_flag(nline, path)
 	local flag = utils.flags[path]
-	if flag ~= nil then
-		nline:append(flag .. " ", hls.groups.delete_flagged)
-		return hls.groups.delete_flagged
-	else
-		nline:append("  ")
-		return nil
+
+	local hlgroup = nil
+	if flag == "D" then
+		hlgroup = hls.groups.delete_flagged
+	elseif flag == "*" then
+		hlgroup = hls.groups.marked
 	end
+
+	nline:append((flag or " ") .. " ", hlgroup)
+	return hlgroup
 end
 
 ---@param nline any

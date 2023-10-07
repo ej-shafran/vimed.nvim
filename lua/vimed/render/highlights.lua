@@ -3,7 +3,7 @@ local M = {}
 ---@alias HighlightStyle { background: string?, foreground: string?, gui: string? }
 
 ---@alias GroupStyles
----| { link_count: HighlightStyle?, size: HighlightStyle?, group: HighlightStyle?, owner: HighlightStyle?, month: HighlightStyle?, day: HighlightStyle?, time: HighlightStyle?, file_name: HighlightStyle?, header: HighlightStyle?, dir_name: HighlightStyle?, total: HighlightStyle?, perm_dir: HighlightStyle?, perm_read: HighlightStyle?, perm_write: HighlightStyle?, perm_group: HighlightStyle?, delete_flagged: HighlightStyle? }
+---| { link_count: HighlightStyle?, size: HighlightStyle?, group: HighlightStyle?, owner: HighlightStyle?, month: HighlightStyle?, day: HighlightStyle?, time: HighlightStyle?, file_name: HighlightStyle?, header: HighlightStyle?, dir_name: HighlightStyle?, total: HighlightStyle?, perm_dir: HighlightStyle?, perm_read: HighlightStyle?, perm_write: HighlightStyle?, perm_group: HighlightStyle?, delete_flagged: HighlightStyle?, marked: HighlightStyle? }
 
 M.groups = {
 	perm_dir = "VimedPermDir",
@@ -22,6 +22,7 @@ M.groups = {
 	header = "VimedHeader",
 	total = "VimedTotal",
 	delete_flagged = "VimedDeleteFlagged",
+	marked = "VimedMarked",
 }
 
 ---@type GroupStyles
@@ -66,7 +67,11 @@ M.default_styles = {
 	delete_flagged = {
 		foreground = "#e47482",
 		background = "#462d3a",
-	}
+	},
+	marked = {
+		background = "#2d292c",
+		foreground = "#dda055",
+	},
 }
 
 ---If the given highlight group is not defined, define it.
@@ -86,11 +91,15 @@ local function create_hlgroup(group_name, styles)
 		if styles.foreground then
 			hlgroup = hlgroup .. " guifg=" .. styles.foreground
 		else
-			hlgroup = hlgroup .. " guifg=NONE"
+			-- hlgroup = hlgroup .. " guifg=NONE"
 		end
 
 		if styles.gui then
 			hlgroup = hlgroup .. " gui=" .. styles.gui
+		end
+
+		if not styles.background and not styles.gui and not styles.foreground then
+			hlgroup = hlgroup .. " guifg=NONE"
 		end
 
 		vim.cmd.highlight(hlgroup)
