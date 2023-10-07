@@ -207,4 +207,19 @@ function M.unmark()
 	end
 end
 
+function M.mark()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local mode = vim.fn.mode() --[[@as string]]
+	if mode:lower() == "v" then
+		flag_many("*")
+		M.redisplay()
+	else
+		local r = flag_one("*")
+		M.redisplay(r)
+	end
+end
+
 return M
