@@ -3,6 +3,8 @@ local render = require("vimed.render")
 
 local M = {}
 
+---Get count of buffers that aren't the current Vimed buffer.
+---@return integer
 local function count_buffers()
 	local buf_count = 0
 	local current_buffer = vim.api.nvim_get_current_buf()
@@ -19,7 +21,7 @@ local function count_buffers()
 end
 
 ---[COMMAND - +dired/quit-all]
----Closes the current Vimed buffer.
+---Closes the current Vimed buffer. If it's the only buffer, equivalent to `:q`.
 function M.quit()
 	if not utils.is_vimed() then
 		return
@@ -128,6 +130,8 @@ function M.create_dir()
 	end)
 end
 
+---Mark either the files within the visual selection or the file under the cursor with `flag`.
+---@param flag string|nil the flag to use; if `nil` the files are unmarked.
 local function mark(flag)
 	local mode = vim.fn.mode() --[[@as string]]
 	if mode:lower() == "v" then
@@ -176,6 +180,9 @@ function M.flag_file_deletion()
 	mark("D")
 end
 
+---Prompt user to confirm deletion and delete the files passed in if confirmed.
+---*Does not* rerender the Vimed buffer.
+---@param files string[]
 local function delete_files(files)
 	local prompt
 	if #files < 1 then
@@ -222,7 +229,9 @@ function M.flagged_delete()
 	M.redisplay()
 end
 
-local function get_target_files()
+---Get the marked files in the current Vimed buffer.
+---@return string[]
+local function marked_files()
 	local files = {}
 	local cwd = vim.fn.getcwd()
 	for path, flag in pairs(utils.flags) do
@@ -233,12 +242,14 @@ local function get_target_files()
 	return files
 end
 
-function M.delete_file()
+---[COMMAND - dired-do-delete]
+---Delete either the marked files or the file under the cursor.
+function M.delete()
 	if not utils.is_vimed() then
 		return
 	end
 
-	local files = get_target_files()
+	local files = marked_files()
 	if #files == 0 then
 		local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
 		if r < 3 then
