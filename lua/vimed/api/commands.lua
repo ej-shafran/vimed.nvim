@@ -440,4 +440,85 @@ function M.rename()
 	M.redisplay()
 end
 
+function M.shell_command()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local files = marked_files()
+	if #files == 0 then
+		local path = cursor_path()
+		if path == nil then
+			vim.notify("No files specified")
+			return
+		end
+
+		files = { path }
+	end
+
+	local prompt
+	if #files == 1 then
+		prompt = "! on " .. vim.fs.basename(files[1]) .. ": "
+	else
+		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), "\n") --[[@as string]]
+		prompt = files_str .. "\n! on * [" .. #files .. " files]: "
+	end
+
+	local command = vim.fn.input({
+		prompt = prompt,
+		completion = "shellcmd",
+	})
+	if command == "" then
+		return
+	end
+
+	local is_async = command:match("&$") ~= nil
+	if is_async then
+		command = command:gsub("&$", "")
+	end
+
+	local star = command:match("%s%*%s") or command:match("%s%*$") or command:match("^%*%s")
+	if star ~= nil then
+		local files_str = vim.fn.join(files, " ") --[[@as string]]
+		command = command:gsub("%s%*%s", " " .. files_str .. " ")
+		command = command:gsub("%s%*$", " " .. files_str)
+		command = command:gsub("^%*%s", files_str .. " ")
+		if is_async then
+			local result = utils.command(command)
+
+			vim.cmd.split()
+			vim.cmd.e("Async Shell Result")
+			vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(result, "\n") --[[@as table]])
+		else
+			os.execute(command)
+		end
+	else
+		local acc = ""
+		for _, file in ipairs(files) do
+			local cmd = command
+			local question = cmd:match("%s%?%s") or command:match("%s%?$") or command:match("^%?%s")
+			if question ~= nil then
+				cmd = cmd:gsub("%s%?%s", " " .. file .. " ")
+				cmd = cmd:gsub("%s%?$", " " .. file)
+				cmd = cmd:gsub("^%?%s", file .. " ")
+			else
+				cmd = cmd .. " " .. file
+			end
+
+			if is_async then
+				local result = utils.command(cmd)
+				acc = acc .. result
+			else
+				os.execute(cmd)
+			end
+		end
+
+		if is_async then
+			vim.cmd.split()
+			vim.cmd.e("Async Shell Result")
+			vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(acc, "\n") --[[@as table]])
+		end
+	end
+end
+
 return M
