@@ -14,6 +14,8 @@ local M = {}
 M.show_hidden = false
 ---@type boolean
 M.sort_by_time = false
+---@type boolean
+M.hide_details = false
 ---@type FsEntry[]
 M.lines = {}
 ---@type table<string, "D"|"*">

@@ -87,7 +87,8 @@
 *** TODO # - `dired-flag-auto-save-files`
 *** DONE & - `dired-do-async-shell-command`
     CLOSED: [2023-10-08 Sun 02:04]
-*** TODO ( - `dired-hide-details-mode`
+*** DONE ( - `dired-hide-details-mode`
+    CLOSED: [2023-10-08 Sun 02:31]
 *** TODO ) - `dired-git-info-mode`
 *** DONE + - `dired-create-directory`
     CLOSED: [2023-10-07 Sat 22:56]

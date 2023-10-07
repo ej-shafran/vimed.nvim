@@ -28,6 +28,7 @@ M.default_keymaps = {
 		["!"] = commands.shell_command,
 		["X"] = commands.shell_command,
 		["&"] = commands.async_shell_command,
+		["("] = commands.toggle_hide_details,
 	},
 	x = {
 		d = commands.flag_file_deletion,

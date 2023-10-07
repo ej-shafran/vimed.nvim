@@ -8,11 +8,12 @@ local M = {}
 ---@return integer r current row in the buffer
 local function cursor_path()
 	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
-	if r < 3 then
+	local header_lines = utils.hide_details and 1 or 2
+	if r < header_lines + 1 then
 		return nil, r
 	end
 
-	return utils.lines[r - 2].path, r
+	return utils.lines[r - header_lines].path, r
 end
 
 ---Get either the marked files or the file under the cursor if there aren't any.
@@ -203,9 +204,10 @@ local function mark(flag)
 
 		local line_start = vstart[2]
 		local line_end = vend[2]
+		local header_lines = utils.hide_details and 1 or 2
 		for r = line_start, line_end do
-			if r >= 3 then
-				local path = utils.lines[r - 2].path
+			if r >= header_lines + 1 then
+				local path = utils.lines[r - header_lines].path
 				local basename = vim.fs.basename(path)
 				if basename ~= "." and basename ~= ".." then
 					utils.flags[path] = flag
@@ -567,6 +569,17 @@ function M.async_shell_command()
 
 	local commands = parse_command_input(command_input, files)
 	execute(commands, true)
+end
+
+---[COMMAND - dired-hide-details-mode]
+---Toggle showing nothing but flags/marks and filenames
+function M.toggle_hide_details()
+	if not utils.is_vimed() then
+		return
+	end
+
+	utils.hide_details = not utils.hide_details
+	M.redisplay()
 end
 
 return M

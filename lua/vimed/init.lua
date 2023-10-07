@@ -52,6 +52,7 @@ function M.setup(config)
 			cmd("VimedRename", commands.rename)
 			cmd("VimedShellCommand", commands.shell_command)
 			cmd("VimedAsyncShellCommand", commands.async_shell_command)
+			cmd("VimedToggleHideDetails", commands.toggle_hide_details)
 
 			keymaps.setup_keymaps(vim.tbl_deep_extend("force", keymaps.default_keymaps, config.keymaps or {}))
 		end,

@@ -145,17 +145,21 @@ local function display()
 
 	local entries, header = utils.dir_contents(path)
 	display_header(M.buffer, path)
-	display_total(M.buffer, header)
+	if not utils.hide_details then
+		display_total(M.buffer, header)
+	end
 	for _, entry in pairs(entries) do
 		local nline = NuiLine()
 
 		local hlgroup = display_flag(nline, entry.path)
-		display_permissions(nline, entry.permissions, hlgroup)
-		display_link_count(nline, entry.link_count, hlgroup)
-		display_group(nline, entry.group, hlgroup)
-		display_owner(nline, entry.owner, hlgroup)
-		display_size(nline, entry.size, hlgroup)
-		display_date(nline, entry.date, hlgroup)
+		if not utils.hide_details then
+			display_permissions(nline, entry.permissions, hlgroup)
+			display_link_count(nline, entry.link_count, hlgroup)
+			display_group(nline, entry.group, hlgroup)
+			display_owner(nline, entry.owner, hlgroup)
+			display_size(nline, entry.size, hlgroup)
+			display_date(nline, entry.date, hlgroup)
+		end
 		display_path(nline, entry.path, hlgroup)
 
 		table.insert(M.buffer, nline)
