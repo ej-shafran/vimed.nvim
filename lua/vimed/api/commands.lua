@@ -164,6 +164,10 @@ function M.flagged_delete()
 			table.insert(files, k)
 		end
 	end
+	local cwd = vim.fn.getcwd()
+	files = vim.tbl_filter(function(value)
+		return vim.fs.dirname(value) == cwd
+	end, files)
 
 	local prompt
 	if #files < 1 then
@@ -175,13 +179,16 @@ function M.flagged_delete()
 		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), "\n") --[[@as string]]
 		prompt = files_str .. "\nDelete D [" .. #files .. " files]"
 	end
+
 	local choice = vim.fn.confirm(prompt, "&Yes\n&No") --[[@as integer]]
-	if choice == 1 then
-		for _, path in ipairs(files) do
-			vim.fn.delete(path)
-		end
+	if choice ~= 1 then
+		return
 	end
 
+	for _, path in ipairs(files) do
+		vim.fn.delete(path, "rf")
+		utils.flags[path] = nil
+	end
 	M.redisplay()
 end
 
