@@ -101,7 +101,8 @@
     CLOSED: [2023-10-07 Sat 23:21]
 *** TODO H - `dired-do-hardlink`
 *** TODO I - `dired-maybe-insert-subdir`
-*** TODO J - `dired-goto-file`
+*** DONE J - `dired-goto-file`
+    CLOSED: [2023-10-07 Sat 23:38]
 *** TODO L - `dired-do-load`
 *** TODO M - `dired-do-chmod`
 *** TODO O - `dired-do-chown`

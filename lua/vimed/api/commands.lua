@@ -146,12 +146,12 @@ function M.create_dir()
 		return
 	end
 
-	vim.ui.input({
+	local dirname = vim.fn.input({
 		prompt = "Create directory: ",
-	}, function(dirname)
-		vim.fn.mkdir(dirname, "p")
-		M.redisplay()
-	end)
+	})
+
+	vim.fn.mkdir(dirname, "p")
+	M.redisplay()
 end
 
 ---Mark either the files within the visual selection or the file under the cursor with `flag`.
@@ -327,6 +327,32 @@ function M.toggle_marks()
 	end
 
 	M.redisplay()
+end
+
+---[COMMAND - dired-goto-file]
+---Select a file and jump to that file's line in the current Vimed buffer.
+function M.goto_file()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local cwd = vim.fn.getcwd()
+	local file = vim.fn.input({
+		prompt = "Goto file: ",
+		completion = "file",
+	})
+
+	if not file then
+		return
+	end
+
+	file = vim.fs.normalize(cwd .. "/" .. file)
+	for i, line in pairs(utils.lines) do
+		if line.path == file then
+			vim.api.nvim_win_set_cursor(0, { i + 2, 0 })
+			break
+		end
+	end
 end
 
 return M
