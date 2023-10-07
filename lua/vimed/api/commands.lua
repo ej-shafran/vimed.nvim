@@ -399,4 +399,45 @@ function M.chmod()
 	M.redisplay()
 end
 
+---[COMMAND - dired-do-rename]
+---Prompt for a new name and apply it using `mv` to the marked files, or the file under the cursor if there are none.
+function M.rename()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local files = marked_files()
+	if #files == 0 then
+		local path = cursor_path()
+		if path == nil then
+			vim.notify("No files specified")
+			return
+		end
+		files = { path }
+	end
+
+	local prompt
+	if #files == 1 then
+		prompt = "Rename " .. vim.fs.basename(files[1]) .. " to: "
+	else
+		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), "\n") --[[@as string]]
+		prompt = files_str .. "\nMove * [" .. #files .. " files] to: "
+	end
+
+	local location = vim.fn.input({
+		prompt = prompt,
+		completion = "file",
+	})
+	if location == "" then
+		return
+	end
+
+	for _, file in ipairs(files) do
+		local cmd = { "mv", file, location }
+		os.execute(vim.fn.join(cmd, " "))
+	end
+
+	M.redisplay()
+end
+
 return M

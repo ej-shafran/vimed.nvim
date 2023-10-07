@@ -109,7 +109,8 @@
 *** TODO O - `dired-do-chown`
 *** TODO P - `dired-do-print`
 *** TODO Q - `dired-do-find-regexp-and-replace`
-*** TODO R - `dired-do-rename`
+*** DONE R - `dired-do-rename`
+    CLOSED: [2023-10-08 Sun 00:27]
 *** TODO S - `dired-do-symlink`
 *** TODO T - `dired-do-touch`
 *** DONE U - `dired-unmark-all-marks`
