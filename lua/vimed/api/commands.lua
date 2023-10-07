@@ -3,6 +3,21 @@ local render = require("vimed.render")
 
 local M = {}
 
+local function count_buffers()
+	local buf_count = 0
+	local current_buffer = vim.api.nvim_get_current_buf()
+	local cwd = vim.fn.getcwd()
+	local bufinfos = vim.fn.getbufinfo({ bufloaded = true, buflisted = true }) --[[@as table]]
+
+	for _, bufinfo in ipairs(bufinfos) do
+		if bufinfo.name ~= cwd and bufinfo.bufnr ~= current_buffer then
+			buf_count = buf_count + 1
+		end
+	end
+
+	return buf_count
+end
+
 ---[COMMAND - +dired/quit-all]
 ---Closes the current Vimed buffer.
 function M.quit()
@@ -10,7 +25,12 @@ function M.quit()
 		return
 	end
 
-	vim.cmd.bp()
+	local bufcount = count_buffers()
+	if bufcount > 0 then
+		vim.cmd.bp()
+	else
+		vim.cmd.q()
+	end
 end
 
 ---[COMMAND - dired-find-file]
@@ -123,7 +143,10 @@ local function mark(flag)
 		for r = line_start, line_end do
 			if r >= 3 then
 				local path = utils.lines[r - 2].path
-				utils.flags[path] = flag
+				local basename = vim.fs.basename(path)
+				if basename ~= "." and basename ~= ".." then
+					utils.flags[path] = flag
+				end
 			end
 		end
 
@@ -135,7 +158,10 @@ local function mark(flag)
 		end
 
 		local path = utils.lines[r - 2].path
-		utils.flags[path] = flag
+		local basename = vim.fs.basename(path)
+		if basename ~= "." and basename ~= ".." then
+			utils.flags[path] = flag
+		end
 		M.redisplay(r + 1)
 	end
 end
