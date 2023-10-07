@@ -28,41 +28,41 @@ M.groups = {
 ---@type GroupStyles
 M.default_styles = {
 	header = {
-		foreground = "#6666ff",
+		foreground = "#4b8bf4",
 		gui = "bold",
 	},
 	perm_dir = {
-		foreground = "#2222bb",
+		foreground = "#4f8ff4",
 	},
 	perm_read = {
-		foreground = "#bbbb22",
+		foreground = "#dda85b",
 	},
 	perm_write = {
-		foreground = "#bb2222",
+		foreground = "#f4768e",
 	},
 	perm_execute = {
-		foreground = "#22bb22",
+		foreground = "#73dac9",
 	},
 	link_count = {
-		foreground = "#ffbb44",
+		foreground = "#ff9e64",
 	},
 	day = {
-		foreground = "#55cc55",
+		foreground = "#93dc9e",
 	},
 	time = {
-		foreground = "#55cc55",
+		foreground = "#93dc9e",
 	},
 	month = {
-		foreground = "#55cc55",
+		foreground = "#93dc9e",
 	},
 	group = {},
 	owner = {},
 	size = {
-		foreground = "#ffbb44",
+		foreground = "#ff9e64",
 	},
 	file_name = {},
 	dir_name = {
-		foreground = "#6666ff",
+		foreground = "#4786f3",
 	},
 	delete_flagged = {
 		foreground = "#e47482",
