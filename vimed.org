@@ -81,9 +81,11 @@
 
 ** Commands
 *** TODO SPC . - `find-file`
-*** TODO ! - `dired-do-shell-command`
+*** DONE ! - `dired-do-shell-command`
+    CLOSED: [2023-10-08 Sun 02:04]
 *** TODO # - `dired-flag-auto-save-files`
-*** TODO & - `dired-do-async-shell-command`
+*** DONE & - `dired-do-async-shell-command`
+    CLOSED: [2023-10-08 Sun 02:04]
 *** TODO ( - `dired-hide-details-mode`
 *** TODO ) - `dired-git-info-mode`
 *** DONE + - `dired-create-directory`

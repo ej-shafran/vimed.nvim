@@ -242,13 +242,14 @@ end
 ---*Does not* rerender the Vimed buffer.
 ---@param files string[]
 local function delete_files(files)
-	local prompt = prompt_for_files(files, {
-		operation = "Delete",
-		flag = "D",
-		if_none = "(No deletions requested)",
-	})
-
-	local choice = vim.fn.confirm(prompt, "&Yes\n&No") --[[@as integer]]
+	local choice = vim.fn.confirm(
+		prompt_for_files(files, {
+			operation = "Delete",
+			flag = "D",
+			if_none = "(No deletions requested)",
+		}),
+		"&Yes\n&No"
+	) --[[@as integer]]
 	if choice ~= 1 then
 		return
 	end
@@ -403,13 +404,12 @@ function M.chmod()
 		return
 	end
 
-	local prompt = prompt_for_files(files, {
-		operation = "Change mode of",
-		suffix = " to: ",
-		flag = "*",
-	})
 	local mode_change = vim.fn.input({
-		prompt = prompt,
+		prompt = prompt_for_files(files, {
+			operation = "Change mode of",
+			suffix = " to: ",
+			flag = "*",
+		}),
 	})
 	if mode_change == "" then
 		return
@@ -435,14 +435,13 @@ function M.rename()
 		return
 	end
 
-	local prompt = prompt_for_files(files, {
-		operation = "Rename",
-		multi_operation = "Move",
-		suffix = " to: ",
-		flag = "*",
-	})
 	local location = vim.fn.input({
-		prompt = prompt,
+		prompt = prompt_for_files(files, {
+			operation = "Rename",
+			multi_operation = "Move",
+			suffix = " to: ",
+			flag = "*",
+		}),
 		completion = "file",
 	})
 	if location == "" then
@@ -457,6 +456,57 @@ function M.rename()
 	M.redisplay()
 end
 
+---Parse a user-entered shell command to inline the selected files into it, using dired syntax.
+---@param command_input string
+---@param files string[]
+---@return string[]
+local function parse_command_input(command_input, files)
+	local commands = {}
+	if command_input:match("%s%*%s") or command_input:match("%s%*$") or command_input:match("^%*%s") ~= nil then
+		local files_str = vim.fn.join(files, " ") --[[@as string]]
+		command_input = command_input:gsub("%s%*%s", " " .. files_str .. " ")
+		command_input = command_input:gsub("%s%*$", " " .. files_str)
+		command_input = command_input:gsub("^%*%s", files_str .. " ")
+		commands = { command_input }
+	else
+		for _, file in ipairs(files) do
+			local command = command_input
+
+			if command:match("%s%?%s") or command:match("%s%?$") or command:match("^%?%s") ~= nil then
+				command = command:gsub("%s%?%s", " " .. file .. " ")
+				command = command:gsub("%s%?$", " " .. file)
+				command = command:gsub("^%?%s", file .. " ")
+			else
+				command = command .. " " .. file
+			end
+
+			table.insert(commands, command)
+		end
+	end
+	return commands
+end
+
+---@param commands string[] commands to execute
+---@param is_async boolean if `true`, write the result of the commands to a temporary buffer (commands are async by default (?))
+local function execute(commands, is_async)
+	if is_async then
+		local acc = ""
+		for _, command in ipairs(commands) do
+			acc = acc .. utils.command(command)
+		end
+		vim.cmd.split()
+		vim.cmd.e("Async Shell Result")
+		vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(acc, "\n") --[[@as table]])
+	else
+		for _, command in ipairs(commands) do
+			os.execute(command)
+		end
+	end
+end
+
+---[COMMAND - dired-do-shell-command]
+---Prompt for a shell command and execute it on the marked files, or the file under the cursor if there are none.
+---TODO: add dired info here to explain shell command syntax
 function M.shell_command()
 	if not utils.is_vimed() then
 		return
@@ -468,66 +518,55 @@ function M.shell_command()
 		return
 	end
 
-	local prompt = prompt_for_files(files, {
-		operation = "! on ",
-		flag = "*",
-		suffix = ": ",
-	})
-	local command = vim.fn.input({
-		prompt = prompt,
+	local command_input = vim.fn.input({
+		prompt = prompt_for_files(files, {
+			operation = "! on",
+			flag = "*",
+			suffix = ": ",
+		}),
 		completion = "shellcmd",
 	})
-	if command == "" then
+	if command_input == "" then
 		return
 	end
 
-	local is_async = command:match("&$") ~= nil
+	local is_async = command_input:match("&$") ~= nil
 	if is_async then
-		command = command:gsub("&$", "")
+		command_input = command_input:gsub("&$", "")
 	end
 
-	local star = command:match("%s%*%s") or command:match("%s%*$") or command:match("^%*%s")
-	if star ~= nil then
-		local files_str = vim.fn.join(files, " ") --[[@as string]]
-		command = command:gsub("%s%*%s", " " .. files_str .. " ")
-		command = command:gsub("%s%*$", " " .. files_str)
-		command = command:gsub("^%*%s", files_str .. " ")
-		if is_async then
-			local result = utils.command(command)
+	local commands = parse_command_input(command_input, files)
+	execute(commands, is_async)
+end
 
-			vim.cmd.split()
-			vim.cmd.e("Async Shell Result")
-			vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(result, "\n") --[[@as table]])
-		else
-			os.execute(command)
-		end
-	else
-		local acc = ""
-		for _, file in ipairs(files) do
-			local cmd = command
-			local question = cmd:match("%s%?%s") or command:match("%s%?$") or command:match("^%?%s")
-			if question ~= nil then
-				cmd = cmd:gsub("%s%?%s", " " .. file .. " ")
-				cmd = cmd:gsub("%s%?$", " " .. file)
-				cmd = cmd:gsub("^%?%s", file .. " ")
-			else
-				cmd = cmd .. " " .. file
-			end
-
-			if is_async then
-				local result = utils.command(cmd)
-				acc = acc .. result
-			else
-				os.execute(cmd)
-			end
-		end
-
-		if is_async then
-			vim.cmd.split()
-			vim.cmd.e("Async Shell Result")
-			vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(acc, "\n") --[[@as table]])
-		end
+---[COMMAND - dired-do-async-shell-command]
+---Prompt for a shell command and execute it on the marked files, or the file under the cursor if there are none.
+---Places the output of the command(s) into a temporary buffer.
+function M.async_shell_command()
+	if not utils.is_vimed() then
+		return
 	end
+
+	local files = target_files()
+	if files == nil then
+		vim.notify("No files specified")
+		return
+	end
+
+	local command_input = vim.fn.input({
+		prompt = prompt_for_files(files, {
+			operation = "& on",
+			flag = "*",
+			suffix = ": ",
+		}),
+		completion = "shellcmd",
+	})
+	if command_input == "" then
+		return
+	end
+
+	local commands = parse_command_input(command_input, files)
+	execute(commands, true)
 end
 
 return M

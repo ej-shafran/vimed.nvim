@@ -44,6 +44,8 @@ function M.setup_keymaps(config_maps)
 	nmap("M", api.commands.chmod)
 	nmap("R", api.commands.rename)
 	nmap("!", api.commands.shell_command)
+	nmap("X", api.commands.shell_command)
+	nmap("&", api.commands.async_shell_command)
 
 	xmap("d", api.commands.flag_file_deletion)
 	xmap("u", api.commands.unmark)
@@ -85,6 +87,7 @@ function M.setup_commands()
 	create_cmd("VimedChmod", api.commands.chmod)
 	create_cmd("VimedRename", api.commands.rename)
 	create_cmd("VimedShellCommand", api.commands.shell_command)
+	create_cmd("VimedAsyncShellCommand", api.commands.async_shell_command)
 end
 
 ---@param config Config
