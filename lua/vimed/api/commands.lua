@@ -176,25 +176,7 @@ function M.flag_file_deletion()
 	mark("D")
 end
 
----[COMMAND - dired-do-flagged-delete]
----Delete all files that are flagged for deletion.
-function M.flagged_delete()
-	if not utils.is_vimed() then
-		return
-	end
-
-	---@type string[]
-	local files = {}
-	for k, v in pairs(utils.flags) do
-		if v == "D" then
-			table.insert(files, k)
-		end
-	end
-	local cwd = vim.fn.getcwd()
-	files = vim.tbl_filter(function(value)
-		return vim.fs.dirname(value) == cwd
-	end, files)
-
+local function delete_files(files)
 	local prompt
 	if #files < 1 then
 		vim.notify("(No deletions requested)")
@@ -215,6 +197,59 @@ function M.flagged_delete()
 		vim.fn.delete(path, "rf")
 		utils.flags[path] = nil
 	end
+end
+
+---[COMMAND - dired-do-flagged-delete]
+---Delete all files that are flagged for deletion.
+function M.flagged_delete()
+	if not utils.is_vimed() then
+		return
+	end
+
+	---@type string[]
+	local files = {}
+	for k, v in pairs(utils.flags) do
+		if v == "D" then
+			table.insert(files, k)
+		end
+	end
+	local cwd = vim.fn.getcwd()
+	files = vim.tbl_filter(function(value)
+		return vim.fs.dirname(value) == cwd
+	end, files)
+
+	delete_files(files)
+	M.redisplay()
+end
+
+local function get_target_files()
+	local files = {}
+	local cwd = vim.fn.getcwd()
+	for path, flag in pairs(utils.flags) do
+		if flag == "*" and vim.fs.dirname(path) == cwd then
+			table.insert(files, path)
+		end
+	end
+	return files
+end
+
+function M.delete_file()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local files = get_target_files()
+	if #files == 0 then
+		local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
+		if r < 3 then
+			return
+		end
+
+		local path = utils.lines[r - 2].path
+		files = { path }
+	end
+
+	delete_files(files)
 	M.redisplay()
 end
 

@@ -34,6 +34,7 @@ function M.setup_keymaps()
 	nmap("u", api.commands.unmark)
 	nmap("m", api.commands.mark)
 	nmap("U", api.commands.unmark_all)
+	nmap("D", api.commands.delete_file)
 
 	xmap("d", api.commands.flag_file_deletion)
 	xmap("u", api.commands.unmark)
