@@ -78,7 +78,64 @@
 *** TODO Confirm that all planned features are implemented and working.
 *** TODO Ensure comprehensive test coverage and stability.
 *** TODO Celebrate the successful completion of the Neovim Dired Clone Plugin!
- 
+
+** Commands
+*** TODO SPC . - `find-file`
+*** TODO ! - `dired-do-shell-command`
+*** TODO # - `dired-flag-auto-save-files`
+*** TODO & - `dired-do-async-shell-command`
+*** TODO ( - `dired-hide-details-mode`
+*** TODO ) - `dired-git-info-mode`
+*** DONE + - `dired-create-directory`
+    CLOSED: [2023-10-07 Sat 22:56]
+*** DONE - - `dired-up-directory`
+    CLOSED: [2023-10-07 Sat 22:57]
+*** TODO . - `dired-clean-directory`
+*** TODO < - `dired-prev-dirline`
+*** TODO = - `dired-diff`
+*** TODO > - `dired-next-dirline`
+*** TODO A - `dired-do-find-regexp`
+*** TODO B - `dired-do-byte-compile`
+*** TODO C - `dired-do-copy`
+*** TODO D - `dired-do-delete`
+*** TODO H - `dired-do-hardlink`
+*** TODO I - `dired-maybe-insert-subdir`
+*** TODO J - `dired-goto-file`
+*** TODO L - `dired-do-load`
+*** TODO M - `dired-do-chmod`
+*** TODO O - `dired-do-chown`
+*** TODO P - `dired-do-print`
+*** TODO Q - `dired-do-find-regexp-and-replace`
+*** TODO R - `dired-do-rename`
+*** TODO S - `dired-do-symlink`
+*** TODO T - `dired-do-touch`
+*** DONE U - `dired-unmark-all-marks`
+    CLOSED: [2023-10-07 Sat 22:56]
+*** TODO W - `browse-url-of-dired-file`
+*** TODO X - `dired-do-shell-command`
+*** TODO Y - `dired-copy-filename-as-kill`
+*** TODO Z - `dired-do-compress`
+*** DONE ^ - `dired-up-directory`
+    CLOSED: [2023-10-07 Sat 22:57]
+*** TODO a - `dired-find-alternate-file`
+*** TODO c - `dired-do-compress-to`
+*** DONE d - `dired-flag-file-deletion`
+    CLOSED: [2023-10-07 Sat 22:56]
+*** TODO i - `dired-toggle-read-only`
+*** DONE m - `dired-mark`
+    CLOSED: [2023-10-07 Sat 22:56]
+*** DONE o - `dired-sort-toggle-or-edit`
+    CLOSED: [2023-10-07 Sat 22:56]
+*** DONE q - `+dired/quit-all`
+    CLOSED: [2023-10-07 Sat 22:56]
+*** TODO r - `dired-do-redisplay`
+*** TODO t - `dired-toggle-marks`
+*** DONE u - `dired-unmark`
+    CLOSED: [2023-10-07 Sat 22:56]
+*** DONE x - `dired-do-flagged-delete`
+    CLOSED: [2023-10-07 Sat 22:56]
+*** TODO ~ - `dired-flag-backup-files`
+
 
 * Deadlines and Milestones
 ** TODO Initial Development Phase
