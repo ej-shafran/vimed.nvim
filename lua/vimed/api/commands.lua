@@ -109,10 +109,6 @@ function M.create_dir()
 end
 
 local function mark(flag)
-	if not utils.is_vimed() then
-		return
-	end
-
 	local mode = vim.fn.mode() --[[@as string]]
 	if mode:lower() == "v" then
 		vim.cmd.normal("")
@@ -147,6 +143,10 @@ end
 ---[COMMAND - dired-flag-file-deletion]
 ---Toggle whether the path(s) under the cursor is flagged to be deleted.
 function M.flag_file_deletion()
+	if not utils.is_vimed() then
+		return
+	end
+
 	mark("D")
 end
 
@@ -195,13 +195,37 @@ end
 ---[COMMAND - dired-unmark]
 ---Remove flag for the path under the cursor.
 function M.unmark()
+	if not utils.is_vimed() then
+		return
+	end
+
 	mark(nil)
 end
 
 ---[COMMAND - dired-mark]
 ---Toggle whether the path(s) under the cursor is marked for actions.
 function M.mark()
+	if not utils.is_vimed() then
+		return
+	end
+
 	mark("*")
+end
+
+---[COMMAND - dired-unmark-all-marks]
+---Remove all marks in current Vimed buffer.
+function M.unmark_all()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local cwd = vim.fn.getcwd()
+	for flagged, _ in pairs(utils.flags) do
+		if vim.fs.dirname(flagged) == cwd then
+			utils.flags[flagged] = nil
+		end
+	end
+	M.redisplay()
 end
 
 return M
