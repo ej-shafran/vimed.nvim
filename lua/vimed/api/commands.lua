@@ -300,12 +300,16 @@ function M.unmark_all()
 		return
 	end
 
-	local files = marked_files()
-	for _, path in ipairs(files) do
-		utils.flags[path] = nil
+	local file_count = 0
+	local cwd = vim.fn.getcwd()
+	for path, _ in pairs(utils.flags) do
+		if vim.fs.dirname(path) == cwd then
+			utils.flags[path] = nil
+			file_count = file_count + 1
+		end
 	end
 
-	vim.notify(#files .. " marks removed")
+	vim.notify(file_count .. " marks removed")
 
 	M.redisplay()
 end
