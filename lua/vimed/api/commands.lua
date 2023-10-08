@@ -158,7 +158,7 @@ M.chmod = command.act_on_files(function(files, input)
 
 	local cmd = { "chmod", input }
 	vim.list_extend(cmd, files)
-	os.execute(vim.fn.join(cmd, " "))
+	vim.notify(utils.command(cmd))
 end, {
 	input = {
 		operation = "Change mode of",
@@ -173,36 +173,12 @@ M.chown = command.act_on_files(function(files, input)
 
 	local cmd = { "chown", input }
 	vim.list_extend(cmd, files)
-	os.execute(vim.fn.join(cmd, " "))
+	utils.command(cmd)
 end, {
 	input = {
 		operation = "Change Owner of",
 	},
 }, "user")
-
----[COMMAND - dired-do-rename]
-M.rename = command.act_on_files(function(files, input)
-	if input == "" then
-		return
-	end
-
-	if #files == 1 and vim.fn.filereadable(input) then
-		local choice = vim.fn.confirm("Overwrite " .. input .. "?", "&Yes\n&No")
-		if choice ~= 1 then
-			return
-		end
-	end
-
-	for _, file in ipairs(files) do
-		local cmd = { "mv", file, input }
-		os.execute(vim.fn.join(cmd, " "))
-	end
-end, {
-	input = {
-		operation = "Rename",
-		multi_operation = "Move",
-	},
-})
 
 ---[COMMAND - dired-do-load]
 M.load = command.act_on_files(function(files)
@@ -226,7 +202,7 @@ M.touch = command.act_on_files(function(files, input)
 		table.insert(cmd, "--date=" .. input)
 	end
 
-	os.execute(vim.fn.join(cmd, " "))
+	vim.notify(utils.command(cmd))
 end, {
 	input = {
 		operation = "Change Timestamp of",
@@ -241,6 +217,25 @@ M.yank = command.act_on_files(function(files)
 	vim.notify(files_str)
 end, {})
 
+---[COMMAND - dired-do-rename]
+M.rename = command.create_files(function(src, trg)
+	if vim.fn.filereadable(trg) ~= 0 then
+		local choice = vim.fn.confirm("Overwrite " .. trg .. "?", "&Yes\n&No")
+		if choice ~= 1 then
+			return
+		end
+	end
+
+	local cmd = { "mv", src, trg }
+	vim.notify(utils.command(cmd))
+end, {
+	input = {
+		operation = "Rename",
+		multi_operation = "Move",
+		suffix = " to: ",
+	},
+})
+
 ---[COMMAND - dired-do-copy]
 M.copy = command.create_files(utils.copy_file, {
 	input = {
@@ -252,7 +247,7 @@ M.copy = command.create_files(utils.copy_file, {
 
 ---[COMMAND - dired-do-symlink]
 M.symlink = command.create_files(function(src, trg)
-	os.execute(vim.fn.join({ "ln", "-s", src, trg }, " "))
+	vim.notify(utils.command({ "ln", "-s", src, trg }))
 end, {
 	input = {
 		operation = "Symlink",
@@ -263,7 +258,7 @@ end, {
 
 ---[COMMAND - dired-do-hardlink]
 M.hardlink = command.create_files(function(src, trg)
-	os.execute(vim.fn.join({ "ln", src, trg }, " "))
+	vim.notify(utils.command({ "ln", src, trg }))
 end, {
 	input = {
 		operation = "Hardlink",
@@ -279,7 +274,7 @@ end, {
 local function parse_command_input(files, input)
 	local commands = {}
 	if input:match("%s%*%s") or input:match("%s%*$") or input:match("^%*%s") ~= nil then
-		--[[@as string]]
+		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), " ") --[[@as string]]
 		input = input:gsub("%s%*%s", " " .. files_str .. " ")
 		input = input:gsub("%s%*$", " " .. files_str)
 		input = input:gsub("^%*%s", files_str .. " ")
@@ -288,12 +283,13 @@ local function parse_command_input(files, input)
 		for _, file in ipairs(files) do
 			local cmd = input
 
+			local filename = vim.fs.basename(file)
 			if cmd:match("%s%?%s") or cmd:match("%s%?$") or cmd:match("^%?%s") ~= nil then
-				cmd = cmd:gsub("%s%?%s", " " .. file .. " ")
-				cmd = cmd:gsub("%s%?$", " " .. file)
-				cmd = cmd:gsub("^%?%s", file .. " ")
+				cmd = cmd:gsub("%s%?%s", " " .. filename .. " ")
+				cmd = cmd:gsub("%s%?$", " " .. filename)
+				cmd = cmd:gsub("^%?%s", filename .. " ")
 			else
-				cmd = cmd .. " " .. file
+				cmd = cmd .. " " .. filename
 			end
 
 			table.insert(commands, cmd)

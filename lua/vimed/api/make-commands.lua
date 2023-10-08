@@ -279,7 +279,8 @@ function M.execute(parse, opts)
 			vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(acc, "\n") --[[@as table]])
 		else
 			for _, cmd in ipairs(commands) do
-				os.execute(cmd)
+				local result = utils.command(cmd)
+				vim.notify(result)
 			end
 		end
 	end
