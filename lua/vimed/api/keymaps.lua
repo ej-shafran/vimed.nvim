@@ -50,6 +50,7 @@ M.default_keymaps = {
 		["*!"] = { commands.unmark_all, "Unmark All" },
 		["**"] = { commands.mark_executables, "Mark Executables" },
 		["*@"] = { commands.mark_symlinks, "Mark Symbolic Links" },
+		["*/"] = { commands.mark_directories, "Mark Directories" },
 	},
 	x = {
 		d = { commands.flag_file_deletion, "Flag For Deletion" },

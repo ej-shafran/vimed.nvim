@@ -420,4 +420,9 @@ M.mark_symlinks = command.mark_via_filter(function(entry)
 	return entry.link ~= nil
 end, { flag = "*", kind = "symbolic link" })
 
+---[COMMAND - dired-mark-directories]
+M.mark_directories = command.mark_via_filter(function(entry)
+	return entry.permissions.is_dir
+end, { flag = "*", kind = "directory file" })
+
 return M

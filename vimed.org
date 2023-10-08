@@ -178,7 +178,8 @@
 *** DONE * *              dired-mark-executables
     CLOSED: [2023-10-08 Sun 18:54]
 *** TODO * .              dired-mark-extension
-*** TODO * /              dired-mark-directories
+*** DONE * /              dired-mark-directories
+    CLOSED: [2023-10-08 Sun 20:37]
 *** TODO * ?              dired-unmark-all-files
 *** DONE * @              dired-mark-symlinks
     CLOSED: [2023-10-08 Sun 18:59]
