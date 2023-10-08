@@ -278,6 +278,12 @@ M.yank = command.act_on_files(function(files)
 	vim.notify(files_str)
 end, {})
 
+---[COMMAND - dired-upcase]
+M.upcase = command.confirm_each_file(string.upper, { action = "Rename upcase" })
+
+---[COMMAND - dired-downcase]
+M.downcase = command.confirm_each_file(string.lower, { action = "Rename downcase" })
+
 ---[COMMAND - dired-do-rename]
 M.rename = command.create_files(function(src, trg)
 	if vim.fn.filereadable(trg) ~= 0 then

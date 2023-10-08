@@ -351,4 +351,40 @@ function M.dirline(logic)
 	end
 end
 
+---@param transform fun(filename: string): string
+---@param opts { action: string }
+---@return function
+function M.confirm_each_file(transform, opts)
+	return function()
+		if not utils.is_vimed() then
+			return
+		end
+
+		local files = M.target_files()
+		if files == nil then
+			vim.notify("No files specified")
+			return
+		end
+
+		for _, file in ipairs(files) do
+			local filename = vim.fs.basename(file)
+			local transformed = transform(filename)
+			local choice =
+				vim.fn.confirm(opts.action .. " '" .. filename .. "' to '" .. transformed .. "'?", "&Yes\n&No\n&Quit")
+			if choice == 3 then
+				break
+			end
+
+			if choice == 1 then
+				local transformed_filename = vim.fs.normalize(vim.fs.dirname(file) .. "/" .. transformed)
+				os.rename(file, transformed_filename)
+				state.flags[transformed_filename] = state.flags[file]
+				state.flags[file] = nil
+			end
+		end
+
+		M.redisplay()
+	end
+end
+
 return M

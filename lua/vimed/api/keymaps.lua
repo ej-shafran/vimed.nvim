@@ -42,6 +42,8 @@ M.default_keymaps = {
 		["("] = { commands.toggle_hide_details, "Toggle Hide Details" },
 		["<"] = { commands.prev_dirline, "Previous Dir Line" },
 		[">"] = { commands.next_dirline, "Next Dir Line" },
+		["%u"] = { commands.upcase, "Rename Uppercase" },
+		["%l"] = { commands.downcase, "Rename Downcase" },
 	},
 	x = {
 		d = { commands.flag_file_deletion, "Flag For Deletion" },

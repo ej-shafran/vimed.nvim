@@ -169,6 +169,36 @@
     CLOSED: [2023-10-07 Sat 22:56]
 *** DONE ~ - `dired-flag-backup-files`
     CLOSED: [2023-10-08 Sun 14:13]
+*** TODO * C-n            dired-next-marked-file
+*** TODO * C-p            dired-prev-marked-file
+*** TODO * !              dired-unmark-all-marks
+*** TODO * %              dired-mark-files-regexp
+*** TODO * (              dired-mark-sexp
+*** TODO * *              dired-mark-executables
+*** TODO * .              dired-mark-extension
+*** TODO * /              dired-mark-directories
+*** TODO * ?              dired-unmark-all-files
+*** TODO * @              dired-mark-symlinks
+*** TODO * O              dired-mark-omitted
+*** TODO * c              dired-change-marks
+*** TODO * m              dired-mark
+*** TODO * s              dired-mark-subdir-files
+*** TODO * t              dired-toggle-marks
+*** TODO * u              dired-unmark
+*** TODO * <delete>       dired-unmark-backward
+*** TODO % &              dired-flag-garbage-files
+*** TODO % C              dired-do-copy-regexp
+*** TODO % H              dired-do-hardlink-regexp
+*** TODO % R              dired-do-rename-regexp
+*** TODO % S              dired-do-symlink-regexp
+*** TODO % d              dired-flag-files-regexp
+*** TODO % g              dired-mark-files-containing-regexp
+*** DONE % l              dired-downcase
+    CLOSED: [2023-10-08 Sun 18:32]
+*** TODO % m              dired-mark-files-regexp
+*** TODO % r              dired-do-rename-regexp
+*** DONE % u              dired-upcase
+    CLOSED: [2023-10-08 Sun 18:25]
 
 
 * Deadlines and Milestones
