@@ -13,6 +13,7 @@ M.default_keymaps = {
 		L = { commands.load, "Load" },
 		M = { commands.chmod, "Change Permissions" },
 		R = { commands.rename, "Rename" },
+		S = { commands.symlink, "Symlink" },
 		U = { commands.unmark_all, "Unmark All" },
 		d = { commands.flag_file_deletion, "Flag For Deletion" },
 		m = { commands.mark, "Mark" },

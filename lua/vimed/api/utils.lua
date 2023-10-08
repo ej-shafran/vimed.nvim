@@ -18,7 +18,7 @@ M.sort_by_time = false
 M.hide_details = false
 ---@type FsEntry[]
 M.lines = {}
----@type table<string, "D"|"*"|"C">
+---@type table<string, "D"|"*"|"C"|"Y">
 M.flags = {}
 
 ---Whether the current buffer is a Vimed buffer.

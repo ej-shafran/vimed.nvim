@@ -582,72 +582,6 @@ function M.toggle_hide_details()
 	M.redisplay()
 end
 
----@param source string
----@param target string
-local function copy_file(source, target)
-	local source_file = io.open(source, "rb")
-	if not source_file then
-		return
-	end
-
-	local target_file = io.open(target, "wb")
-	if not target_file then
-		source_file:close()
-		return
-	end
-
-	local content = source_file:read("*a")
-	target_file:write(content)
-
-	source_file:close()
-	target_file:close()
-end
-
----[COMMAND - dired-do-copy]
----Prompt for a target location. If no files are marked, copy the file under the cursor to that location.
----If files are marked, prompt to confirm creation of the target directory. Upon "Yes", create the directory and copy the marked files into it.
-function M.copy()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local files = target_files()
-	if files == nil then
-		vim.notify("No files specified")
-		return
-	end
-
-	local target = vim.fn.input({
-		prompt = prompt_for_files(files, {
-			operation = "Copy",
-			flag = "*",
-			suffix = " to: ",
-		}),
-		completion = "file",
-	})
-	if target == "" then
-		return
-	end
-
-	local cwd = vim.fn.getcwd()
-	if #files == 1 then
-		copy_file(files[1], target)
-		utils.flags[vim.fs.normalize(cwd .. "/" .. target)] = "C"
-	else
-		local dir = vim.fs.normalize(cwd .. "/" .. target)
-		local choice = vim.fn.confirm("Create destination dir `" .. dir .. "`?", "&Yes\n&No") --[[@as integer]]
-		if choice == 1 then
-			vim.fn.mkdir(dir, "p")
-
-			for _, file in ipairs(files) do
-				copy_file(file, vim.fs.normalize(dir .. "/" .. vim.fs.basename(file)))
-			end
-		end
-	end
-
-	M.redisplay()
-end
-
 ---[COMMAND - dired-do-load]
 ---Load the Lua files that are marked/under the cursor.
 function M.load()
@@ -677,6 +611,115 @@ function M.load()
 	for _, file in ipairs(files) do
 		vim.cmd.source(file)
 	end
+end
+
+---@param source string
+---@param target string
+local function copy_file(source, target)
+	local source_file = io.open(source, "rb")
+	if not source_file then
+		return
+	end
+
+	local target_file = io.open(target, "wb")
+	if not target_file then
+		source_file:close()
+		return
+	end
+
+	local content = source_file:read("*a")
+	target_file:write(content)
+
+	source_file:close()
+	target_file:close()
+end
+
+---@param files string[]
+---@param create_fn fun(string, string)
+---@param target string
+---@param flag string
+local function create_files(files, create_fn, target, flag)
+	local cwd = vim.fn.getcwd()
+	target = vim.fs.normalize(cwd .. "/" .. target)
+	if #files == 1 then
+		create_fn(files[1], target)
+		utils.flags[target] = flag
+	else
+		local choice = vim.fn.confirm("Create destination dir `" .. target .. "`?", "&Yes\n&No") --[[@as integer]]
+		if choice == 1 then
+			vim.fn.mkdir(target, "p")
+
+			for _, file in ipairs(files) do
+				local file_path = vim.fs.normalize(target .. "/" .. vim.fs.basename(file))
+				create_fn(file, file_path)
+				utils.flags[file_path] = flag
+			end
+		end
+	end
+end
+
+---[COMMAND - dired-do-copy]
+---Prompt for a target location. If no files are marked, copy the file under the cursor to that location.
+---If files are marked, prompt to confirm creation of the target directory. Upon "Yes", create the directory and copy the marked files into it.
+function M.copy()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local files = target_files()
+	if files == nil then
+		vim.notify("No files specified")
+		return
+	end
+
+	local target = vim.fn.input({
+		prompt = prompt_for_files(files, {
+			operation = "Copy",
+			flag = "*",
+			suffix = " to: ",
+		}),
+		completion = "file",
+	})
+	if target == "" then
+		return
+	end
+
+	create_files(files, copy_file, target, "C")
+
+	M.redisplay()
+end
+
+---[COMMAND - dired-do-symlink]
+---Create a symlink from the files under the cursor/marked.
+---TODO: documentation
+function M.symlink()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local files = target_files()
+	if files == nil then
+		vim.notify("No files selected")
+		return
+	end
+
+	local target = vim.fn.input({
+		prompt = prompt_for_files(files, {
+			operation = "Symlink",
+			suffix = " from: ",
+			flag = "*",
+		}),
+		completion = "file",
+	})
+	if target == "" then
+		return
+	end
+
+	create_files(files, function(src, trg)
+		os.execute(vim.fn.join({ "ln", "-s", src, trg }))
+	end, target, "Y")
+
+	M.redisplay()
 end
 
 return M
