@@ -171,7 +171,8 @@
     CLOSED: [2023-10-08 Sun 14:13]
 *** TODO * C-n            dired-next-marked-file
 *** TODO * C-p            dired-prev-marked-file
-*** TODO * !              dired-unmark-all-marks
+*** DONE * !              dired-unmark-all-marks
+    CLOSED: [2023-10-08 Sun 18:38]
 *** TODO * %              dired-mark-files-regexp
 *** TODO * (              dired-mark-sexp
 *** TODO * *              dired-mark-executables
@@ -181,10 +182,13 @@
 *** TODO * @              dired-mark-symlinks
 *** TODO * O              dired-mark-omitted
 *** TODO * c              dired-change-marks
-*** TODO * m              dired-mark
+*** DONE * m              dired-mark
+    CLOSED: [2023-10-08 Sun 18:35]
 *** TODO * s              dired-mark-subdir-files
-*** TODO * t              dired-toggle-marks
-*** TODO * u              dired-unmark
+*** DONE * t              dired-toggle-marks
+    CLOSED: [2023-10-08 Sun 18:36]
+*** DONE * u              dired-unmark
+    CLOSED: [2023-10-08 Sun 18:35]
 *** TODO * <delete>       dired-unmark-backward
 *** TODO % &              dired-flag-garbage-files
 *** TODO % C              dired-do-copy-regexp

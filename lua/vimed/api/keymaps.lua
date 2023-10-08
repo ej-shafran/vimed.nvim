@@ -44,11 +44,17 @@ M.default_keymaps = {
 		[">"] = { commands.next_dirline, "Next Dir Line" },
 		["%u"] = { commands.upcase, "Rename Uppercase" },
 		["%l"] = { commands.downcase, "Rename Downcase" },
+		["*u"] = { commands.unmark, "Unmark" },
+		["*m"] = { commands.mark, "Mark" },
+		["*t"] = { commands.toggle_marks, "Toggle Marks" },
+		["*!"] = { commands.unmark_all, "Unmark All" },
 	},
 	x = {
 		d = { commands.flag_file_deletion, "Flag For Deletion" },
 		u = { commands.unmark, "Unmark" },
 		m = { commands.mark, "Mark" },
+		["*u"] = { commands.unmark, "Unmark" },
+		["*m"] = { commands.mark, "Mark" },
 	},
 }
 
