@@ -320,4 +320,34 @@ function M.delete_files(get_files, if_none)
 	end
 end
 
+---@param logic fun(last: integer, current: integer, offset: integer): integer, boolean
+function M.dirline(logic)
+	return function()
+		if not utils.is_vimed() then
+			return
+		end
+
+		local last_dirline = #state.lines
+		for i = last_dirline, 1, -1 do
+			local line = state.lines[i]
+			if line.permissions.is_dir then
+				last_dirline = i
+				break
+			end
+		end
+
+		local offset = state.hide_details and 1 or 2
+		local current = unpack(vim.api.nvim_win_get_cursor(0))
+		local last = last_dirline + offset
+
+		local line, out_of_bounds = logic(last, current, offset)
+
+		if out_of_bounds then
+			vim.notify("No more subdirectories")
+		end
+
+		vim.api.nvim_win_set_cursor(0, { line, 0 })
+	end
+end
+
 return M

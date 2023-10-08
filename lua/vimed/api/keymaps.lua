@@ -36,6 +36,8 @@ M.default_keymaps = {
 		["X"] = { commands.shell_command, "Shell Command" },
 		["&"] = { commands.async_shell_command, "Async Shell Command" },
 		["("] = { commands.toggle_hide_details, "Toggle Hide Details" },
+		["<"] = { commands.prev_dirline, "Previous Dir Line" },
+		[">"] = { commands.next_dirline, "Next Dir Line" },
 	},
 	x = {
 		d = { commands.flag_file_deletion, "Flag For Deletion" },

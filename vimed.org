@@ -105,9 +105,11 @@
 *** DONE - - `dired-up-directory`
     CLOSED: [2023-10-07 Sat 22:57]
 *** TODO . - `dired-clean-directory`
-*** TODO < - `dired-prev-dirline`
+*** DONE < - `dired-prev-dirline`
+    CLOSED: [2023-10-08 Sun 13:49]
 *** TODO = - `dired-diff`
-*** TODO > - `dired-next-dirline`
+*** DONE > - `dired-next-dirline`
+    CLOSED: [2023-10-08 Sun 13:49]
 *** TODO A - `dired-do-find-regexp`
 *** TODO B - `dired-do-byte-compile`
 *** DONE C - `dired-do-copy`

@@ -89,14 +89,37 @@ M.goto_file = command.basic(function()
 	end
 
 	file = vim.fs.normalize(cwd .. "/" .. file)
+	local header_lines = state.hide_details and 1 or 2
 	for i, line in pairs(state.lines) do
 		if line.path == file then
-			vim.api.nvim_win_set_cursor(0, { i + 2, 0 })
+			vim.api.nvim_win_set_cursor(0, { i + header_lines, 0 })
 			break
 		end
 	end
 
 	return false
+end)
+
+---[COMMAND - dired-prev-dirline]
+M.prev_dirline = command.dirline(function(last, current, offset)
+	if current > last then
+		return last, false
+	elseif current <= offset + 1 then
+		return offset + 1, true
+	else
+		return current - 1, false
+	end
+end)
+
+---[COMMAND - dired-next-dirline]
+M.next_dirline = command.dirline(function(last, current, offset)
+	if current >= last then
+		return last, true
+	elseif current < offset + 1 then
+		return offset + 1, false
+	else
+		return current + 1, false
+	end
 end)
 
 ---[COMMAND]
