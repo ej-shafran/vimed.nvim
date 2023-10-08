@@ -42,7 +42,7 @@ M.default_keymaps = {
 }
 
 ---@param config_maps VimedKeymaps
-function M.setup_keymaps(config_maps)
+function M.setup(config_maps)
 	for mode, tbl in pairs(config_maps) do
 		for lhs, rhs in pairs(tbl) do
 			if type(rhs) ~= "boolean" then

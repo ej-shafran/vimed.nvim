@@ -58,7 +58,7 @@ function M.setup(config)
 			cmd("VimedUnmark", commands.unmark)
 			cmd("VimedUnmarkAll", commands.unmark_all)
 
-			keymaps.setup_keymaps(vim.tbl_deep_extend("force", keymaps.default_keymaps, config.keymaps or {}))
+			keymaps.setup(vim.tbl_deep_extend("force", keymaps.default_keymaps, config.keymaps or {}))
 		end,
 	})
 
