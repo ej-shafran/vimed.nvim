@@ -716,8 +716,41 @@ function M.symlink()
 	end
 
 	create_files(files, function(src, trg)
-		os.execute(vim.fn.join({ "ln", "-s", src, trg }))
+		os.execute(vim.fn.join({ "ln", "-s", src, trg }, " "))
 	end, target, "Y")
+
+	M.redisplay()
+end
+
+---[COMMAND - dired-do-hardlink]
+---Create a hard link from the files under the cursor/marked.
+---TODO: documentation
+function M.hardlink()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local files = target_files()
+	if files == nil then
+		vim.notify("No files selected")
+		return
+	end
+
+	local target = vim.fn.input({
+		prompt = prompt_for_files(files, {
+			operation = "Hardlink",
+			suffix = " from: ",
+			flag = "*",
+		}),
+		completion = "file",
+	})
+	if target == "" then
+		return
+	end
+
+	create_files(files, function(src, trg)
+		os.execute(vim.fn.join({ "ln", src, trg }, " "))
+	end, target, "H")
 
 	M.redisplay()
 end

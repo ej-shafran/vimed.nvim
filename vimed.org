@@ -115,7 +115,8 @@
     CLOSED: [2023-10-08 Sun 03:09]
 *** DONE D - `dired-do-delete`
     CLOSED: [2023-10-07 Sat 23:21]
-*** TODO H - `dired-do-hardlink`
+*** DONE H - `dired-do-hardlink`
+    CLOSED: [2023-10-08 Sun 03:54]
 *** TODO I - `dired-maybe-insert-subdir`
 *** DONE J - `dired-goto-file`
     CLOSED: [2023-10-07 Sat 23:38]

@@ -9,6 +9,7 @@ M.default_keymaps = {
 	n = {
 		C = { commands.copy, "Copy" },
 		D = { commands.delete, "Delete" },
+		H = { commands.hardlink, "Hard Link" },
 		J = { commands.goto_file, "Goto File" },
 		L = { commands.load, "Load" },
 		M = { commands.chmod, "Change Permissions" },
