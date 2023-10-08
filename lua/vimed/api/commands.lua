@@ -132,6 +132,21 @@ end, {
 	},
 })
 
+---[COMMAND - dired-do-chown]
+M.chown = command.act_on_files(function(files, input)
+	if input == "" then
+		return
+	end
+
+	local cmd = { "chown", input }
+	vim.list_extend(cmd, files)
+	os.execute(vim.fn.join(cmd, " "))
+end, {
+	input = {
+		operation = "Change Owner of",
+	},
+}, "user")
+
 ---[COMMAND - dired-do-rename]
 M.rename = command.act_on_files(function(files, input)
 	if input == "" then

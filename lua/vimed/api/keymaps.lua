@@ -13,6 +13,7 @@ M.default_keymaps = {
 		J = { commands.goto_file, "Goto File" },
 		L = { commands.load, "Load" },
 		M = { commands.chmod, "Change Permissions" },
+		O = { commands.chown, "Change Owner" },
 		R = { commands.rename, "Rename" },
 		S = { commands.symlink, "Symlink" },
 		T = { commands.touch, "Change Timestamp" },
