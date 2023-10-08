@@ -175,10 +175,12 @@
     CLOSED: [2023-10-08 Sun 18:38]
 *** DONE * %              dired-mark-files-regexp
     CLOSED: [2023-10-08 Sun 20:46]
-*** TODO * (              dired-mark-sexp
+*** DONE * (              dired-mark-sexp
+    CLOSED: [2023-10-09 Mon 00:37]
 *** DONE * *              dired-mark-executables
     CLOSED: [2023-10-08 Sun 18:54]
-*** TODO * .              dired-mark-extension
+*** DONE * .              dired-mark-extension
+    CLOSED: [2023-10-09 Mon 00:37]
 *** DONE * /              dired-mark-directories
     CLOSED: [2023-10-08 Sun 20:37]
 *** TODO * ?              dired-unmark-all-files
@@ -188,7 +190,8 @@
 *** TODO * c              dired-change-marks
 *** DONE * m              dired-mark
     CLOSED: [2023-10-08 Sun 18:35]
-*** TODO * s              dired-mark-subdir-files
+*** DONE * s              dired-mark-subdir-files
+    CLOSED: [2023-10-09 Mon 00:11]
 *** DONE * t              dired-toggle-marks
     CLOSED: [2023-10-08 Sun 18:36]
 *** DONE * u              dired-unmark

@@ -387,8 +387,8 @@ function M.confirm_each_file(transform, opts)
 	end
 end
 
----@param filter fun(entry: FsEntry, input: string?): boolean
----@param opts { flag: string, kind: string, input: { prompt: string, completion: string? }? }
+---@param filter fun(entry: FsEntry, input: any?): boolean
+---@param opts { flag: string, kind: string, input: { prompt: string, completion: string?, process: fun(raw: string): any }? }
 function M.mark_via_filter(filter, opts)
 	return function()
 		if not utils.is_vimed() then
@@ -397,7 +397,13 @@ function M.mark_via_filter(filter, opts)
 
 		local input = nil
 		if opts.input then
-			input = vim.fn.input(opts.input)
+			input = vim.fn.input({
+				prompt = opts.input.prompt,
+				completion = opts.input.completion,
+			})
+			if opts.input.process then
+				input = opts.input.process(input)
+			end
 		end
 
 		local count = 0

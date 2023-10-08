@@ -76,6 +76,21 @@ M.toggle_marks = command.basic(function()
 	end
 end)
 
+---[COMMAND - dired-mark-subdir-files]
+M.mark_subdir_files = command.basic(function()
+	for _, line in pairs(state.lines) do
+		local path = line.path
+		local filename = vim.fs.basename(path)
+		if filename ~= "." and filename ~= ".." then
+			if state.flags[path] == "*" then
+				state.flags[path] = nil
+			elseif not state.flags[path] then
+				state.flags[path] = "*"
+			end
+		end
+	end
+end)
+
 ---[COMMAND - dired-goto-file]
 M.goto_file = command.basic(function()
 	local cwd = vim.fn.getcwd()
@@ -429,19 +444,17 @@ end, { flag = "*", kind = "directory file" })
 M.mark_regexp = command.mark_via_filter(function(entry, input)
 	local re = vim.regex(input) --[[@as any]]
 	return re:match_str(entry.path) ~= nil
-end, { flag = "*", kind = "matching file", input = {
-	prompt = "Mark files (regexp): ",
-	completion = "file",
-} })
+end, {
+	flag = "*",
+	kind = "matching file",
+	input = {
+		prompt = "Mark files (regexp): ",
+		completion = "file",
+	},
+})
 
 ---[COMMAND - dired-mark-extension]
 M.mark_extension = command.mark_via_filter(function(entry, input)
-	if input:match("^%.") == nil then
-		input = "." .. input
-	end
-
-	input = input:gsub("%.", "%.")
-
 	return vim.fs.basename(entry.path):match("." .. input .. "$")
 end, {
 	flag = "*",
@@ -449,6 +462,41 @@ end, {
 	input = {
 		prompt = "Marking extension: ", --TODO: add default
 		completion = "filetype",
+		process = function(raw)
+			if raw:match("^%.") == nil then
+				raw = "." .. raw
+			end
+
+			raw = raw:gsub("%.", "%.")
+			return raw
+		end,
+	},
+})
+
+---[COMMAND - dired-mark-sexp]
+M.mark_lua_expression = command.mark_via_filter(function(entry, func)
+	if func == nil then
+		return false
+	end
+
+	_A = entry
+	local ok, result = pcall(func)
+	return ok and result
+end, {
+	flag = "*",
+	kind = "matched file",
+	input = {
+		prompt = "Mark if (lua expression): ",
+		completion = "lua",
+		process = function(raw)
+			local func, err = load(raw)
+			if not func then
+				vim.notify("Lua interperter error: " .. err, vim.log.levels.ERROR)
+				return nil
+			else
+				return func
+			end
+		end,
 	},
 })
 
