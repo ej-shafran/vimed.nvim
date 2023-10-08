@@ -425,4 +425,14 @@ M.mark_directories = command.mark_via_filter(function(entry)
 	return entry.permissions.is_dir
 end, { flag = "*", kind = "directory file" })
 
+
+---[COMMAND - dired-mark-files-regexp]
+M.mark_regexp = command.mark_via_filter(function(entry, input)
+	local re = vim.regex(input) --[[@as any]]
+	return re:match_str(entry.path) ~= nil
+end, { flag = "*", kind = "matching file", input = {
+	prompt = "Mark files (regexp): ",
+	completion = "file",
+} })
+
 return M

@@ -173,7 +173,8 @@
 *** TODO * C-p            dired-prev-marked-file
 *** DONE * !              dired-unmark-all-marks
     CLOSED: [2023-10-08 Sun 18:38]
-*** TODO * %              dired-mark-files-regexp
+*** DONE * %              dired-mark-files-regexp
+    CLOSED: [2023-10-08 Sun 20:46]
 *** TODO * (              dired-mark-sexp
 *** DONE * *              dired-mark-executables
     CLOSED: [2023-10-08 Sun 18:54]

@@ -387,17 +387,22 @@ function M.confirm_each_file(transform, opts)
 	end
 end
 
----@param filter fun(entry: FsEntry): boolean
----@param opts { flag: string, kind: string }
+---@param filter fun(entry: FsEntry, input: string?): boolean
+---@param opts { flag: string, kind: string, input: { prompt: string, completion: string? }? }
 function M.mark_via_filter(filter, opts)
 	return function()
 		if not utils.is_vimed() then
 			return
 		end
 
+		local input = nil
+		if opts.input then
+			input = vim.fn.input(opts.input)
+		end
+
 		local count = 0
 		for _, line in ipairs(state.lines) do
-			if state.flags[line.path] ~= opts.flag and filter(line) then
+			if state.flags[line.path] ~= opts.flag and filter(line, input) then
 				state.flags[line.path] = opts.flag
 				count = count + 1
 			end
