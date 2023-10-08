@@ -33,28 +33,28 @@ function M.setup(config)
 				vim.cmd.setlocal("nonumber norelativenumber")
 			end
 
-			cmd("VimedQuit", commands.quit)
-			cmd("VimedEnter", commands.enter)
+			cmd("VimedAsyncShellCommand", commands.async_shell_command)
 			cmd("VimedBack", commands.back)
-			cmd("VimedToggleHidden", commands.toggle_hidden)
+			cmd("VimedChmod", commands.chmod)
+			cmd("VimedCopy", commands.copy)
 			cmd("VimedCreateDir", commands.create_dir)
-			cmd("VimedRedisplay", commands.redisplay)
-			cmd("VimedToggleSort", commands.toggle_sort)
+			cmd("VimedDelete", commands.delete)
+			cmd("VimedEnter", commands.enter)
 			cmd("VimedFlagFileDeletion", commands.flag_file_deletion)
 			cmd("VimedFlaggedDelete", commands.flagged_delete)
-			cmd("VimedUnmark", commands.unmark)
-			cmd("VimedMark", commands.mark)
-			cmd("VimedUnmarkAll", commands.unmark_all)
-			cmd("VimedDelete", commands.delete)
-			cmd("VimedToggleMarks", commands.toggle_marks)
 			cmd("VimedGotoFile", commands.goto_file)
-			cmd("VimedChmod", commands.chmod)
+			cmd("VimedLoad", commands.load)
+			cmd("VimedMark", commands.mark)
+			cmd("VimedQuit", commands.quit)
+			cmd("VimedRedisplay", commands.redisplay)
 			cmd("VimedRename", commands.rename)
 			cmd("VimedShellCommand", commands.shell_command)
-			cmd("VimedAsyncShellCommand", commands.async_shell_command)
+			cmd("VimedToggleHidden", commands.toggle_hidden)
 			cmd("VimedToggleHideDetails", commands.toggle_hide_details)
-			cmd("VimedCopy", commands.copy)
-			cmd("VimedLoad", commands.load)
+			cmd("VimedToggleMarks", commands.toggle_marks)
+			cmd("VimedToggleSort", commands.toggle_sort)
+			cmd("VimedUnmark", commands.unmark)
+			cmd("VimedUnmarkAll", commands.unmark_all)
 
 			keymaps.setup_keymaps(vim.tbl_deep_extend("force", keymaps.default_keymaps, config.keymaps or {}))
 		end,
@@ -66,14 +66,23 @@ function M.setup(config)
 		-- open vimed when opening a directory
 		vim.api.nvim_create_autocmd("BufEnter", {
 			pattern = "*",
-			command = "if isdirectory(expand('%')) && !&modified | execute 'lua require(\"vimed\").open_vimed()' | endif",
+			callback = function()
+				local bufvar = vim.fn.getbufvar(vim.api.nvim_get_current_buf(), "&modified") --[[@as integer]]
+				if vim.fn.isdirectory(vim.fn.expand("%")) ~= 0 and vim.fn.empty(bufvar) ~= 0 then
+					M.open_vimed()
+				end
+			end,
 			group = vimed_group,
 		})
 
 		-- disable file explorer
 		vim.api.nvim_create_autocmd("VimEnter", {
 			pattern = "*",
-			command = "if exists('#FileExplorer') | execute 'autocmd! FileExplorer *' | endif",
+			callback = function()
+				if vim.fn.exists("#FileExplorer") then
+					vim.cmd("autocmd! FileExplorer *")
+				end
+			end,
 			group = vimed_group,
 		})
 	end
