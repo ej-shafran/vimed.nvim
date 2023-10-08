@@ -165,6 +165,28 @@ end, {
 	},
 })
 
+---[COMMAND - dired-do-compress]
+M.compress = command.act_on_files(function(files)
+	for _, file in ipairs(files) do
+		local cmd, should_delete, target = utils.compress_command(file)
+
+		vim.notify(utils.command(cmd))
+		if should_delete then
+			vim.fn.delete(file)
+			if target ~= nil then
+				state.flags[target] = state.flags[file]
+			end
+			state.flags[file] = nil
+		end
+	end
+end, {
+	confirm = {
+		operation = "Compress or uncompress",
+		suffix = "?",
+		flag = "*",
+	},
+})
+
 ---[COMMAND - dired-do-chown]
 M.chown = command.act_on_files(function(files, input)
 	if input == "" then

@@ -134,4 +134,43 @@ function M.copy_file(source, target)
 	target_file:close()
 end
 
+---@param file string
+---@return table
+---@return boolean
+---@return string|nil
+function M.compress_command(file)
+	local filename = vim.fs.basename(file)
+
+	local cmd
+	local should_delete = true
+	local target = nil
+	if vim.fn.isdirectory(file) ~= 0 then
+		cmd = { "tar", "-czf", filename .. ".tar.gz", filename }
+		should_delete = false
+	else
+		local extension = vim.fn.fnamemodify(filename, ":e")
+		if extension == "gz" then
+			if vim.fn.fnamemodify(filename, ":r:e") == "tar" then
+				cmd = { "tar", "-xzf", filename }
+				should_delete = false
+				target = file:gsub("%.tar%.gz$", "")
+			else
+				cmd = { "gunzip", filename }
+				target = file:gsub("%.gz$", "")
+			end
+		elseif extension == "zip" then
+			cmd = { "unzip", "-o", filename }
+			target = file:gsub("%.zip$", "")
+		elseif extension == "7z" then
+			cmd = { "7z", "x", filename }
+			target = file:gsub("%.7z$", "")
+		else
+			cmd = { "gzip", filename }
+			target = file .. ".gz"
+		end
+	end
+
+	return cmd, should_delete, target
+end
+
 return M

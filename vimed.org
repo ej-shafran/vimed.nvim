@@ -142,7 +142,8 @@
     CLOSED: [2023-10-08 Sun 02:23]
 *** DONE Y - `dired-copy-filename-as-kill`
     CLOSED: [2023-10-08 Sun 13:36]
-*** TODO Z - `dired-do-compress`
+*** DONE Z - `dired-do-compress`
+    CLOSED: [2023-10-08 Sun 15:08]
 *** DONE ^ - `dired-up-directory`
     CLOSED: [2023-10-07 Sat 22:57]
 *** TODO a - `dired-find-alternate-file`
