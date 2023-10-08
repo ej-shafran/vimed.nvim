@@ -52,6 +52,7 @@ M.default_keymaps = {
 		["*@"] = { commands.mark_symlinks, "Mark Symbolic Links" },
 		["*/"] = { commands.mark_directories, "Mark Directories" },
 		["*%"] = { commands.mark_regexp, "Mark Files Using Regex" },
+		["*."] = { commands.mark_extension, "Mark Files By Extension" },
 	},
 	x = {
 		d = { commands.flag_file_deletion, "Flag For Deletion" },

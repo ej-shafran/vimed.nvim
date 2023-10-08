@@ -425,7 +425,6 @@ M.mark_directories = command.mark_via_filter(function(entry)
 	return entry.permissions.is_dir
 end, { flag = "*", kind = "directory file" })
 
-
 ---[COMMAND - dired-mark-files-regexp]
 M.mark_regexp = command.mark_via_filter(function(entry, input)
 	local re = vim.regex(input) --[[@as any]]
@@ -434,5 +433,23 @@ end, { flag = "*", kind = "matching file", input = {
 	prompt = "Mark files (regexp): ",
 	completion = "file",
 } })
+
+---[COMMAND - dired-mark-extension]
+M.mark_extension = command.mark_via_filter(function(entry, input)
+	if input:match("^%.") == nil then
+		input = "." .. input
+	end
+
+	input = input:gsub("%.", "%.")
+
+	return vim.fs.basename(entry.path):match("." .. input .. "$")
+end, {
+	flag = "*",
+	kind = "matching file",
+	input = {
+		prompt = "Marking extension: ", --TODO: add default
+		completion = "filetype",
+	},
+})
 
 return M
