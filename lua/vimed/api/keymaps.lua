@@ -10,6 +10,7 @@ M.default_keymaps = {
 		C = { commands.copy, "Copy" },
 		D = { commands.delete, "Delete" },
 		J = { commands.goto_file, "Goto File" },
+		L = { commands.load, "Load" },
 		M = { commands.chmod, "Change Permissions" },
 		R = { commands.rename, "Rename" },
 		U = { commands.unmark_all, "Unmark All" },

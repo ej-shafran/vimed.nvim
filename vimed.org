@@ -118,7 +118,8 @@
 *** TODO I - `dired-maybe-insert-subdir`
 *** DONE J - `dired-goto-file`
     CLOSED: [2023-10-07 Sat 23:38]
-*** TODO L - `dired-do-load`
+*** DONE L - `dired-do-load`
+    CLOSED: [2023-10-08 Sun 03:23]
 *** DONE M - `dired-do-chmod`
     CLOSED: [2023-10-07 Sat 23:50]
 *** TODO O - `dired-do-chown`

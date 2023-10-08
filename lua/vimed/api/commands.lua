@@ -648,4 +648,35 @@ function M.copy()
 	M.redisplay()
 end
 
+---[COMMAND - dired-do-load]
+---Load the Lua files that are marked/under the cursor.
+function M.load()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local files = target_files()
+	if files == nil then
+		vim.notify("No files specified")
+		return
+	end
+
+	local choice = vim.fn.confirm(
+		prompt_for_files(files, {
+			operation = "Load",
+			suffix = "?",
+			flag = "*",
+		}),
+		"&Yes\n&No"
+	) --[[@as integer]]
+
+	if choice ~= 1 then
+		return
+	end
+
+	for _, file in ipairs(files) do
+		vim.cmd.source(file)
+	end
+end
+
 return M
