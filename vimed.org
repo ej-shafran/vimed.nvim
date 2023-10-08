@@ -22,31 +22,41 @@
     CLOSED: [2023-10-04 Wed 23:53]
  
 ** Navigation and Actions
-*** TODO Implement keybindings for common file operations (copy, move, delete, rename).
+*** DONE Implement keybindings for common file operations (copy, move, delete, rename).
+    CLOSED: [2023-10-08 Sun 03:09]
 *** TODO Provide options for sorting and filtering files. [1/2]
 **** TODO Filtering
 **** DONE Sorting
      CLOSED: [2023-10-06 Fri 02:23]
-*** TODO Allow for marking files for batch operations.
-*** TODO Implement common file actions (create directory, open in terminal, etc.).
+*** DONE Allow for marking files for batch operations.
+    CLOSED: [2023-10-08 Sun 03:09]
+*** DONE Implement common file actions (create directory, open in terminal, etc.).
+    CLOSED: [2023-10-08 Sun 03:10]
  
 ** File Operations
-*** TODO Implement file copy functionality.
-*** TODO Implement file move functionality.
-*** TODO Implement file deletion functionality.
-*** TODO Implement file renaming functionality.
+*** DONE Implement file copy functionality.
+    CLOSED: [2023-10-08 Sun 03:09]
+*** DONE Implement file move functionality.
+    CLOSED: [2023-10-08 Sun 03:09]
+*** DONE Implement file deletion functionality.
+    CLOSED: [2023-10-08 Sun 03:09]
+*** DONE Implement file renaming functionality.
+    CLOSED: [2023-10-08 Sun 03:10]
  
 ** Additional Features
 *** TODO Add search functionality within the file list.
-*** TODO Implement file permission editing.
+*** DONE Implement file permission editing.
+    CLOSED: [2023-10-08 Sun 03:10]
 *** TODO Allow for customizable themes and appearances.
-*** TODO Provide user configuration options.
+*** DONE Provide user configuration options.
+    CLOSED: [2023-10-08 Sun 03:10]
  
 ** Documentation
 *** TODO Write clear and comprehensive documentation.
 *** TODO Include installation instructions.
 *** TODO Create usage examples and tutorials.
- 
+*** TODO Add checks and error messages for features that only work for POSIX.
+
 ** Testing and Debugging
 *** TODO Implement unit tests for critical functions.
 *** TODO Perform extensive testing to ensure stability.
@@ -100,7 +110,8 @@
 *** TODO > - `dired-next-dirline`
 *** TODO A - `dired-do-find-regexp`
 *** TODO B - `dired-do-byte-compile`
-*** TODO C - `dired-do-copy`
+*** DONE C - `dired-do-copy`
+    CLOSED: [2023-10-08 Sun 03:09]
 *** DONE D - `dired-do-delete`
     CLOSED: [2023-10-07 Sat 23:21]
 *** TODO H - `dired-do-hardlink`
@@ -157,16 +168,3 @@
    DEADLINE: <2023-10-14 Sat 22:00>
 ** TODO Ongoing Maintenance and Updates
    DEADLINE: <2023-10-14 Sat 22:00>
-
-* Resources
-** TODO Neovim Lua Plugin Development Guide
-** TODO Neovim Plugin API Documentation
-** TODO Emacs `dired` Mode Documentation
-** TODO Neovim Community and Forums
-
-* Notes and Ideas
-  Record any ideas or notes that come up during development.
-
-* References
-  Keep a list of helpful articles, tutorials, and code snippets.
-

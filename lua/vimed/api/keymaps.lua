@@ -7,6 +7,7 @@ local M = {}
 ---@type VimedKeymaps
 M.default_keymaps = {
 	n = {
+		C = { commands.copy, "Copy" },
 		D = { commands.delete, "Delete" },
 		J = { commands.goto_file, "Goto File" },
 		M = { commands.chmod, "Change Permissions" },

@@ -36,7 +36,7 @@ local function display_flag(nline, path)
 	local hlgroup = nil
 	if flag == "D" then
 		hlgroup = hls.groups.delete_flagged
-	elseif flag == "*" then
+	elseif flag == "*" or flag == "C" then
 		hlgroup = hls.groups.marked
 	end
 
