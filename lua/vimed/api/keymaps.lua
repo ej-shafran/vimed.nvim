@@ -15,6 +15,7 @@ M.default_keymaps = {
 		M = { commands.chmod, "Change Permissions" },
 		R = { commands.rename, "Rename" },
 		S = { commands.symlink, "Symlink" },
+		T = { commands.touch, "Change Timestamp" },
 		U = { commands.unmark_all, "Unmark All" },
 		d = { commands.flag_file_deletion, "Flag For Deletion" },
 		m = { commands.mark, "Mark" },

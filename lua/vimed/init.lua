@@ -55,6 +55,7 @@ function M.setup(config)
 			cmd("VimedToggleHideDetails", commands.toggle_hide_details)
 			cmd("VimedToggleMarks", commands.toggle_marks)
 			cmd("VimedToggleSort", commands.toggle_sort)
+			cmd("VimedTouch", commands.touch)
 			cmd("VimedUnmark", commands.unmark)
 			cmd("VimedUnmarkAll", commands.unmark_all)
 

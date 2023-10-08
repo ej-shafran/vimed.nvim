@@ -130,7 +130,8 @@
     CLOSED: [2023-10-08 Sun 00:27]
 *** DONE S - `dired-do-symlink`
     CLOSED: [2023-10-08 Sun 03:50]
-*** TODO T - `dired-do-touch`
+*** DONE T - `dired-do-touch`
+    CLOSED: [2023-10-08 Sun 12:44]
 *** DONE U - `dired-unmark-all-marks`
     CLOSED: [2023-10-07 Sat 22:56]
 *** TODO W - `browse-url-of-dired-file`

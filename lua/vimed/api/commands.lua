@@ -119,6 +119,10 @@ M.flag_file_deletion = command.mark("D")
 
 ---[COMMAND - dired-do-chmod]
 M.chmod = command.act_on_files(function(files, input)
+	if input == "" then
+		return
+	end
+
 	local cmd = { "chmod", input }
 	vim.list_extend(cmd, files)
 	os.execute(vim.fn.join(cmd, " "))
@@ -130,6 +134,10 @@ end, {
 
 ---[COMMAND - dired-do-rename]
 M.rename = command.act_on_files(function(files, input)
+	if input == "" then
+		return
+	end
+
 	if #files == 1 and vim.fn.filereadable(input) then
 		local choice = vim.fn.confirm("Overwrite " .. input .. "?", "&Yes\n&No")
 		if choice ~= 1 then
@@ -160,6 +168,23 @@ end, {
 		flag = "*",
 	},
 })
+
+---[COMMAND - dired-do-touch]
+M.touch = command.act_on_files(function(files, input)
+	local cmd = { "touch" }
+	vim.list_extend(cmd, files)
+
+	if input ~= "" then
+		table.insert(cmd, "--date=" .. input)
+	end
+
+	os.execute(vim.fn.join(cmd, " "))
+end, {
+	input = {
+		operation = "Change Timestamp of",
+		suffix = " to (default now): ",
+	},
+}, "shellcmd")
 
 ---[COMMAND - dired-do-copy]
 M.copy = command.create_files(utils.copy_file, {

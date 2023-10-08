@@ -163,8 +163,9 @@ end
 
 ---@param logic fun(files: string[], input: string?): integer|nil|false
 ---@param opts { input: PromptOpts?, confirm: PromptOpts? }
+---@param completion string?
 ---@return function
-function M.act_on_files(logic, opts)
+function M.act_on_files(logic, opts, completion)
 	return function()
 		if not utils.is_vimed() then
 			return
@@ -180,11 +181,8 @@ function M.act_on_files(logic, opts)
 		if opts.input ~= nil then
 			input = vim.fn.input({
 				prompt = prompt_for_files(files, vim.tbl_extend("force", { suffix = " to: ", flag = "*" }, opts.input)),
-				completion = "file",
+				completion = completion or "file",
 			})
-			if input == "" then
-				return
-			end
 		end
 
 		if opts.confirm ~= nil then
