@@ -100,6 +100,16 @@ M.goto_file = command.basic(function()
 	return false
 end)
 
+---[COMMAND - dired-flag-backup-files]
+M.flag_backup_files = command.basic(function()
+	for _, line in pairs(state.lines) do
+		local path = line.path
+		if path:match("~$") ~= nil then
+			state.flags[path] = "D"
+		end
+	end
+end)
+
 ---[COMMAND - dired-prev-dirline]
 M.prev_dirline = command.dirline(function(last, current, offset)
 	if current > last then

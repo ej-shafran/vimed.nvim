@@ -164,7 +164,8 @@
     CLOSED: [2023-10-07 Sat 22:56]
 *** DONE x - `dired-do-flagged-delete`
     CLOSED: [2023-10-07 Sat 22:56]
-*** TODO ~ - `dired-flag-backup-files`
+*** DONE ~ - `dired-flag-backup-files`
+    CLOSED: [2023-10-08 Sun 14:13]
 
 
 * Deadlines and Milestones

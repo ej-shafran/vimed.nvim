@@ -28,6 +28,7 @@ M.default_keymaps = {
 		u = { commands.unmark, "Unmark" },
 		x = { commands.flagged_delete, "Delete Flagged Files" },
 		["<CR>"] = { commands.enter, "Edit File" },
+		["~"] = { commands.flag_backup_files, "Flag Backup Files" },
 		["-"] = { commands.back, "Back" },
 		["^"] = { commands.back, "Back" },
 		["."] = { commands.toggle_hidden, "Toggle Hidden" },
