@@ -96,4 +96,42 @@ function M.parse_ls_line(line, path)
 	}
 end
 
+---Get count of buffers that aren't the current Vimed buffer.
+---@return integer
+function M.count_buffers()
+	local buf_count = 0
+	local current_buffer = vim.api.nvim_get_current_buf()
+	local cwd = vim.fn.getcwd()
+	local bufinfos = vim.fn.getbufinfo({ bufloaded = true, buflisted = true }) --[[@as table]]
+
+	for _, bufinfo in ipairs(bufinfos) do
+		if bufinfo.name ~= cwd and bufinfo.bufnr ~= current_buffer then
+			buf_count = buf_count + 1
+		end
+	end
+
+	return buf_count
+end
+
+---@param source string
+---@param target string
+function M.copy_file(source, target)
+	local source_file = io.open(source, "rb")
+	if not source_file then
+		return
+	end
+
+	local target_file = io.open(target, "wb")
+	if not target_file then
+		source_file:close()
+		return
+	end
+
+	local content = source_file:read("*a")
+	target_file:write(content)
+
+	source_file:close()
+	target_file:close()
+end
+
 return M

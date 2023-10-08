@@ -65,23 +65,6 @@ local function prompt_for_files(files, opts)
 	return prompt
 end
 
----Get count of buffers that aren't the current Vimed buffer.
----@return integer
-local function count_buffers()
-	local buf_count = 0
-	local current_buffer = vim.api.nvim_get_current_buf()
-	local cwd = vim.fn.getcwd()
-	local bufinfos = vim.fn.getbufinfo({ bufloaded = true, buflisted = true }) --[[@as table]]
-
-	for _, bufinfo in ipairs(bufinfos) do
-		if bufinfo.name ~= cwd and bufinfo.bufnr ~= current_buffer then
-			buf_count = buf_count + 1
-		end
-	end
-
-	return buf_count
-end
-
 ---[COMMAND - +dired/quit-all]
 ---Closes the current Vimed buffer. If it's the only buffer, equivalent to `:q`.
 function M.quit()
@@ -89,7 +72,7 @@ function M.quit()
 		return
 	end
 
-	local bufcount = count_buffers()
+	local bufcount = utils.count_buffers()
 	if bufcount > 0 then
 		vim.cmd.bp()
 	else
@@ -614,27 +597,6 @@ function M.load()
 	end
 end
 
----@param source string
----@param target string
-local function copy_file(source, target)
-	local source_file = io.open(source, "rb")
-	if not source_file then
-		return
-	end
-
-	local target_file = io.open(target, "wb")
-	if not target_file then
-		source_file:close()
-		return
-	end
-
-	local content = source_file:read("*a")
-	target_file:write(content)
-
-	source_file:close()
-	target_file:close()
-end
-
 ---@param files string[]
 ---@param create_fn fun(string, string)
 ---@param target string
@@ -685,7 +647,7 @@ function M.copy()
 		return
 	end
 
-	create_files(files, copy_file, target, "C")
+	create_files(files, utils.copy_file, target, "C")
 
 	M.redisplay()
 end
