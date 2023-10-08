@@ -3,7 +3,7 @@
 ---@alias Permissions { is_dir: boolean, user: UserPermissions, group: UserPermissions, owner: UserPermissions }
 
 ---@alias FsEntry
----| { permissions: Permissions, link_count: string, owner: string, group: string, size: string, date: Date, path: string }
+---| { permissions: Permissions, link_count: string, owner: string, group: string, size: string, date: Date, path: string, link: string? }
 
 ---@alias DirContents
 ---| { header: string, lines: string[] }
@@ -48,7 +48,7 @@ end
 ---Get the `ls` command to run.
 ---@return string
 local function run_command()
-	local cmd = "ls --group-directories-first -lh"
+	local cmd = "ls --group-directories-first -lhHQ"
 	if M.show_hidden then
 		cmd = cmd .. " -a"
 	end
@@ -101,6 +101,9 @@ end
 ---@return FsEntry
 local function parse_ls_line(line, path)
 	local sections = vim.fn.split(line) --[[@as table]]
+	local path_section = vim.fn.join(vim.list_slice(sections, 9), " ") --[[@as string]]
+	local file_path = path_section:match('"([^"]*)"')
+	local link = path_section:match('-> "([^"]*)"')
 	return {
 		permissions = parse_permissions(sections[1]),
 		link_count = sections[2],
@@ -112,7 +115,8 @@ local function parse_ls_line(line, path)
 			day = sections[7],
 			time = sections[8],
 		},
-		path = path .. "/" .. sections[9],
+		path = path .. "/" .. file_path,
+		link = link,
 	}
 end
 

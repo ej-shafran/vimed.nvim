@@ -139,6 +139,19 @@ local function display_path(nline, path, hlgroup)
 	nline:append(vim.fs.basename(path), hlgroup or hl)
 end
 
+local function display_link(nline, link, hlgroup)
+	if link == nil then
+		return
+	end
+	local hl = hls.groups.file_name
+	if vim.fn.isdirectory(link) ~= 0 then
+		hl = hls.groups.dir_name
+	end
+
+	nline:append(" -> ", hlgroup)
+	nline:append(link, hlgroup or hl)
+end
+
 local function display()
 	local path = vim.fn.getcwd()
 	assert(path ~= nil, "no cwd")
@@ -161,6 +174,7 @@ local function display()
 			display_date(nline, entry.date, hlgroup)
 		end
 		display_path(nline, entry.path, hlgroup)
+		display_link(nline, entry.link, hlgroup)
 
 		table.insert(M.buffer, nline)
 	end

@@ -2,7 +2,6 @@
 #+author: EJ Shafran
 
 * TODOs
-** TODO Work with `-H`
 
 ** Plugin Architecture
 *** DONE Set up a Neovim plugin development environment.
