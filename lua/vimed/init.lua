@@ -59,6 +59,7 @@ function M.setup(config)
 			cmd("VimedTouch", commands.touch)
 			cmd("VimedUnmark", commands.unmark)
 			cmd("VimedUnmarkAll", commands.unmark_all)
+			cmd("VimedYank", commands.yank)
 
 			keymaps.setup(vim.tbl_deep_extend("force", keymaps.default_keymaps, config.keymaps or {}))
 		end,

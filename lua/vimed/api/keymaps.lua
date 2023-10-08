@@ -18,6 +18,7 @@ M.default_keymaps = {
 		S = { commands.symlink, "Symlink" },
 		T = { commands.touch, "Change Timestamp" },
 		U = { commands.unmark_all, "Unmark All" },
+		Y = { commands.yank, "Yank File Name" },
 		d = { commands.flag_file_deletion, "Flag For Deletion" },
 		m = { commands.mark, "Mark" },
 		o = { commands.toggle_sort, "Toggle Sort Order" },

@@ -201,6 +201,13 @@ end, {
 	},
 }, "shellcmd")
 
+---[COMMAND - dired-copy-filename-as-kill]
+M.yank = command.act_on_files(function(files)
+	local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), " ") --[[@as string]]
+	vim.fn.setreg("+", files_str)
+	vim.notify(files_str)
+end, {})
+
 ---[COMMAND - dired-do-copy]
 M.copy = command.create_files(utils.copy_file, {
 	input = {
@@ -239,7 +246,7 @@ end, {
 local function parse_command_input(files, input)
 	local commands = {}
 	if input:match("%s%*%s") or input:match("%s%*$") or input:match("^%*%s") ~= nil then
-		local files_str = vim.fn.join(files, " ") --[[@as string]]
+		--[[@as string]]
 		input = input:gsub("%s%*%s", " " .. files_str .. " ")
 		input = input:gsub("%s%*$", " " .. files_str)
 		input = input:gsub("^%*%s", files_str .. " ")

@@ -138,7 +138,8 @@
 *** TODO W - `browse-url-of-dired-file`
 *** DONE X - `dired-do-shell-command`
     CLOSED: [2023-10-08 Sun 02:23]
-*** TODO Y - `dired-copy-filename-as-kill`
+*** DONE Y - `dired-copy-filename-as-kill`
+    CLOSED: [2023-10-08 Sun 13:36]
 *** TODO Z - `dired-do-compress`
 *** DONE ^ - `dired-up-directory`
     CLOSED: [2023-10-07 Sat 22:57]
