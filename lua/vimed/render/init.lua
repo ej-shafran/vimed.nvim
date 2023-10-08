@@ -131,12 +131,26 @@ end
 ---@param path string
 ---@param hlgroup string?
 local function display_path(nline, path, hlgroup)
-	local hl = hls.groups.file_name
+	local name = vim.fs.basename(path)
+
 	if vim.fn.isdirectory(path) ~= 0 then
-		hl = hls.groups.dir_name
+		nline:append(name, hlgroup or hls.groups.dir_name)
+		return
 	end
 
-	nline:append(vim.fs.basename(path), hlgroup or hl)
+	local extension = nil
+	local parts = vim.fn.split(name, "\\.") --[[@as table]]
+	if #parts > 1 then
+		extension = parts[#parts]
+		table.remove(parts, #parts)
+	end
+
+	name = vim.fn.join(parts, ".") --[[@as string]]
+	nline:append(name, hlgroup or hls.groups.file_name)
+
+	if extension ~= nil then
+		nline:append("." .. extension, hlgroup or hls.groups.extension)
+	end
 end
 
 local function display_link(nline, link, hlgroup)

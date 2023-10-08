@@ -3,7 +3,7 @@ local M = {}
 ---@alias HighlightStyle { background: string?, foreground: string?, gui: string? }
 
 ---@alias GroupStyles
----| { link_count: HighlightStyle?, size: HighlightStyle?, group: HighlightStyle?, owner: HighlightStyle?, month: HighlightStyle?, day: HighlightStyle?, time: HighlightStyle?, file_name: HighlightStyle?, header: HighlightStyle?, dir_name: HighlightStyle?, total: HighlightStyle?, perm_dir: HighlightStyle?, perm_read: HighlightStyle?, perm_write: HighlightStyle?, perm_group: HighlightStyle?, delete_flagged: HighlightStyle?, marked: HighlightStyle? }
+---| { link_count: HighlightStyle?, size: HighlightStyle?, group: HighlightStyle?, owner: HighlightStyle?, month: HighlightStyle?, day: HighlightStyle?, time: HighlightStyle?, file_name: HighlightStyle?, header: HighlightStyle?, dir_name: HighlightStyle?, total: HighlightStyle?, perm_dir: HighlightStyle?, perm_read: HighlightStyle?, perm_write: HighlightStyle?, perm_group: HighlightStyle?, delete_flagged: HighlightStyle?, marked: HighlightStyle?, extension: HighlightStyle? }
 
 M.groups = {
 	perm_dir = "VimedPermDir",
@@ -23,6 +23,7 @@ M.groups = {
 	total = "VimedTotal",
 	delete_flagged = "VimedDeleteFlagged",
 	marked = "VimedMarked",
+	extension = "VimedExtension",
 }
 
 ---@type GroupStyles
@@ -71,6 +72,9 @@ M.default_styles = {
 	marked = {
 		background = "#2d292c",
 		foreground = "#dda055",
+	},
+	extension = {
+		foreground = "#65738e",
 	},
 }
 
