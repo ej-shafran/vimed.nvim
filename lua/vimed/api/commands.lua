@@ -1,4 +1,5 @@
 local utils = require("vimed.api.utils")
+local state = require("vimed._state")
 local render = require("vimed.render")
 
 local M = {}
@@ -8,12 +9,12 @@ local M = {}
 ---@return integer r current row in the buffer
 local function cursor_path()
 	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
-	local header_lines = utils.hide_details and 1 or 2
+	local header_lines = state.hide_details and 1 or 2
 	if r < header_lines + 1 then
 		return nil, r
 	end
 
-	return utils.lines[r - header_lines].path, r
+	return state.lines[r - header_lines].path, r
 end
 
 ---Get either the marked files or the file under the cursor if there aren't any.
@@ -21,7 +22,7 @@ end
 local function target_files()
 	local files = {}
 	local cwd = vim.fn.getcwd()
-	for path, flag in pairs(utils.flags) do
+	for path, flag in pairs(state.flags) do
 		if flag == "*" and vim.fs.dirname(path) == cwd then
 			table.insert(files, path)
 		end
@@ -139,7 +140,7 @@ function M.toggle_hidden()
 		return
 	end
 
-	utils.show_hidden = not utils.show_hidden
+	state.show_hidden = not state.show_hidden
 	M.redisplay()
 end
 
@@ -171,7 +172,7 @@ function M.toggle_sort()
 		return
 	end
 
-	utils.sort_by_time = not utils.sort_by_time
+	state.sort_by_time = not state.sort_by_time
 	M.redisplay()
 end
 
@@ -204,13 +205,13 @@ local function mark(flag)
 
 		local line_start = vstart[2]
 		local line_end = vend[2]
-		local header_lines = utils.hide_details and 1 or 2
+		local header_lines = state.hide_details and 1 or 2
 		for r = line_start, line_end do
 			if r >= header_lines + 1 then
-				local path = utils.lines[r - header_lines].path
+				local path = state.lines[r - header_lines].path
 				local basename = vim.fs.basename(path)
 				if basename ~= "." and basename ~= ".." then
-					utils.flags[path] = flag
+					state.flags[path] = flag
 				end
 			end
 		end
@@ -224,7 +225,7 @@ local function mark(flag)
 
 		local basename = vim.fs.basename(path)
 		if basename ~= "." and basename ~= ".." then
-			utils.flags[path] = flag
+			state.flags[path] = flag
 		end
 		M.redisplay(r + 1)
 	end
@@ -258,7 +259,7 @@ local function delete_files(files)
 
 	for _, path in ipairs(files) do
 		vim.fn.delete(path, "rf")
-		utils.flags[path] = nil
+		state.flags[path] = nil
 	end
 end
 
@@ -271,7 +272,7 @@ function M.flagged_delete()
 
 	---@type string[]
 	local files = {}
-	for k, v in pairs(utils.flags) do
+	for k, v in pairs(state.flags) do
 		if v == "D" then
 			table.insert(files, k)
 		end
@@ -336,9 +337,9 @@ function M.unmark_all()
 
 	local file_count = 0
 	local cwd = vim.fn.getcwd()
-	for path, _ in pairs(utils.flags) do
+	for path, _ in pairs(state.flags) do
 		if vim.fs.dirname(path) == cwd then
-			utils.flags[path] = nil
+			state.flags[path] = nil
 			file_count = file_count + 1
 		end
 	end
@@ -355,12 +356,12 @@ function M.toggle_marks()
 		return
 	end
 
-	for _, line in pairs(utils.lines) do
+	for _, line in pairs(state.lines) do
 		local path = line.path
-		if utils.flags[path] == "*" then
-			utils.flags[path] = nil
-		elseif not utils.flags[path] then
-			utils.flags[path] = "*"
+		if state.flags[path] == "*" then
+			state.flags[path] = nil
+		elseif not state.flags[path] then
+			state.flags[path] = "*"
 		end
 	end
 
@@ -385,7 +386,7 @@ function M.goto_file()
 	end
 
 	file = vim.fs.normalize(cwd .. "/" .. file)
-	for i, line in pairs(utils.lines) do
+	for i, line in pairs(state.lines) do
 		if line.path == file then
 			vim.api.nvim_win_set_cursor(0, { i + 2, 0 })
 			break
@@ -578,7 +579,7 @@ function M.toggle_hide_details()
 		return
 	end
 
-	utils.hide_details = not utils.hide_details
+	state.hide_details = not state.hide_details
 	M.redisplay()
 end
 
@@ -643,7 +644,7 @@ local function create_files(files, create_fn, target, flag)
 	target = vim.fs.normalize(cwd .. "/" .. target)
 	if #files == 1 then
 		create_fn(files[1], target)
-		utils.flags[target] = flag
+		state.flags[target] = flag
 	else
 		local choice = vim.fn.confirm("Create destination dir `" .. target .. "`?", "&Yes\n&No") --[[@as integer]]
 		if choice == 1 then
@@ -652,7 +653,7 @@ local function create_files(files, create_fn, target, flag)
 			for _, file in ipairs(files) do
 				local file_path = vim.fs.normalize(target .. "/" .. vim.fs.basename(file))
 				create_fn(file, file_path)
-				utils.flags[file_path] = flag
+				state.flags[file_path] = flag
 			end
 		end
 	end

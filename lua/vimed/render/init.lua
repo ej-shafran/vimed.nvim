@@ -1,4 +1,4 @@
-local utils = require("vimed.api.utils")
+local state = require("vimed._state")
 local hls = require("vimed.render.highlights")
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
@@ -31,7 +31,7 @@ end
 ---@param path string
 ---@return string?
 local function display_flag(nline, path)
-	local flag = utils.flags[path]
+	local flag = state.flags[path]
 
 	local hlgroup = nil
 	if flag == "D" then
@@ -170,16 +170,16 @@ local function display()
 	local path = vim.fn.getcwd()
 	assert(path ~= nil, "no cwd")
 
-	local entries, header = utils.dir_contents(path)
+	local entries, header = state.dir_contents(path)
 	display_header(M.buffer, path)
-	if not utils.hide_details then
+	if not state.hide_details then
 		display_total(M.buffer, header)
 	end
 	for _, entry in pairs(entries) do
 		local nline = NuiLine()
 
 		local hlgroup = display_flag(nline, entry.path)
-		if not utils.hide_details then
+		if not state.hide_details then
 			display_permissions(nline, entry.permissions, hlgroup)
 			display_link_count(nline, entry.link_count, hlgroup)
 			display_group(nline, entry.group, hlgroup)
