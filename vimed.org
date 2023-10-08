@@ -180,7 +180,8 @@
 *** TODO * .              dired-mark-extension
 *** TODO * /              dired-mark-directories
 *** TODO * ?              dired-unmark-all-files
-*** TODO * @              dired-mark-symlinks
+*** DONE * @              dired-mark-symlinks
+    CLOSED: [2023-10-08 Sun 18:59]
 *** TODO * O              dired-mark-omitted
 *** TODO * c              dired-change-marks
 *** DONE * m              dired-mark

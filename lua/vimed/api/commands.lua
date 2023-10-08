@@ -415,4 +415,9 @@ M.mark_executables = command.mark_via_filter(function(entry)
 	return not entry.permissions.is_dir and entry.permissions.user.execute
 end, { flag = "*", kind = "executable" })
 
+---[COMMAND - dired-mark-symlinks]
+M.mark_symlinks = command.mark_via_filter(function(entry)
+	return entry.link ~= nil
+end, { flag = "*", kind = "symbolic link" })
+
 return M
