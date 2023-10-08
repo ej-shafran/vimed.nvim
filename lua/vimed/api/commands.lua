@@ -187,6 +187,45 @@ end, {
 	},
 })
 
+local compress_files_alist = {
+	["%.tar%.gz$"] = "tar -cf - %i | gzip -c9 > %o",
+	["%.tar%.bz2$"] = "tar -cf - %i | bzip2 -c9 > %o",
+	["%.tar%.xz$"] = "tar -cf - %i | xz -c9 > %o",
+	["%.tar%.zst$"] = "tar -cf - %i | zstd -19 -o %o",
+	["%.zip$"] = "zip %o -r --filesync %i",
+}
+
+---[COMMAND - dired-do-compress-to]
+M.compress_to = command.act_on_files(function(files)
+	local target = vim.fn.input({
+		prompt = "Compress to: ",
+		completion = "file",
+	})
+
+	if target == "" then
+		return
+	end
+
+	local base_cmd = nil
+	for pattern, value in pairs(compress_files_alist) do
+		if target:match(pattern) ~= nil then
+			base_cmd = value
+			break
+		end
+	end
+
+	local extension = vim.fn.fnamemodify(target, ":e")
+	if base_cmd == nil then
+		vim.notify("No compression rule found for `." .. extension .. "`")
+		return false
+	end
+
+	local cmd = base_cmd:gsub("%%i", vim.fn.join(vim.tbl_map(vim.fs.basename, files), " "))
+	cmd = cmd:gsub("%%o", target)
+
+	vim.notify(utils.command(cmd))
+end, {})
+
 ---[COMMAND - dired-do-chown]
 M.chown = command.act_on_files(function(files, input)
 	if input == "" then

@@ -20,6 +20,7 @@ M.default_keymaps = {
 		U = { commands.unmark_all, "Unmark All" },
 		Y = { commands.yank, "Yank File Name" },
 		Z = { commands.compress, "Compress Or Uncompress" },
+		c = { commands.compress_to, "Compress To" },
 		d = { commands.flag_file_deletion, "Flag For Deletion" },
 		m = { commands.mark, "Mark" },
 		o = { commands.toggle_sort, "Toggle Sort Order" },

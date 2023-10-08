@@ -147,7 +147,8 @@
 *** DONE ^ - `dired-up-directory`
     CLOSED: [2023-10-07 Sat 22:57]
 *** TODO a - `dired-find-alternate-file`
-*** TODO c - `dired-do-compress-to`
+*** DONE c - `dired-do-compress-to`
+    CLOSED: [2023-10-08 Sun 17:01]
 *** DONE d - `dired-flag-file-deletion`
     CLOSED: [2023-10-07 Sat 22:56]
 *** TODO i - `dired-toggle-read-only`
