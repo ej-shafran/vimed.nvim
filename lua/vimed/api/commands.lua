@@ -410,4 +410,9 @@ end, "(No deletions requested)")
 ---[COMMAND - dired-do-delete]
 M.delete = command.delete_files(command.target_files, "No file on this line")
 
+---[COMMAND - dired-mark-executables]
+M.mark_executables = command.mark_via_filter(function(entry)
+	return not entry.permissions.is_dir and entry.permissions.user.execute
+end, { flag = "*", kind = "executable" })
+
 return M

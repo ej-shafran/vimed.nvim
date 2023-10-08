@@ -175,7 +175,8 @@
     CLOSED: [2023-10-08 Sun 18:38]
 *** TODO * %              dired-mark-files-regexp
 *** TODO * (              dired-mark-sexp
-*** TODO * *              dired-mark-executables
+*** DONE * *              dired-mark-executables
+    CLOSED: [2023-10-08 Sun 18:54]
 *** TODO * .              dired-mark-extension
 *** TODO * /              dired-mark-directories
 *** TODO * ?              dired-unmark-all-files

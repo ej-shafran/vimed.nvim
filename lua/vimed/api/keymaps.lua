@@ -48,6 +48,7 @@ M.default_keymaps = {
 		["*m"] = { commands.mark, "Mark" },
 		["*t"] = { commands.toggle_marks, "Toggle Marks" },
 		["*!"] = { commands.unmark_all, "Unmark All" },
+		["**"] = { commands.mark_executables, "Mark Executables" },
 	},
 	x = {
 		d = { commands.flag_file_deletion, "Flag For Deletion" },

@@ -387,4 +387,27 @@ function M.confirm_each_file(transform, opts)
 	end
 end
 
+---@param filter fun(entry: FsEntry): boolean
+---@param opts { flag: string, kind: string }
+function M.mark_via_filter(filter, opts)
+	return function()
+		if not utils.is_vimed() then
+			return
+		end
+
+		local count = 0
+		for _, line in ipairs(state.lines) do
+			if state.flags[line.path] ~= opts.flag and filter(line) then
+				state.flags[line.path] = opts.flag
+				count = count + 1
+			end
+		end
+
+		local suffix = count == 1 and "" or "s"
+		vim.notify(count .. " " .. opts.kind .. suffix .. " marked")
+
+		M.redisplay()
+	end
+end
+
 return M
