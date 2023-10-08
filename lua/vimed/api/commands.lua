@@ -4,11 +4,33 @@ local render = require("vimed.render")
 
 local M = {}
 
+---@param r integer? the row to place the cursor at after rerendering
+local function redisplay(r)
+	if not utils.is_vimed() then
+		return
+	end
+
+	if r == nil then
+		r = unpack(vim.api.nvim_win_get_cursor(0))
+	end
+
+	render.render()
+
+	local last_line = vim.fn.line("w$") --[[@as number]]
+	if r > last_line then
+		r = last_line
+	end
+	vim.api.nvim_win_set_cursor(0, { r, 0 })
+end
+
+---[COMMAND - dired-do-redisplay]
+M.redisplay = redisplay
+
 ---Get the path under the cursor, or `nil` if there isn't one.
 ---@return string|nil
 ---@return integer r current row in the buffer
 local function cursor_path()
-	local r, _ = unpack(vim.api.nvim_win_get_cursor(0))
+	local r = unpack(vim.api.nvim_win_get_cursor(0))
 	local header_lines = state.hide_details and 1 or 2
 	if r < header_lines + 1 then
 		return nil, r
@@ -16,6 +38,188 @@ local function cursor_path()
 
 	return state.lines[r - header_lines].path, r
 end
+
+---@param logic fun(): integer|nil|false
+local function command(logic)
+	return function()
+		if not utils.is_vimed() then
+			return
+		end
+
+		local r = logic()
+
+		if r ~= false then
+			redisplay(r)
+		end
+	end
+end
+
+---[COMMAND - +dired/quit-all]
+M.quit = command(function()
+	local bufcount = utils.count_buffers()
+	if bufcount > 0 then
+		vim.cmd.bp()
+	else
+		vim.cmd.q()
+	end
+
+	return false
+end)
+
+---[COMMAND - dired-up-directory]
+M.back = command(function()
+	local cwd = vim.fn.getcwd() --[[@as string]]
+	local dir = vim.fs.dirname(cwd)
+	vim.api.nvim_set_current_dir(dir)
+end)
+
+---[COMMAND - dired-find-file]
+M.enter = command(function()
+	local path = cursor_path()
+	if path == nil then
+		return false
+	end
+
+	if vim.fn.isdirectory(path) == 0 then
+		vim.cmd.e(path)
+		return false
+	else
+		vim.api.nvim_set_current_dir(path)
+	end
+end)
+
+---[COMMAND - dired-create-directory]
+M.create_dir = command(function()
+	local dirname = vim.fn.input({
+		prompt = "Create directory: ",
+	})
+
+	vim.fn.mkdir(dirname, "p")
+end)
+
+---[COMMAND - dired-unmark-all-marks]
+M.unmark_all = command(function()
+	local file_count = 0
+	local cwd = vim.fn.getcwd()
+	for path, _ in pairs(state.flags) do
+		if vim.fs.dirname(path) == cwd then
+			state.flags[path] = nil
+			file_count = file_count + 1
+		end
+	end
+
+	vim.notify(file_count .. " marks removed")
+end)
+
+---[COMMAND - dired-toggle-marks]
+M.toggle_marks = command(function()
+	for _, line in pairs(state.lines) do
+		local path = line.path
+		if state.flags[path] == "*" then
+			state.flags[path] = nil
+		elseif not state.flags[path] then
+			state.flags[path] = "*"
+		end
+	end
+end)
+
+---[COMMAND - dired-goto-file]
+M.goto_file = command(function()
+	local cwd = vim.fn.getcwd()
+	local file = vim.fn.input({
+		prompt = "Goto file: ",
+		completion = "file",
+	})
+
+	if not file then
+		return false
+	end
+
+	file = vim.fs.normalize(cwd .. "/" .. file)
+	for i, line in pairs(state.lines) do
+		if line.path == file then
+			vim.api.nvim_win_set_cursor(0, { i + 2, 0 })
+			break
+		end
+	end
+
+	return false
+end)
+
+---@param state_key string
+---@return function
+local function toggle_command(state_key)
+	return function()
+		if not utils.is_vimed() then
+			return
+		end
+
+		state[state_key] = not state[state_key]
+		redisplay()
+	end
+end
+
+---[COMMAND]
+M.toggle_hidden = toggle_command("show_hidden")
+
+---[COMMAND - dired-sort-toggle-or-edit]
+M.toggle_sort = toggle_command("sort_by_time")
+
+---[COMMAND - dired-hide-details-mode]
+M.toggle_hide_details = toggle_command("hide_details")
+
+local function mark_command(flag)
+	return function()
+		if not utils.is_vimed() then
+			return
+		end
+
+		local mode = vim.fn.mode() --[[@as string]]
+		if mode:lower() == "v" then
+			vim.cmd.normal("")
+
+			local vstart = vim.fn.getpos("'<")
+			local vend = vim.fn.getpos("'>")
+			assert(vstart ~= nil)
+			assert(vend ~= nil)
+
+			local line_start = vstart[2]
+			local line_end = vend[2]
+			local header_lines = state.hide_details and 1 or 2
+			for r = line_start, line_end do
+				if r >= header_lines + 1 then
+					local path = state.lines[r - header_lines].path
+					local basename = vim.fs.basename(path)
+					if basename ~= "." and basename ~= ".." then
+						state.flags[path] = flag
+					end
+				end
+			end
+
+			redisplay()
+		else
+			local path, r = cursor_path()
+			if path == nil then
+				return
+			end
+
+			local basename = vim.fs.basename(path)
+			if basename ~= "." and basename ~= ".." then
+				state.flags[path] = flag
+			end
+			redisplay(r + 1)
+		end
+	end
+end
+
+---[COMMAND - dired-unmark]
+M.unmark = mark_command(nil)
+
+---[COMMAND - dired-mark]
+M.mark = mark_command("*")
+
+---[COMMAND - dired-flag-file-deletion]
+M.flag_file_deletion = mark_command("D")
 
 ---Get either the marked files or the file under the cursor if there aren't any.
 ---@return string[]|nil
@@ -39,9 +243,11 @@ local function target_files()
 	return files
 end
 
+---@alias PromptOpts {operation: string, flag: string, suffix: string?, multi_operation: string?}
+
 ---Create a prompt for an operation which can be done on marked files or the file under the cursor.
 ---@param files string[]
----@param opts {operation: string, flag: string, suffix: string?, multi_operation: string?}
+---@param opts PromptOpts
 ---@return string
 local function prompt_for_files(files, opts)
 	local prompt
@@ -65,194 +271,335 @@ local function prompt_for_files(files, opts)
 	return prompt
 end
 
----[COMMAND - +dired/quit-all]
----Closes the current Vimed buffer. If it's the only buffer, equivalent to `:q`.
-function M.quit()
-	if not utils.is_vimed() then
-		return
-	end
+---@param logic fun(files: string[], input: string?): integer|nil|false
+---@param opts { input: { prompt: PromptOpts, completion: string? }?, confirm: { prompt: PromptOpts }? }
+---@return function
+local function files_command(logic, opts)
+	return function()
+		if not utils.is_vimed() then
+			return
+		end
 
-	local bufcount = utils.count_buffers()
-	if bufcount > 0 then
-		vim.cmd.bp()
-	else
-		vim.cmd.q()
+		local files = target_files()
+		if files == nil then
+			vim.notify("No files specified")
+			return
+		end
+
+		local input = nil
+		if opts.input ~= nil then
+			input = vim.fn.input({
+				prompt = prompt_for_files(files, opts.input.prompt),
+				completion = opts.input.completion,
+			})
+			if input == "" then
+				return
+			end
+		end
+
+		if opts.confirm ~= nil then
+			local choice = vim.fn.confirm(prompt_for_files(files, opts.confirm.prompt), "&Yes\n&No")
+			if choice ~= 1 then
+				return
+			end
+		end
+
+		local r = logic(files, input)
+
+		if r ~= false then
+			redisplay(r)
+		end
 	end
 end
 
----[COMMAND - dired-find-file]
----If the line under the cursor is a file path, edit that file.
----If the line under the cursor is a directory path, change the current directory to it and re-render the Vimed buffer.
-function M.enter()
-	if not utils.is_vimed() then
-		return
+---[COMMAND - dired-do-chmod]
+M.chmod = files_command(function(files, input)
+	local cmd = { "chmod", input }
+	vim.list_extend(cmd, files)
+	os.execute(vim.fn.join(cmd, " "))
+end, {
+	input = {
+		prompt = {
+			operation = "Change mode of",
+			suffix = " to: ",
+			flag = "*",
+		},
+		completion = "file",
+	},
+})
+
+---[COMMAND - dired-do-rename]
+M.rename = files_command(function(files, input)
+	if #files == 1 and vim.fn.filereadable(input) then
+		local choice = vim.fn.confirm("Overwrite " .. input .. "?", "&Yes\n&No")
+		if choice ~= 1 then
+			return
+		end
 	end
 
-	local path = cursor_path()
-	if path == nil then
-		return
+	for _, file in ipairs(files) do
+		local cmd = { "mv", file, input }
+		os.execute(vim.fn.join(cmd, " "))
 	end
+end, {
+	input = {
+		prompt = {
+			operation = "Rename",
+			multi_operation = "Move",
+			suffix = " to: ",
+			flag = "*",
+		},
+		completion = "file",
+	},
+})
 
-	if vim.fn.isdirectory(path) == 0 then
-		vim.cmd.e(path)
-	else
-		vim.api.nvim_set_current_dir(path)
-		M.redisplay()
+---[COMMAND - dired-do-load]
+M.load = files_command(function(files)
+	for _, file in ipairs(files) do
+		vim.cmd.source(file)
 	end
-end
+end, {
+	confirm = {
+		prompt = {
+			operation = "Load",
+			suffix = "?",
+			flag = "*",
+		},
+	},
+})
 
----[COMMAND - dired-up-directory]
----Go up one directory level and re-render the Vimed buffer.
-function M.back()
-	if not utils.is_vimed() then
-		return
-	end
+---@param logic fun(src: string, trg: string)
+---@param opts { input: { prompt: PromptOpts, completion: string? }, flag: string }
+local function create_files_command(logic, opts)
+	return function()
+		if not utils.is_vimed() then
+			return
+		end
 
-	local cwd = vim.fn.getcwd()
-	assert(cwd ~= nil, "no cwd")
+		local files = target_files()
+		if files == nil then
+			vim.notify("No files specified")
+			return
+		end
 
-	local dir = vim.fs.dirname(cwd)
-	vim.api.nvim_set_current_dir(dir)
-	M.redisplay()
-end
+		local target = vim.fn.input({
+			prompt = prompt_for_files(files, opts.input.prompt),
+			completion = opts.input.completion,
+		})
+		if target == "" then
+			return
+		end
 
----[COMMAND]
----Toggle the showing of hidden files.
-function M.toggle_hidden()
-	if not utils.is_vimed() then
-		return
-	end
+		local cwd = vim.fn.getcwd()
+		target = vim.fs.normalize(cwd .. "/" .. target)
+		if #files == 1 then
+			logic(files[1], target)
+			state.flags[target] = opts.flag
+		else
+			local choice = vim.fn.confirm("Create destination dir `" .. target .. "`?", "&Yes\n&No") --[[@as integer]]
+			if choice == 1 then
+				vim.fn.mkdir(target, "p")
 
-	state.show_hidden = not state.show_hidden
-	M.redisplay()
-end
-
----[COMMAND - dired-do-redisplay]
----Re-render the Vimed display.
----@param r integer? row to place cursor at
-function M.redisplay(r)
-	if not utils.is_vimed() then
-		return
-	end
-
-	if r == nil then
-		r, _ = unpack(vim.api.nvim_win_get_cursor(0))
-	end
-
-	render.render()
-
-	local last_line = vim.fn.line("w$") --[[@as number]]
-	if r > last_line then
-		r = last_line
-	end
-	vim.api.nvim_win_set_cursor(0, { r, 0 })
-end
-
----[COMMAND - dired-sort-toggle-or-edit]
----Toggle between "date" and "name" sorts.
-function M.toggle_sort()
-	if not utils.is_vimed() then
-		return
-	end
-
-	state.sort_by_time = not state.sort_by_time
-	M.redisplay()
-end
-
----[COMMAND - dired-create-directory]
----Prompt for a directory name and create it.
-function M.create_dir()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local dirname = vim.fn.input({
-		prompt = "Create directory: ",
-	})
-
-	vim.fn.mkdir(dirname, "p")
-	M.redisplay()
-end
-
----Mark either the files within the visual selection or the file under the cursor with `flag`.
----@param flag string|nil the flag to use; if `nil` the files are unmarked.
-local function mark(flag)
-	local mode = vim.fn.mode() --[[@as string]]
-	if mode:lower() == "v" then
-		vim.cmd.normal("")
-
-		local vstart = vim.fn.getpos("'<")
-		local vend = vim.fn.getpos("'>")
-		assert(vstart ~= nil)
-		assert(vend ~= nil)
-
-		local line_start = vstart[2]
-		local line_end = vend[2]
-		local header_lines = state.hide_details and 1 or 2
-		for r = line_start, line_end do
-			if r >= header_lines + 1 then
-				local path = state.lines[r - header_lines].path
-				local basename = vim.fs.basename(path)
-				if basename ~= "." and basename ~= ".." then
-					state.flags[path] = flag
+				for _, file in ipairs(files) do
+					local file_path = vim.fs.normalize(target .. "/" .. vim.fs.basename(file))
+					logic(file, file_path)
+					state.flags[file_path] = opts.flag
 				end
 			end
 		end
 
-		M.redisplay()
-	else
-		local path, r = cursor_path()
-		if path == nil then
+		redisplay()
+	end
+end
+
+---[COMMAND - dired-do-copy]
+M.copy = create_files_command(utils.copy_file, {
+	input = {
+		prompt = {
+			operation = "Copy",
+			suffix = " to: ",
+			flag = "*",
+		},
+		completion = "file",
+	},
+	flag = "C",
+})
+
+---[COMMAND - dired-do-symlink]
+M.symlink = create_files_command(function(src, trg)
+	os.execute(vim.fn.join({ "ln", "-s", src, trg }, " "))
+end, {
+	input = {
+		prompt = {
+			operation = "Symlink",
+			suffix = " from: ",
+			flag = "*",
+		},
+		completion = "file",
+	},
+	flag = "Y",
+})
+
+---[COMMAND - dired-do-hardlink]
+M.hardlink = create_files_command(function(src, trg)
+	os.execute(vim.fn.join({ "ln", src, trg }, " "))
+end, {
+	input = {
+		prompt = {
+			operation = "Hardlink",
+			suffix = " from: ",
+			flag = "*",
+		},
+		completion = "file",
+	},
+	flag = "H",
+})
+
+---@param parse fun(files: string[], input: string): string[], boolean
+---@param opts { input: { prompt: PromptOpts, completion: string? } }
+---@return function
+local function execute_command(parse, opts)
+	return function()
+		if not utils.is_vimed() then
 			return
 		end
 
-		local basename = vim.fs.basename(path)
-		if basename ~= "." and basename ~= ".." then
-			state.flags[path] = flag
+		local files = target_files()
+		if files == nil then
+			vim.notify("No files specified")
+			return
 		end
-		M.redisplay(r + 1)
+
+		local input = vim.fn.input({
+			prompt = prompt_for_files(files, opts.input.prompt),
+			completion = opts.input.completion,
+		})
+		if input == "" then
+			return
+		end
+
+		local commands, is_async = parse(files, input)
+
+		if is_async then
+			local acc = ""
+			for _, cmd in ipairs(commands) do
+				acc = acc .. utils.command(cmd)
+			end
+			vim.cmd.split()
+			vim.cmd.e("Async Shell Result")
+			vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(acc, "\n") --[[@as table]])
+		else
+			for _, cmd in ipairs(commands) do
+				os.execute(cmd)
+			end
+		end
 	end
 end
 
----[COMMAND - dired-flag-file-deletion]
----Toggle whether the path(s) under the cursor is flagged to be deleted.
-function M.flag_file_deletion()
-	if not utils.is_vimed() then
-		return
-	end
-
-	mark("D")
-end
-
----Prompt user to confirm deletion and delete the files passed in if confirmed.
----*Does not* rerender the Vimed buffer.
+---Parse a user-entered shell command to inline the selected files into it, using dired syntax.
+---@param input string
 ---@param files string[]
-local function delete_files(files)
-	local choice = vim.fn.confirm(
-		prompt_for_files(files, {
-			operation = "Delete",
-			flag = "D",
-			if_none = "(No deletions requested)",
-		}),
-		"&Yes\n&No"
-	) --[[@as integer]]
-	if choice ~= 1 then
-		return
+---@return string[]
+local function parse_command_input(files, input)
+	local commands = {}
+	if input:match("%s%*%s") or input:match("%s%*$") or input:match("^%*%s") ~= nil then
+		local files_str = vim.fn.join(files, " ") --[[@as string]]
+		input = input:gsub("%s%*%s", " " .. files_str .. " ")
+		input = input:gsub("%s%*$", " " .. files_str)
+		input = input:gsub("^%*%s", files_str .. " ")
+		commands = { input }
+	else
+		for _, file in ipairs(files) do
+			local cmd = input
+
+			if cmd:match("%s%?%s") or cmd:match("%s%?$") or cmd:match("^%?%s") ~= nil then
+				cmd = cmd:gsub("%s%?%s", " " .. file .. " ")
+				cmd = cmd:gsub("%s%?$", " " .. file)
+				cmd = cmd:gsub("^%?%s", file .. " ")
+			else
+				cmd = cmd .. " " .. file
+			end
+
+			table.insert(commands, cmd)
+		end
+	end
+	return commands
+end
+
+---[COMMAND - dired-do-shell-command]
+M.shell_command = execute_command(function(files, input)
+	local is_async = input:match("&$") ~= nil
+	if is_async then
+		input = input:gsub("&$", "")
 	end
 
-	for _, path in ipairs(files) do
-		vim.fn.delete(path, "rf")
-		state.flags[path] = nil
+	local commands = parse_command_input(files, input)
+
+	return commands, is_async
+end, {
+	input = {
+		prompt = {
+			operation = "! on",
+			suffix = ": ",
+			flag = "*",
+		},
+		completion = "shellcmd",
+	},
+})
+
+---[COMMAND - dired-do-async-shell-command]
+M.async_shell_command = execute_command(function(files, input)
+	local commands = parse_command_input(files, input)
+
+	return commands, true
+end, {
+	input = {
+		prompt = {
+			operation = "& on",
+			suffix = ": ",
+			flag = "*",
+		},
+		completion = "shellcmd",
+	},
+})
+
+---@param get_files fun(): string[]|nil
+---@param if_none string
+---@return function
+local function delete_files_command(get_files, if_none)
+	return function()
+		if not utils.is_vimed() then
+			return
+		end
+
+		local files = get_files()
+		if files == nil or #files == 0 then
+			vim.notify(if_none)
+			return
+		end
+
+		local choice = vim.fn.confirm(
+			prompt_for_files(files, {
+				operation = "Delete",
+				flag = "D",
+			}),
+			"&Yes\n&No"
+		) --[[@as integer]]
+		if choice ~= 1 then
+			return
+		end
+
+		for _, path in ipairs(files) do
+			vim.fn.delete(path, "rf")
+			state.flags[path] = nil
+		end
+
+		redisplay()
 	end
 end
 
 ---[COMMAND - dired-do-flagged-delete]
----Delete all files that are flagged for deletion.
-function M.flagged_delete()
-	if not utils.is_vimed() then
-		return
-	end
-
+M.flagged_delete = delete_files_command(function()
 	---@type string[]
 	local files = {}
 	for k, v in pairs(state.flags) do
@@ -261,461 +608,12 @@ function M.flagged_delete()
 		end
 	end
 	local cwd = vim.fn.getcwd()
-	files = vim.tbl_filter(function(value)
+	return vim.tbl_filter(function(value)
 		return vim.fs.dirname(value) == cwd
 	end, files)
-
-	if #files == 0 then
-		vim.notify("No files specified")
-		return
-	end
-
-	delete_files(files)
-	M.redisplay()
-end
+end, "(No deletions requested)")
 
 ---[COMMAND - dired-do-delete]
----Delete either the marked files or the file under the cursor.
-function M.delete()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local files = target_files()
-	if files == nil then
-		vim.notify("No files on this line")
-		return
-	end
-
-	delete_files(files)
-	M.redisplay()
-end
-
----[COMMAND - dired-unmark]
----Remove flag for the path under the cursor.
-function M.unmark()
-	if not utils.is_vimed() then
-		return
-	end
-
-	mark(nil)
-end
-
----[COMMAND - dired-mark]
----Toggle whether the path(s) under the cursor is marked for actions.
-function M.mark()
-	if not utils.is_vimed() then
-		return
-	end
-
-	mark("*")
-end
-
----[COMMAND - dired-unmark-all-marks]
----Remove all marks in current Vimed buffer.
-function M.unmark_all()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local file_count = 0
-	local cwd = vim.fn.getcwd()
-	for path, _ in pairs(state.flags) do
-		if vim.fs.dirname(path) == cwd then
-			state.flags[path] = nil
-			file_count = file_count + 1
-		end
-	end
-
-	vim.notify(file_count .. " marks removed")
-
-	M.redisplay()
-end
-
----[COMMAND - dired-toggle-marks]
----Unmark all files marked with "*" and mark all unmarked files with "*".
-function M.toggle_marks()
-	if not utils.is_vimed() then
-		return
-	end
-
-	for _, line in pairs(state.lines) do
-		local path = line.path
-		if state.flags[path] == "*" then
-			state.flags[path] = nil
-		elseif not state.flags[path] then
-			state.flags[path] = "*"
-		end
-	end
-
-	M.redisplay()
-end
-
----[COMMAND - dired-goto-file]
----Select a file and jump to that file's line in the current Vimed buffer.
-function M.goto_file()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local cwd = vim.fn.getcwd()
-	local file = vim.fn.input({
-		prompt = "Goto file: ",
-		completion = "file",
-	})
-
-	if not file then
-		return
-	end
-
-	file = vim.fs.normalize(cwd .. "/" .. file)
-	for i, line in pairs(state.lines) do
-		if line.path == file then
-			vim.api.nvim_win_set_cursor(0, { i + 2, 0 })
-			break
-		end
-	end
-end
-
----[COMMAND - dired-do-chmod]
----Prompt for a mode change and apply it using `chmod` to the marked files, or the file under the cursor if there are none.
-function M.chmod()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local files = target_files()
-	if files == nil then
-		vim.notify("No files specified")
-		return
-	end
-
-	local mode_change = vim.fn.input({
-		prompt = prompt_for_files(files, {
-			operation = "Change mode of",
-			suffix = " to: ",
-			flag = "*",
-		}),
-	})
-	if mode_change == "" then
-		return
-	end
-
-	local cmd = { "chmod", mode_change }
-	vim.list_extend(cmd, files)
-	os.execute(vim.fn.join(cmd, " "))
-
-	M.redisplay()
-end
-
----[COMMAND - dired-do-rename]
----Prompt for a new name and apply it using `mv` to the marked files, or the file under the cursor if there are none.
-function M.rename()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local files = target_files()
-	if files == nil then
-		vim.notify("No files specified")
-		return
-	end
-
-	local location = vim.fn.input({
-		prompt = prompt_for_files(files, {
-			operation = "Rename",
-			multi_operation = "Move",
-			suffix = " to: ",
-			flag = "*",
-		}),
-		completion = "file",
-	})
-	if location == "" then
-		return
-	end
-
-	for _, file in ipairs(files) do
-		local cmd = { "mv", file, location }
-		os.execute(vim.fn.join(cmd, " "))
-	end
-
-	M.redisplay()
-end
-
----Parse a user-entered shell command to inline the selected files into it, using dired syntax.
----@param command_input string
----@param files string[]
----@return string[]
-local function parse_command_input(command_input, files)
-	local commands = {}
-	if command_input:match("%s%*%s") or command_input:match("%s%*$") or command_input:match("^%*%s") ~= nil then
-		local files_str = vim.fn.join(files, " ") --[[@as string]]
-		command_input = command_input:gsub("%s%*%s", " " .. files_str .. " ")
-		command_input = command_input:gsub("%s%*$", " " .. files_str)
-		command_input = command_input:gsub("^%*%s", files_str .. " ")
-		commands = { command_input }
-	else
-		for _, file in ipairs(files) do
-			local command = command_input
-
-			if command:match("%s%?%s") or command:match("%s%?$") or command:match("^%?%s") ~= nil then
-				command = command:gsub("%s%?%s", " " .. file .. " ")
-				command = command:gsub("%s%?$", " " .. file)
-				command = command:gsub("^%?%s", file .. " ")
-			else
-				command = command .. " " .. file
-			end
-
-			table.insert(commands, command)
-		end
-	end
-	return commands
-end
-
----@param commands string[] commands to execute
----@param is_async boolean if `true`, write the result of the commands to a temporary buffer (commands are async by default (?))
-local function execute(commands, is_async)
-	if is_async then
-		local acc = ""
-		for _, command in ipairs(commands) do
-			acc = acc .. utils.command(command)
-		end
-		vim.cmd.split()
-		vim.cmd.e("Async Shell Result")
-		vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(acc, "\n") --[[@as table]])
-	else
-		for _, command in ipairs(commands) do
-			os.execute(command)
-		end
-	end
-end
-
----[COMMAND - dired-do-shell-command]
----Prompt for a shell command and execute it on the marked files, or the file under the cursor if there are none.
----TODO: add dired info here to explain shell command syntax
-function M.shell_command()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local files = target_files()
-	if files == nil then
-		vim.notify("No files specified")
-		return
-	end
-
-	local command_input = vim.fn.input({
-		prompt = prompt_for_files(files, {
-			operation = "! on",
-			flag = "*",
-			suffix = ": ",
-		}),
-		completion = "shellcmd",
-	})
-	if command_input == "" then
-		return
-	end
-
-	local is_async = command_input:match("&$") ~= nil
-	if is_async then
-		command_input = command_input:gsub("&$", "")
-	end
-
-	local commands = parse_command_input(command_input, files)
-	execute(commands, is_async)
-end
-
----[COMMAND - dired-do-async-shell-command]
----Prompt for a shell command and execute it on the marked files, or the file under the cursor if there are none.
----Places the output of the command(s) into a temporary buffer.
-function M.async_shell_command()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local files = target_files()
-	if files == nil then
-		vim.notify("No files specified")
-		return
-	end
-
-	local command_input = vim.fn.input({
-		prompt = prompt_for_files(files, {
-			operation = "& on",
-			flag = "*",
-			suffix = ": ",
-		}),
-		completion = "shellcmd",
-	})
-	if command_input == "" then
-		return
-	end
-
-	local commands = parse_command_input(command_input, files)
-	execute(commands, true)
-end
-
----[COMMAND - dired-hide-details-mode]
----Toggle showing nothing but flags/marks and filenames
-function M.toggle_hide_details()
-	if not utils.is_vimed() then
-		return
-	end
-
-	state.hide_details = not state.hide_details
-	M.redisplay()
-end
-
----[COMMAND - dired-do-load]
----Load the Lua files that are marked/under the cursor.
-function M.load()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local files = target_files()
-	if files == nil then
-		vim.notify("No files specified")
-		return
-	end
-
-	local choice = vim.fn.confirm(
-		prompt_for_files(files, {
-			operation = "Load",
-			suffix = "?",
-			flag = "*",
-		}),
-		"&Yes\n&No"
-	) --[[@as integer]]
-
-	if choice ~= 1 then
-		return
-	end
-
-	for _, file in ipairs(files) do
-		vim.cmd.source(file)
-	end
-end
-
----@param files string[]
----@param create_fn fun(string, string)
----@param target string
----@param flag string
-local function create_files(files, create_fn, target, flag)
-	local cwd = vim.fn.getcwd()
-	target = vim.fs.normalize(cwd .. "/" .. target)
-	if #files == 1 then
-		create_fn(files[1], target)
-		state.flags[target] = flag
-	else
-		local choice = vim.fn.confirm("Create destination dir `" .. target .. "`?", "&Yes\n&No") --[[@as integer]]
-		if choice == 1 then
-			vim.fn.mkdir(target, "p")
-
-			for _, file in ipairs(files) do
-				local file_path = vim.fs.normalize(target .. "/" .. vim.fs.basename(file))
-				create_fn(file, file_path)
-				state.flags[file_path] = flag
-			end
-		end
-	end
-end
-
----[COMMAND - dired-do-copy]
----Prompt for a target location. If no files are marked, copy the file under the cursor to that location.
----If files are marked, prompt to confirm creation of the target directory. Upon "Yes", create the directory and copy the marked files into it.
-function M.copy()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local files = target_files()
-	if files == nil then
-		vim.notify("No files specified")
-		return
-	end
-
-	local target = vim.fn.input({
-		prompt = prompt_for_files(files, {
-			operation = "Copy",
-			flag = "*",
-			suffix = " to: ",
-		}),
-		completion = "file",
-	})
-	if target == "" then
-		return
-	end
-
-	create_files(files, utils.copy_file, target, "C")
-
-	M.redisplay()
-end
-
----[COMMAND - dired-do-symlink]
----Create a symlink from the files under the cursor/marked.
----TODO: documentation
-function M.symlink()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local files = target_files()
-	if files == nil then
-		vim.notify("No files selected")
-		return
-	end
-
-	local target = vim.fn.input({
-		prompt = prompt_for_files(files, {
-			operation = "Symlink",
-			suffix = " from: ",
-			flag = "*",
-		}),
-		completion = "file",
-	})
-	if target == "" then
-		return
-	end
-
-	create_files(files, function(src, trg)
-		os.execute(vim.fn.join({ "ln", "-s", src, trg }, " "))
-	end, target, "Y")
-
-	M.redisplay()
-end
-
----[COMMAND - dired-do-hardlink]
----Create a hard link from the files under the cursor/marked.
----TODO: documentation
-function M.hardlink()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local files = target_files()
-	if files == nil then
-		vim.notify("No files selected")
-		return
-	end
-
-	local target = vim.fn.input({
-		prompt = prompt_for_files(files, {
-			operation = "Hardlink",
-			suffix = " from: ",
-			flag = "*",
-		}),
-		completion = "file",
-	})
-	if target == "" then
-		return
-	end
-
-	create_files(files, function(src, trg)
-		os.execute(vim.fn.join({ "ln", src, trg }, " "))
-	end, target, "H")
-
-	M.redisplay()
-end
+M.delete = delete_files_command(target_files, "No file on this line")
 
 return M
