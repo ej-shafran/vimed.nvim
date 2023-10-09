@@ -73,7 +73,7 @@
     CLOSED: [2023-10-07 Sat 22:56]
 *** DONE -		dired-up-directory
     CLOSED: [2023-10-07 Sat 22:57]
-*** TODO .		dired-clean-directory
+*** UNPLANNED .		dired-clean-directory
 *** DONE <		dired-prev-dirline
     CLOSED: [2023-10-08 Sun 13:49]
 *** TODO =		dired-diff
@@ -155,7 +155,8 @@
     CLOSED: [2023-10-09 Mon 00:37]
 *** DONE * /		dired-mark-directories
     CLOSED: [2023-10-08 Sun 20:37]
-*** TODO * ?		dired-unmark-all-files
+*** DONE * ?		dired-unmark-all-files
+    CLOSED: [2023-10-10 Tue 01:09]
 *** DONE * @		dired-mark-symlinks
     CLOSED: [2023-10-08 Sun 18:59]
 *** TODO * O		dired-mark-omitted

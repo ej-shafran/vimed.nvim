@@ -146,6 +146,22 @@ M.change_marks = command.basic(function()
 	end
 end)
 
+---[COMMAND - dired-unmark-all-files]
+M.unmark_files = command.basic(function()
+	vim.notify("Remove marks (<CR> means all): ")
+	local target = vim.fn.getchar()
+	local target_str = vim.fn.nr2char(target)
+	if target_str == "" then
+		return false
+	end
+
+	for file, flag in pairs(state.flags) do
+		if target == vim.fn.char2nr("\n") or target == vim.fn.char2nr("\r") or target_str == flag then
+			state.flags[file] = nil
+		end
+	end
+end)
+
 ---[COMMAND - dired-prev-dirline]
 M.prev_dirline = command.dirline(function(last, current, offset)
 	if current > last then

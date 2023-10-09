@@ -86,6 +86,7 @@ function M.setup(config)
 			cmd("VimedTouch", commands.touch)
 			cmd("VimedUnmark", commands.unmark)
 			cmd("VimedUnmarkAll", commands.unmark_all)
+			cmd("VimedUnmarkFiles", commands.unmark_files)
 			cmd("VimedUpcase", commands.upcase)
 			cmd("VimedYank", commands.yank)
 
