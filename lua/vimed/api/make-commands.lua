@@ -449,19 +449,24 @@ function M.with_regexp(logic, opts)
 
 		local count = 0
 		for _, file in ipairs(files) do
-			local result = nil
 			if repl ~= nil then
-				result = logic(file, vim.fn.substitute(vim.fs.basename(file), regex_raw, repl, ""))
+				local target = vim.fn.substitute(vim.fs.basename(file), regex_raw, repl, "")
+				local choice = vim.fn.confirm(
+					opts.name .. " '" .. vim.fs.basename(file) .. "' to '" .. target .. "'?",
+					"&Yes\n&No\n&Quit"
+				)
+				if choice == 3 then
+					break
+				end
+
+				if choice == 1 then
+					local target_file = vim.fs.normalize(vim.fs.dirname(file) .. "/" .. target)
+					logic(file, target_file)
+					count = count + 1
+				end
 			else
-				result = logic(file)
-			end
-
-			if result then
+				logic(file)
 				count = count + 1
-			end
-
-			if result == false then
-				break
 			end
 		end
 

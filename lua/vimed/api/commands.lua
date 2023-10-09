@@ -313,20 +313,21 @@ end
 
 ---[COMMAND - dired-do-rename-regexp]
 M.rename_regexp = command.with_regexp(function(file, target)
-	local choice = vim.fn.confirm("Rename '" .. vim.fs.basename(file) .. "' to '" .. target .. "'?", "&Yes\n&No\n&Quit")
-	if choice == 3 then
-		return false
-	end
-
-	if choice == 1 then
-		local target_file = vim.fs.normalize(vim.fs.dirname(file) .. "/" .. target)
-		rename_file(file, target_file)
-		state.flags[target_file] = state.flags[file]
-		state.flags[file] = nil
-		return true
-	end
+	rename_file(file, target)
+	state.flags[target] = state.flags[file]
+	state.flags[file] = nil
 end, {
 	name = "Rename",
+	operation = "from",
+	replace = true,
+})
+
+---[COMMAND - dired-do-copy-regexp]
+M.copy_regexp = command.with_regexp(function(file, target)
+	utils.copy_file(file, target)
+	state.flags[target] = "C"
+end, {
+	name = "Copy",
 	operation = "from",
 	replace = true,
 })

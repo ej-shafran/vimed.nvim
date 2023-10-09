@@ -50,6 +50,7 @@ M.default_keymaps = {
 		["*t"] = { commands.toggle_marks, "Toggle Marks" },
 		["%r"] = { commands.rename_regexp, "Rename By Regex" },
 		["%R"] = { commands.rename_regexp, "Rename By Regex" },
+		["%C"] = { commands.copy_regexp, "Copy By Regex" },
 		["*s"] = { commands.mark_subdir_files, "Mark Subdir Files" },
 		["*!"] = { commands.unmark_all, "Unmark All" },
 		["**"] = { commands.mark_executables, "Mark Executables" },

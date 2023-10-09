@@ -198,7 +198,8 @@
     CLOSED: [2023-10-08 Sun 18:35]
 *** TODO * <delete>       dired-unmark-backward
 *** TODO % &              dired-flag-garbage-files
-*** TODO % C              dired-do-copy-regexp
+*** DONE % C              dired-do-copy-regexp
+    CLOSED: [2023-10-09 Mon 15:56]
 *** TODO % H              dired-do-hardlink-regexp
 *** DONE % R              dired-do-rename-regexp
     CLOSED: [2023-10-09 Mon 10:43]
