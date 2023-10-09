@@ -44,6 +44,7 @@ M.default_keymaps = {
 		[">"] = { commands.next_dirline, "Next Dir Line" },
 		["%u"] = { commands.upcase, "Rename Uppercase" },
 		["%l"] = { commands.downcase, "Rename Downcase" },
+		["%m"] = { commands.mark_regexp, "Mark Files Using Regex" },
 		["*u"] = { commands.unmark, "Unmark" },
 		["*m"] = { commands.mark, "Mark" },
 		["*t"] = { commands.toggle_marks, "Toggle Marks" },

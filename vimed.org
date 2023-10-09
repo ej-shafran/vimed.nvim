@@ -206,7 +206,8 @@
 *** TODO % g              dired-mark-files-containing-regexp
 *** DONE % l              dired-downcase
     CLOSED: [2023-10-08 Sun 18:32]
-*** TODO % m              dired-mark-files-regexp
+*** DONE % m              dired-mark-files-regexp
+    CLOSED: [2023-10-09 Mon 08:57]
 *** TODO % r              dired-do-rename-regexp
 *** DONE % u              dired-upcase
     CLOSED: [2023-10-08 Sun 18:25]
