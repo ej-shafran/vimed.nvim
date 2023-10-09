@@ -125,6 +125,27 @@ M.flag_backup_files = command.basic(function()
 	end
 end)
 
+---[COMMAND - dired-change-marks]
+M.change_marks = command.basic(function()
+	vim.notify("Change (old mark): ")
+	local from = vim.fn.getcharstr()
+	if from == "" then
+		return false
+	end
+
+	vim.notify("Change " .. from .. " marks to (new mark): ")
+	local to = vim.fn.getcharstr()
+	if to == "" then
+		return false
+	end
+
+	for file, flag in pairs(state.flags) do
+		if flag == from then
+			state.flags[file] = to
+		end
+	end
+end)
+
 ---[COMMAND - dired-prev-dirline]
 M.prev_dirline = command.dirline(function(last, current, offset)
 	if current > last then
