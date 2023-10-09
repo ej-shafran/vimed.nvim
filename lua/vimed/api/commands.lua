@@ -299,21 +299,9 @@ M.upcase = command.confirm_each_file(string.upper, { action = "Rename upcase" })
 ---[COMMAND - dired-downcase]
 M.downcase = command.confirm_each_file(string.lower, { action = "Rename downcase" })
 
-local function rename_file(src, trg)
-	if vim.fn.filereadable(trg) ~= 0 then
-		local choice = vim.fn.confirm("Overwrite " .. trg .. "?", "&Yes\n&No")
-		if choice ~= 1 then
-			return
-		end
-	end
-
-	local cmd = { "mv", src, trg }
-	vim.notify(utils.command(cmd))
-end
-
 ---[COMMAND - dired-do-rename-regexp]
 M.rename_regexp = command.with_regexp(function(file, target)
-	rename_file(file, target)
+	utils.rename_file(file, target)
 	state.flags[target] = state.flags[file]
 	state.flags[file] = nil
 end, {
@@ -333,7 +321,7 @@ end, {
 })
 
 ---[COMMAND - dired-do-rename]
-M.rename = command.create_files(rename_file, {
+M.rename = command.create_files(utils.rename_file, {
 	input = {
 		operation = "Rename",
 		multi_operation = "Move",
@@ -372,37 +360,6 @@ end, {
 	flag = "H",
 })
 
----Parse a user-entered shell command to inline the selected files into it, using dired syntax.
----@param input string
----@param files string[]
----@return string[]
-local function parse_command_input(files, input)
-	local commands = {}
-	if input:match("%s%*%s") or input:match("%s%*$") or input:match("^%*%s") ~= nil then
-		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), " ") --[[@as string]]
-		input = input:gsub("%s%*%s", " " .. files_str .. " ")
-		input = input:gsub("%s%*$", " " .. files_str)
-		input = input:gsub("^%*%s", files_str .. " ")
-		commands = { input }
-	else
-		for _, file in ipairs(files) do
-			local cmd = input
-
-			local filename = vim.fs.basename(file)
-			if cmd:match("%s%?%s") or cmd:match("%s%?$") or cmd:match("^%?%s") ~= nil then
-				cmd = cmd:gsub("%s%?%s", " " .. filename .. " ")
-				cmd = cmd:gsub("%s%?$", " " .. filename)
-				cmd = cmd:gsub("^%?%s", filename .. " ")
-			else
-				cmd = cmd .. " " .. filename
-			end
-
-			table.insert(commands, cmd)
-		end
-	end
-	return commands
-end
-
 ---[COMMAND - dired-do-shell-command]
 M.shell_command = command.execute(function(files, input)
 	local is_async = input:match("&$") ~= nil
@@ -410,7 +367,7 @@ M.shell_command = command.execute(function(files, input)
 		input = input:gsub("&$", "")
 	end
 
-	local commands = parse_command_input(files, input)
+	local commands = utils.parse_command_input(files, input)
 
 	return commands, is_async
 end, {
@@ -421,7 +378,7 @@ end, {
 
 ---[COMMAND - dired-do-async-shell-command]
 M.async_shell_command = command.execute(function(files, input)
-	local commands = parse_command_input(files, input)
+	local commands = utils.parse_command_input(files, input)
 
 	return commands, true
 end, {

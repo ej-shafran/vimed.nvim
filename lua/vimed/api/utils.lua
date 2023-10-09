@@ -173,4 +173,35 @@ function M.compress_command(file)
 	return cmd, should_delete, target
 end
 
+---Parse a user-entered shell command to inline the selected files into it, using dired syntax.
+---@param input string
+---@param files string[]
+---@return string[]
+function M.parse_command_input(files, input)
+	local commands = {}
+	if input:match("%s%*%s") or input:match("%s%*$") or input:match("^%*%s") ~= nil then
+		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), " ") --[[@as string]]
+		input = input:gsub("%s%*%s", " " .. files_str .. " ")
+		input = input:gsub("%s%*$", " " .. files_str)
+		input = input:gsub("^%*%s", files_str .. " ")
+		commands = { input }
+	else
+		for _, file in ipairs(files) do
+			local cmd = input
+
+			local filename = vim.fs.basename(file)
+			if cmd:match("%s%?%s") or cmd:match("%s%?$") or cmd:match("^%?%s") ~= nil then
+				cmd = cmd:gsub("%s%?%s", " " .. filename .. " ")
+				cmd = cmd:gsub("%s%?$", " " .. filename)
+				cmd = cmd:gsub("^%?%s", filename .. " ")
+			else
+				cmd = cmd .. " " .. filename
+			end
+
+			table.insert(commands, cmd)
+		end
+	end
+	return commands
+end
+
 return M

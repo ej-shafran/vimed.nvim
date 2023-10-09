@@ -147,6 +147,9 @@ local function display_path(nline, path, hlgroup)
 	end
 end
 
+---@param nline any
+---@param link string
+---@param hlgroup string?
 local function display_link(nline, link, hlgroup)
 	if link == nil then
 		return
