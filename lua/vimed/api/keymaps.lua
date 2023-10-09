@@ -33,6 +33,7 @@ M.default_keymaps = {
 		["!"] = { commands.shell_command, "Shell Command" },
 		["%&"] = { commands.flag_garbage_files, "Flag Garbage Files" },
 		["%C"] = { commands.copy_regexp, "Copy By Regex" },
+		["%H"] = { commands.hardlink_regexp, "HardLink By Regex" },
 		["%R"] = { commands.rename_regexp, "Rename By Regex" },
 		["%l"] = { commands.downcase, "Rename Downcase" },
 		["%m"] = { commands.mark_regexp, "Mark Files Using Regex" },

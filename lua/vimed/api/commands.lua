@@ -312,6 +312,11 @@ end, {
 	replace = true,
 })
 
+---[COMMAND - dired-do-hardlink-regexp]
+M.hardlink_regexp = command.with_regexp(function(file, target)
+	vim.notify(utils.command({ "ln", file, target }))
+end, { name = "HardLink", operation = "from", replace = true })
+
 ---[COMMAND - dired-do-rename]
 M.rename = command.create_files(utils.rename_file, {
 	input = {

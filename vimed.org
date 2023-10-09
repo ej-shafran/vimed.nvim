@@ -201,7 +201,8 @@
     CLOSED: [2023-10-09 Mon 23:59]
 *** DONE % C              dired-do-copy-regexp
     CLOSED: [2023-10-09 Mon 15:56]
-*** TODO % H              dired-do-hardlink-regexp
+*** DONE % H              dired-do-hardlink-regexp
+    CLOSED: [2023-10-10 Tue 00:05]
 *** DONE % R              dired-do-rename-regexp
     CLOSED: [2023-10-09 Mon 10:43]
 *** TODO % S              dired-do-symlink-regexp
