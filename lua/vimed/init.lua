@@ -1,10 +1,11 @@
----@alias Config { styles: GroupStyles?, keymaps: VimedKeymaps?, hijack_netrw: boolean?, keep_line_numbers: boolean? }
+---@alias Config { styles: GroupStyles?, keymaps: VimedKeymaps?, hijack_netrw: boolean?, keep_line_numbers: boolean?, compress_files_alist: table<string, string>? }
 
 local commands = require("vimed.api.commands")
 local utils = require("vimed.api.utils")
 local render = require("vimed.render")
 local hls = require("vimed.render.highlights")
 local keymaps = require("vimed.api.keymaps")
+local state = require("vimed._state")
 
 local M = {}
 
@@ -20,6 +21,9 @@ end
 
 ---@param config Config
 function M.setup(config)
+	state.compress_files_alist =
+		vim.tbl_extend("force", state.default_compress_files_alist, config.compress_files_alist or {})
+
 	hls.setup(vim.tbl_extend("force", hls.default_styles, config.styles or {}))
 
 	vim.api.nvim_create_user_command("Vimed", M.open_vimed, {})

@@ -202,14 +202,6 @@ end, {
 	},
 })
 
-local compress_files_alist = {
-	["%.tar%.gz$"] = "tar -cf - %i | gzip -c9 > %o",
-	["%.tar%.bz2$"] = "tar -cf - %i | bzip2 -c9 > %o",
-	["%.tar%.xz$"] = "tar -cf - %i | xz -c9 > %o",
-	["%.tar%.zst$"] = "tar -cf - %i | zstd -19 -o %o",
-	["%.zip$"] = "zip %o -r --filesync %i",
-}
-
 ---[COMMAND - dired-do-compress-to]
 M.compress_to = command.act_on_files(function(files)
 	local target = vim.fn.input({
@@ -222,7 +214,7 @@ M.compress_to = command.act_on_files(function(files)
 	end
 
 	local base_cmd = nil
-	for pattern, value in pairs(compress_files_alist) do
+	for pattern, value in pairs(state.compress_files_alist) do
 		if target:match(pattern) ~= nil then
 			base_cmd = value
 			break
