@@ -1,4 +1,4 @@
----@alias VimedKeymaps table<"n"|"x"|"v"|"V", table<string, boolean|{ [1]: string|function, [2]: string? }>>
+---@alias VimedKeymaps table<"n"|"x"|"v"|"V", table<string, "which_key_ignore"|false|{ [1]: string|function, [2]: string? }>>
 
 local commands = require("vimed.api.commands")
 
@@ -77,11 +77,32 @@ M.default_keymaps = {
 }
 
 ---@param config_maps VimedKeymaps
-function M.setup(config_maps)
+---@param which_key_support boolean?
+function M.setup(config_maps, which_key_support)
+	if which_key_support then
+		require("which-key").register({
+			["*"] = {
+				name = "mark",
+			},
+			["%"] = {
+				name = "regex",
+			},
+		}, { buffer = 0 })
+	end
+
 	for mode, tbl in pairs(config_maps) do
-		for lhs, rhs in pairs(tbl) do
-			if type(rhs) ~= "boolean" then
-				vim.keymap.set(mode, lhs, rhs[1], { buffer = 0, desc = "Vimed: " .. (rhs[2] or lhs) })
+		if which_key_support then
+			require("which-key").register(tbl, { mode = mode, buffer = 0 })
+		else
+			for lhs, rhs in pairs(tbl) do
+				if rhs ~= false then
+					vim.keymap.set(
+						mode,
+						lhs,
+						rhs[1],
+						{ buffer = 0, desc = "Vimed: " .. (rhs[2] or lhs), noremap = true }
+					)
+				end
 			end
 		end
 	end

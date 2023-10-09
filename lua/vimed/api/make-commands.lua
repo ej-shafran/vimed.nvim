@@ -433,6 +433,9 @@ function M.with_regexp(logic, opts)
 		local regex_raw = vim.fn.input({
 			prompt = opts.name .. " " .. opts.operation .. " (regexp): ",
 		})
+		if regex_raw == "" then
+			return
+		end
 		local re = vim.regex(regex_raw) --[[@as any]]
 
 		local all_files = M.target_files() or {}
@@ -445,6 +448,9 @@ function M.with_regexp(logic, opts)
 			repl = vim.fn.input({
 				prompt = opts.name .. " to: ", --TODO: add default
 			})
+			if repl == "" then
+				return
+			end
 		end
 
 		local count = 0

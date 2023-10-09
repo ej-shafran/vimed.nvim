@@ -1,4 +1,4 @@
----@alias Config { styles: GroupStyles?, keymaps: VimedKeymaps?, hijack_netrw: boolean?, keep_line_numbers: boolean?, compress_files_alist: table<string, string>?, garbage_files_regex: string? }
+---@alias Config { styles: GroupStyles?, keymaps: VimedKeymaps?, hijack_netrw: boolean?, keep_line_numbers: boolean?, compress_files_alist: table<string, string>?, garbage_files_regex: string?, which_key_support: boolean? }
 
 local commands = require("vimed.api.commands")
 local utils = require("vimed.api.utils")
@@ -90,7 +90,10 @@ function M.setup(config)
 			cmd("VimedUpcase", commands.upcase)
 			cmd("VimedYank", commands.yank)
 
-			keymaps.setup(vim.tbl_deep_extend("force", keymaps.default_keymaps, config.keymaps or {}))
+			keymaps.setup(
+				vim.tbl_deep_extend("force", keymaps.default_keymaps, config.keymaps or {}),
+				config.which_key_support
+			)
 		end,
 	})
 
