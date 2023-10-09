@@ -87,7 +87,7 @@ end
 ---@param link_count string
 ---@param hlgroup string?
 local function display_link_count(nline, link_count, hlgroup)
-	nline:append(string.format("%2s", link_count), hlgroup or hls.groups.link_count)
+	nline:append(string.format("%3s", link_count), hlgroup or hls.groups.link_count)
 	nline:append(" ", hlgroup)
 end
 
