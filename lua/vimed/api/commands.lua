@@ -423,14 +423,21 @@ M.mark_directories = command.mark_via_filter(function(entry)
 end, { flag = "*", kind = "directory file" })
 
 ---[COMMAND - dired-mark-files-regexp]
-M.mark_regexp = command.mark_via_filter(function(entry, input)
-	local re = vim.regex(input) --[[@as any]]
-	return re:match_str(entry.path) ~= nil
-end, {
+M.mark_regexp = command.mark_via_filter(utils.matches_input_regex, {
 	flag = "*",
 	kind = "matching file",
 	input = {
 		prompt = "Mark files (regexp): ",
+		completion = "file",
+	},
+})
+
+---[COMMAND - dired-flag-files-regexp]
+M.flag_regexp = command.mark_via_filter(utils.matches_input_regex, {
+	flag = "D",
+	kind = "matching file",
+	input = {
+		prompt = "Flag for deletion (regexp): ",
 		completion = "file",
 	},
 })

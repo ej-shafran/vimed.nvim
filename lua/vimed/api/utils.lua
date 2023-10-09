@@ -204,4 +204,9 @@ function M.parse_command_input(files, input)
 	return commands
 end
 
+function M.matches_input_regex(entry, input)
+	local re = vim.regex(input) --[[@as any]]
+	return re:match_str(entry.path) ~= nil
+end
+
 return M
