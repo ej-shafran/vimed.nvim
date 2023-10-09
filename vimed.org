@@ -209,7 +209,8 @@
     CLOSED: [2023-10-10 Tue 00:08]
 *** DONE % d              dired-flag-files-regexp
     CLOSED: [2023-10-10 Tue 00:14]
-*** TODO % g              dired-mark-files-containing-regexp
+*** DONE % g              dired-mark-files-containing-regexp
+    CLOSED: [2023-10-10 Tue 00:29]
 *** DONE % l              dired-downcase
     CLOSED: [2023-10-08 Sun 18:32]
 *** DONE % m              dired-mark-files-regexp

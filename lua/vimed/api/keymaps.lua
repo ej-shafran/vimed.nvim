@@ -37,6 +37,7 @@ M.default_keymaps = {
 		["%R"] = { commands.rename_regexp, "Rename By Regex" },
 		["%S"] = { commands.symlink_regexp, "Symlink By Regex" },
 		["%d"] = { commands.flag_regexp, "Flag For Deletion by Regex" },
+		["%g"] = { commands.mark_files_containing_regexp, "Mark Files Containing Regexp" },
 		["%l"] = { commands.downcase, "Rename Downcase" },
 		["%m"] = { commands.mark_regexp, "Mark Files Using Regex" },
 		["%r"] = { commands.rename_regexp, "Rename By Regex" },

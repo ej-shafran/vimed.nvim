@@ -495,4 +495,25 @@ M.flag_garbage_files = command.mark_via_filter(function(entry)
 	return re:match_str(vim.fs.basename(entry.path))
 end, { flag = "D", kind = "matching file" })
 
+---[COMMAND - dired-mark-files-containing-regexp]
+M.mark_files_containing_regexp = command.mark_via_filter(function(entry, input)
+	if entry.permissions.is_dir or not entry.permissions.user.read then
+		return false
+	end
+
+	local f = assert(io.open(entry.path, "rb"))
+	local content = f:read("*a")
+	f:close()
+
+	local re = vim.regex(input) --[[@as any]]
+	return re:match_str(content)
+end, {
+	flag = "*",
+	kind = "matching file",
+	input = {
+		prompt = "Mark files containing (regexp): ",
+		completion = "file",
+	},
+})
+
 return M
