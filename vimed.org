@@ -47,7 +47,8 @@
 *** TODO Add search functionality within the file list.
 *** DONE Implement file permission editing.
     CLOSED: [2023-10-08 Sun 03:10]
-*** TODO Allow for customizable themes and appearances.
+*** DONE Allow for customizable themes and appearances.
+    CLOSED: [2023-10-10 Tue 00:30]
 *** DONE Provide user configuration options.
     CLOSED: [2023-10-08 Sun 03:10]
  
@@ -57,176 +58,133 @@
 *** TODO Create usage examples and tutorials.
 *** TODO Add checks and error messages for features that only work for POSIX.
 
-** Testing and Debugging
-*** TODO Implement unit tests for critical functions.
-*** TODO Perform extensive testing to ensure stability.
-*** TODO Debug and resolve any issues or bugs that arise.
- 
-** User Feedback and Improvements
-*** TODO Gather user feedback and feature requests.
-*** TODO Continuously improve the plugin based on user input.
- 
-** Release and Distribution
-*** TODO Prepare the plugin for release.
-*** TODO Publish the plugin on the Neovim plugin repository.
-*** TODO Announce the plugin to the Neovim community.
- 
-** Maintenance and Updates
-*** TODO Stay updated with Neovim's development and make necessary adjustments.
-*** TODO Address compatibility issues with newer Neovim versions.
-*** TODO Provide ongoing support for users.
- 
-** Marketing and Promotion
-*** TODO Promote the plugin through social media, forums, and developer communities.
-*** TODO Encourage user contributions and collaborations.
- 
-** Long-term Goals
-*** TODO Consider expanding the plugin's capabilities based on user demand.
-*** TODO Explore integration with other Neovim plugins and workflows.
- 
-** Project Completion
-*** TODO Confirm that all planned features are implemented and working.
-*** TODO Ensure comprehensive test coverage and stability.
-*** TODO Celebrate the successful completion of the Neovim Dired Clone Plugin!
-
 ** Commands
-*** DONE SPC . - `find-file`
+*** DONE SPC .		find-file
     CLOSED: [2023-10-08 Sun 02:24]
-*** DONE ! - `dired-do-shell-command`
+*** DONE !		dired-do-shell-command
     CLOSED: [2023-10-08 Sun 02:04]
-*** TODO # - `dired-flag-auto-save-files`
-*** DONE & - `dired-do-async-shell-command`
+*** TODO #		dired-flag-auto-save-files
+*** DONE &		dired-do-async-shell-command
     CLOSED: [2023-10-08 Sun 02:04]
-*** DONE ( - `dired-hide-details-mode`
+*** DONE (		dired-hide-details-mode
     CLOSED: [2023-10-08 Sun 02:31]
-*** TODO ) - `dired-git-info-mode`
-*** DONE + - `dired-create-directory`
+*** TODO )		dired-git-info-mode
+*** DONE +		dired-create-directory
     CLOSED: [2023-10-07 Sat 22:56]
-*** DONE - - `dired-up-directory`
+*** DONE -		dired-up-directory
     CLOSED: [2023-10-07 Sat 22:57]
-*** TODO . - `dired-clean-directory`
-*** DONE < - `dired-prev-dirline`
+*** TODO .		dired-clean-directory
+*** DONE <		dired-prev-dirline
     CLOSED: [2023-10-08 Sun 13:49]
-*** TODO = - `dired-diff`
-*** DONE > - `dired-next-dirline`
+*** TODO =		dired-diff
+*** DONE >		dired-next-dirline
     CLOSED: [2023-10-08 Sun 13:49]
-*** TODO A - `dired-do-find-regexp`
-*** TODO B - `dired-do-byte-compile`
-*** DONE C - `dired-do-copy`
+*** TODO A		dired-do-find-regexp
+*** TODO B		dired-do-byte-compile
+*** DONE C		dired-do-copy
     CLOSED: [2023-10-08 Sun 03:09]
-*** DONE D - `dired-do-delete`
+*** DONE D		dired-do-delete
     CLOSED: [2023-10-07 Sat 23:21]
-*** DONE H - `dired-do-hardlink`
+*** DONE H		dired-do-hardlink
     CLOSED: [2023-10-08 Sun 03:54]
-*** TODO I - `dired-maybe-insert-subdir`
-*** DONE J - `dired-goto-file`
+*** TODO I		dired-maybe-insert-subdir
+*** DONE J		dired-goto-file
     CLOSED: [2023-10-07 Sat 23:38]
-*** DONE L - `dired-do-load`
+*** DONE L		dired-do-load
     CLOSED: [2023-10-08 Sun 03:23]
-*** DONE M - `dired-do-chmod`
+*** DONE M		dired-do-chmod
     CLOSED: [2023-10-07 Sat 23:50]
-*** DONE O - `dired-do-chown`
+*** DONE O		dired-do-chown
     CLOSED: [2023-10-08 Sun 12:49]
-*** TODO P - `dired-do-print`
-*** TODO Q - `dired-do-find-regexp-and-replace`
-*** DONE R - `dired-do-rename`
+*** TODO P		dired-do-print
+*** TODO Q		dired-do-find-regexp-and-replace
+*** DONE R		dired-do-rename
     CLOSED: [2023-10-08 Sun 00:27]
-*** DONE S - `dired-do-symlink`
+*** DONE S		dired-do-symlink
     CLOSED: [2023-10-08 Sun 03:50]
-*** DONE T - `dired-do-touch`
+*** DONE T		dired-do-touch
     CLOSED: [2023-10-08 Sun 12:44]
-*** DONE U - `dired-unmark-all-marks`
+*** DONE U		dired-unmark-all-marks
     CLOSED: [2023-10-07 Sat 22:56]
-*** TODO W - `browse-url-of-dired-file`
-*** DONE X - `dired-do-shell-command`
+*** TODO W		browse-url-of-dired-file
+*** DONE X		dired-do-shell-command
     CLOSED: [2023-10-08 Sun 02:23]
-*** DONE Y - `dired-copy-filename-as-kill`
+*** DONE Y		dired-copy-filename-as-kill
     CLOSED: [2023-10-08 Sun 13:36]
-*** DONE Z - `dired-do-compress`
+*** DONE Z		dired-do-compress
     CLOSED: [2023-10-08 Sun 15:08]
-*** DONE ^ - `dired-up-directory`
+*** DONE ^		dired-up-directory
     CLOSED: [2023-10-07 Sat 22:57]
-*** DONE a - `dired-find-alternate-file`
+*** DONE a		dired-find-alternate-file
     CLOSED: [2023-10-08 Sun 18:15]
-*** DONE c - `dired-do-compress-to`
+*** DONE c		dired-do-compress-to
     CLOSED: [2023-10-08 Sun 17:01]
-*** DONE d - `dired-flag-file-deletion`
+*** DONE d		dired-flag-file-deletion
     CLOSED: [2023-10-07 Sat 22:56]
-*** TODO i - `dired-toggle-read-only`
-*** DONE m - `dired-mark`
+*** TODO i		dired-toggle-read-only
+*** DONE m		dired-mark
     CLOSED: [2023-10-07 Sat 22:56]
-*** DONE o - `dired-sort-toggle-or-edit`
+*** DONE o		dired-sort-toggle-or-edit
     CLOSED: [2023-10-07 Sat 22:56]
-*** DONE q - `+dired/quit-all`
+*** DONE q		+dired/quit-all
     CLOSED: [2023-10-07 Sat 22:56]
-*** DONE r - `dired-do-redisplay`
+*** DONE r		dired-do-redisplay
     CLOSED: [2023-10-07 Sat 23:19]
-*** DONE t - `dired-toggle-marks`
+*** DONE t		dired-toggle-marks
     CLOSED: [2023-10-07 Sat 23:19]
-*** DONE u - `dired-unmark`
+*** DONE u		dired-unmark
     CLOSED: [2023-10-07 Sat 22:56]
-*** DONE x - `dired-do-flagged-delete`
+*** DONE x		dired-do-flagged-delete
     CLOSED: [2023-10-07 Sat 22:56]
-*** DONE ~ - `dired-flag-backup-files`
+*** DONE ~		dired-flag-backup-files
     CLOSED: [2023-10-08 Sun 14:13]
-*** TODO * C-n            dired-next-marked-file
-*** TODO * C-p            dired-prev-marked-file
-*** DONE * !              dired-unmark-all-marks
+*** TODO * C-n		dired-next-marked-file
+*** TODO * C-p		dired-prev-marked-file
+*** DONE * !		dired-unmark-all-marks
     CLOSED: [2023-10-08 Sun 18:38]
-*** DONE * %              dired-mark-files-regexp
+*** DONE * %		dired-mark-files-regexp
     CLOSED: [2023-10-08 Sun 20:46]
-*** DONE * (              dired-mark-sexp
+*** DONE * (		dired-mark-sexp
     CLOSED: [2023-10-09 Mon 00:37]
-*** DONE * *              dired-mark-executables
+*** DONE * *		dired-mark-executables
     CLOSED: [2023-10-08 Sun 18:54]
-*** DONE * .              dired-mark-extension
+*** DONE * .		dired-mark-extension
     CLOSED: [2023-10-09 Mon 00:37]
-*** DONE * /              dired-mark-directories
+*** DONE * /		dired-mark-directories
     CLOSED: [2023-10-08 Sun 20:37]
-*** TODO * ?              dired-unmark-all-files
-*** DONE * @              dired-mark-symlinks
+*** TODO * ?		dired-unmark-all-files
+*** DONE * @		dired-mark-symlinks
     CLOSED: [2023-10-08 Sun 18:59]
-*** TODO * O              dired-mark-omitted
-*** TODO * c              dired-change-marks
-*** DONE * m              dired-mark
+*** TODO * O		dired-mark-omitted
+*** TODO * c		dired-change-marks
+*** DONE * m		dired-mark
     CLOSED: [2023-10-08 Sun 18:35]
-*** DONE * s              dired-mark-subdir-files
+*** DONE * s		dired-mark-subdir-files
     CLOSED: [2023-10-09 Mon 00:11]
-*** DONE * t              dired-toggle-marks
+*** DONE * t		dired-toggle-marks
     CLOSED: [2023-10-08 Sun 18:36]
-*** DONE * u              dired-unmark
+*** DONE * u		dired-unmark
     CLOSED: [2023-10-08 Sun 18:35]
-*** TODO * <delete>       dired-unmark-backward
-*** DONE % &              dired-flag-garbage-files
+*** TODO * <BS>		dired-unmark-backward
+*** DONE % &		dired-flag-garbage-files
     CLOSED: [2023-10-09 Mon 23:59]
-*** DONE % C              dired-do-copy-regexp
+*** DONE % C		dired-do-copy-regexp
     CLOSED: [2023-10-09 Mon 15:56]
-*** DONE % H              dired-do-hardlink-regexp
+*** DONE % H		dired-do-hardlink-regexp
     CLOSED: [2023-10-10 Tue 00:05]
-*** DONE % R              dired-do-rename-regexp
+*** DONE % R		dired-do-rename-regexp
     CLOSED: [2023-10-09 Mon 10:43]
-*** DONE % S              dired-do-symlink-regexp
+*** DONE % S		dired-do-symlink-regexp
     CLOSED: [2023-10-10 Tue 00:08]
-*** DONE % d              dired-flag-files-regexp
+*** DONE % d		dired-flag-files-regexp
     CLOSED: [2023-10-10 Tue 00:14]
-*** DONE % g              dired-mark-files-containing-regexp
+*** DONE % g		dired-mark-files-containing-regexp
     CLOSED: [2023-10-10 Tue 00:29]
-*** DONE % l              dired-downcase
+*** DONE % l		dired-downcase
     CLOSED: [2023-10-08 Sun 18:32]
-*** DONE % m              dired-mark-files-regexp
+*** DONE % m		dired-mark-files-regexp
     CLOSED: [2023-10-09 Mon 08:57]
-*** DONE % r              dired-do-rename-regexp
+*** DONE % r		dired-do-rename-regexp
     CLOSED: [2023-10-09 Mon 10:43]
-*** DONE % u              dired-upcase
+*** DONE % u		dired-upcase
     CLOSED: [2023-10-08 Sun 18:25]
-
-
-* Deadlines and Milestones
-** TODO Initial Development Phase
-   DEADLINE: <2023-10-07 Sat 22:00>
-** TODO Testing and Debugging Phase
-   DEADLINE: <2023-10-07 Sat 22:00>
-** TODO Documentation and Release Phase
-   DEADLINE: <2023-10-14 Sat 22:00>
-** TODO Ongoing Maintenance and Updates
-   DEADLINE: <2023-10-14 Sat 22:00>
