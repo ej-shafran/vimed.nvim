@@ -138,17 +138,11 @@ local function display_path(nline, path, hlgroup)
 		return
 	end
 
-	local extension = nil
-	local parts = vim.fn.split(name, "\\.") --[[@as table]]
-	if #parts > 1 then
-		extension = parts[#parts]
-		table.remove(parts, #parts)
-	end
+	local extension = vim.fn.fnamemodify(name, ":e")
 
-	name = vim.fn.join(parts, ".") --[[@as string]]
-	nline:append(name, hlgroup or hls.groups.file_name)
+	nline:append(vim.fn.fnamemodify(name, ":r"), hlgroup or hls.groups.file_name)
 
-	if extension ~= nil then
+	if extension ~= "" then
 		nline:append("." .. extension, hlgroup or hls.groups.extension)
 	end
 end
