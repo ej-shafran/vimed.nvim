@@ -23,6 +23,9 @@ M.default_compress_files_alist = {
 ---@type table<string, string>
 M.compress_files_alist = {}
 
+---@type string
+M.garbage_files_regex = "\\.\\(aux\\|bak\\|dvi\\|log\\|orig\\|rej\\|toc\\)$"
+
 ---Get the `ls` command to run.
 ---@return string
 local function run_command()

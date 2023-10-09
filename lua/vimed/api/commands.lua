@@ -472,4 +472,10 @@ end, {
 	},
 })
 
+---[COMMAND - dired-flag-garbage-files]
+M.flag_garbage_files = command.mark_via_filter(function(entry)
+	local re = vim.regex(state.garbage_files_regex) --[[@as any]]
+	return re:match_str(vim.fs.basename(entry.path))
+end, { flag = "D", kind = "matching file" })
+
 return M

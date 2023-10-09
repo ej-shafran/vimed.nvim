@@ -1,4 +1,4 @@
----@alias Config { styles: GroupStyles?, keymaps: VimedKeymaps?, hijack_netrw: boolean?, keep_line_numbers: boolean?, compress_files_alist: table<string, string>? }
+---@alias Config { styles: GroupStyles?, keymaps: VimedKeymaps?, hijack_netrw: boolean?, keep_line_numbers: boolean?, compress_files_alist: table<string, string>?, garbage_files_regex: string? }
 
 local commands = require("vimed.api.commands")
 local utils = require("vimed.api.utils")
@@ -23,6 +23,9 @@ end
 function M.setup(config)
 	state.compress_files_alist =
 		vim.tbl_extend("force", state.default_compress_files_alist, config.compress_files_alist or {})
+	if config.garbage_files_regex ~= nil then
+		state.garbage_files_regex = config.garbage_files_regex
+	end
 
 	hls.setup(vim.tbl_extend("force", hls.default_styles, config.styles or {}))
 
@@ -51,6 +54,7 @@ function M.setup(config)
 			cmd("VimedEnter", commands.enter)
 			cmd("VimedFlagBackupFiles", commands.flag_backup_files)
 			cmd("VimedFlagFileDeletion", commands.flag_file_deletion)
+			cmd("VimedFlagGarbageFiles", commands.flag_garbage_files)
 			cmd("VimedFlaggedDelete", commands.flagged_delete)
 			cmd("VimedGotoFile", commands.goto_file)
 			cmd("VimedHardlink", commands.hardlink)
