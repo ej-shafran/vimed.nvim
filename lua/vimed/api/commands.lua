@@ -312,6 +312,11 @@ end, {
 	replace = true,
 })
 
+---[COMMAND - dired-do-symlink-regexp]
+M.symlink_regexp = command.with_regexp(function(file, target)
+	vim.notify(utils.command({ "ln", "-s", file, target }))
+end, { name = "SymLink", operation = "from", replace = true })
+
 ---[COMMAND - dired-do-hardlink-regexp]
 M.hardlink_regexp = command.with_regexp(function(file, target)
 	vim.notify(utils.command({ "ln", file, target }))
