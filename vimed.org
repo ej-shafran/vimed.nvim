@@ -200,7 +200,8 @@
 *** TODO % &              dired-flag-garbage-files
 *** TODO % C              dired-do-copy-regexp
 *** TODO % H              dired-do-hardlink-regexp
-*** TODO % R              dired-do-rename-regexp
+*** DONE % R              dired-do-rename-regexp
+    CLOSED: [2023-10-09 Mon 10:43]
 *** TODO % S              dired-do-symlink-regexp
 *** TODO % d              dired-flag-files-regexp
 *** TODO % g              dired-mark-files-containing-regexp
@@ -208,7 +209,8 @@
     CLOSED: [2023-10-08 Sun 18:32]
 *** DONE % m              dired-mark-files-regexp
     CLOSED: [2023-10-09 Mon 08:57]
-*** TODO % r              dired-do-rename-regexp
+*** DONE % r              dired-do-rename-regexp
+    CLOSED: [2023-10-09 Mon 10:43]
 *** DONE % u              dired-upcase
     CLOSED: [2023-10-08 Sun 18:25]
 

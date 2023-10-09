@@ -299,8 +299,7 @@ M.upcase = command.confirm_each_file(string.upper, { action = "Rename upcase" })
 ---[COMMAND - dired-downcase]
 M.downcase = command.confirm_each_file(string.lower, { action = "Rename downcase" })
 
----[COMMAND - dired-do-rename]
-M.rename = command.create_files(function(src, trg)
+local function rename_file(src, trg)
 	if vim.fn.filereadable(trg) ~= 0 then
 		local choice = vim.fn.confirm("Overwrite " .. trg .. "?", "&Yes\n&No")
 		if choice ~= 1 then
@@ -310,7 +309,30 @@ M.rename = command.create_files(function(src, trg)
 
 	local cmd = { "mv", src, trg }
 	vim.notify(utils.command(cmd))
+end
+
+---[COMMAND - dired-do-rename-regexp]
+M.rename_regexp = command.with_regexp(function(file, target)
+	local choice = vim.fn.confirm("Rename '" .. vim.fs.basename(file) .. "' to '" .. target .. "'?", "&Yes\n&No\n&Quit")
+	if choice == 3 then
+		return false
+	end
+
+	if choice == 1 then
+		local target_file = vim.fs.normalize(vim.fs.dirname(file) .. "/" .. target)
+		rename_file(file, target_file)
+		state.flags[target_file] = state.flags[file]
+		state.flags[file] = nil
+		return true
+	end
 end, {
+	name = "Rename",
+	operation = "from",
+	replace = true,
+})
+
+---[COMMAND - dired-do-rename]
+M.rename = command.create_files(rename_file, {
 	input = {
 		operation = "Rename",
 		multi_operation = "Move",

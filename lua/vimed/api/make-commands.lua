@@ -421,4 +421,58 @@ function M.mark_via_filter(filter, opts)
 	end
 end
 
+---@param logic fun(file: string, target: string?): boolean|nil
+---@param opts { name: string, operation: string, replace: boolean? }
+---@return function
+function M.with_regexp(logic, opts)
+	return function()
+		if not utils.is_vimed() then
+			return
+		end
+
+		local regex_raw = vim.fn.input({
+			prompt = opts.name .. " " .. opts.operation .. " (regexp): ",
+		})
+		local re = vim.regex(regex_raw) --[[@as any]]
+
+		local all_files = M.target_files() or {}
+		local files = vim.tbl_filter(function(file)
+			return re:match_str(file)
+		end, all_files)
+
+		local repl = nil
+		if opts.replace then
+			repl = vim.fn.input({
+				prompt = opts.name .. " to: ", --TODO: add default
+			})
+		end
+
+		local count = 0
+		for _, file in ipairs(files) do
+			local result = nil
+			if repl ~= nil then
+				result = logic(file, vim.fn.substitute(vim.fs.basename(file), regex_raw, repl, ""))
+			else
+				result = logic(file)
+			end
+
+			if result then
+				count = count + 1
+			end
+
+			if result == false then
+				break
+			end
+		end
+
+		if #all_files == #files then
+			vim.notify(opts.name .. ": " .. count .. " files done")
+		else
+			vim.notify(opts.name .. ": " .. #all_files - count .. " of " .. #all_files .. " files skipped")
+		end
+
+		M.redisplay()
+	end
+end
+
 return M
