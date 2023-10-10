@@ -209,4 +209,11 @@ function M.matches_input_regex(entry, input)
 	return re:match_str(entry.path) ~= nil
 end
 
+function M.rename_file(src, trg)
+	local ok, err = os.rename(src, trg)
+	if not ok then
+		vim.notify(err --[[@as string]])
+	end
+end
+
 return M
