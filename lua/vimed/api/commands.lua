@@ -630,4 +630,16 @@ end, {
 	},
 })
 
+---[COMMAND - dired-mark-omitted]
+M.mark_omitted = command.mark_via_filter(function(entry)
+	for _, extension in ipairs(state.omit_extensions) do
+		if entry.path:sub(-#extension) == extension then
+			return true
+		end
+	end
+
+	local re = vim.regex(state.omit_files_regex) --[[@as any]]
+	return re:match_str(vim.fs.basename(entry.path))
+end, { flag = "*", kind = "matching files" })
+
 return M

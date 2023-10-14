@@ -54,6 +54,7 @@ M.default_keymaps = {
 		["*/"] = { commands.mark_directories, "Mark Directories" },
 		["*?"] = { commands.unmark_files, "Unmark All Files" },
 		["*@"] = { commands.mark_symlinks, "Mark Symbolic Links" },
+		["*O"] = { commands.mark_omitted, "Mark Omitted" },
 		["*c"] = { commands.change_marks, "Change Marks" },
 		["*m"] = { commands.mark, "Mark" },
 		["*s"] = { commands.mark_subdir_files, "Mark Subdir Files" },

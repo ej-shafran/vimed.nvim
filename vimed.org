@@ -163,7 +163,8 @@
     CLOSED: [2023-10-10 Tue 01:09]
 *** DONE * @		dired-mark-symlinks
     CLOSED: [2023-10-08 Sun 18:59]
-*** TODO * O		dired-mark-omitted
+*** DONE * O		dired-mark-omitted
+    CLOSED: [2023-10-15 Sun 02:11]
 *** DONE * c		dired-change-marks
     CLOSED: [2023-10-10 Tue 00:51]
 *** DONE * m		dired-mark

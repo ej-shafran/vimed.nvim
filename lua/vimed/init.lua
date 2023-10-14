@@ -1,4 +1,4 @@
----@alias Config { styles: GroupStyles?, keymaps: VimedKeymaps?, hijack_netrw: boolean?, keep_line_numbers: boolean?, compress_files_alist: table<string, string>?, garbage_files_regex: string?, which_key_support: boolean? }
+---@alias Config { styles: GroupStyles?, keymaps: VimedKeymaps?, hijack_netrw: boolean?, keep_line_numbers: boolean?, compress_files_alist: table<string, string>?, garbage_files_regex: string?, omit_files_regex: string?, omit_extensions: string[]?, which_key_support: boolean? }
 
 local commands = require("vimed.api.commands")
 local utils = require("vimed.api.utils")
@@ -25,6 +25,12 @@ function M.setup(config)
 		vim.tbl_extend("force", state.default_compress_files_alist, config.compress_files_alist or {})
 	if config.garbage_files_regex ~= nil then
 		state.garbage_files_regex = config.garbage_files_regex
+	end
+	if config.omit_files_regex then
+		state.omit_files_regex = config.omit_files_regex
+	end
+	if config.omit_extensions then
+		state.omit_extensions = config.omit_extensions
 	end
 
 	hls.setup(vim.tbl_extend("force", hls.default_styles, config.styles or {}))
@@ -69,6 +75,7 @@ function M.setup(config)
 			cmd("VimedMarkExtension", commands.mark_extension)
 			cmd("VimedMarkFilesContainingRegexp", commands.mark_files_containing_regexp)
 			cmd("VimedMarkLuaExpression", commands.mark_lua_expression)
+			cmd("VimedMarkOmitted", commands.mark_omitted)
 			cmd("VimedMarkRegexp", commands.mark_regexp)
 			cmd("VimedMarkSubdirFiles", commands.mark_subdir_files)
 			cmd("VimedMarkSymlinks", commands.mark_symlinks)
