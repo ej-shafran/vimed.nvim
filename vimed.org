@@ -99,7 +99,8 @@
     CLOSED: [2023-10-07 Sat 23:50]
 *** DONE O		dired-do-chown
     CLOSED: [2023-10-08 Sun 12:49]
-*** TODO P		dired-do-print
+*** DONE P		dired-do-print
+    CLOSED: [2023-10-15 Sun 01:36]
 *** TODO Q		dired-do-find-regexp-and-replace
 *** DONE R		dired-do-rename
     CLOSED: [2023-10-08 Sun 00:27]

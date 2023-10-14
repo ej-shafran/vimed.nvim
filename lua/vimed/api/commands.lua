@@ -333,10 +333,34 @@ M.touch = command.act_on_files(function(files, input)
 	vim.notify(utils.command(cmd))
 end, {
 	input = {
+		flag = "*",
 		operation = "Change Timestamp of",
 		suffix = " to (default now): ",
 	},
 }, "shellcmd")
+
+---[COMMAND - dired-do-print]
+M.print = command.act_on_files(function(files, input)
+	if input == "" then
+		return
+	end
+
+	local cmd = { input }
+	vim.list_extend(
+		cmd,
+		vim.tbl_map(function(path)
+			return vim.fs.basename(path)
+		end, files)
+	)
+
+	vim.notify(utils.command(cmd))
+end, {
+	input = {
+		flag = "*",
+		operation = "Print",
+		suffix = " with: ",
+	},
+}, "shellcmd", "lpr")
 
 ---[COMMAND - dired-copy-filename-as-kill]
 M.yank = command.act_on_files(function(files)

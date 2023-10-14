@@ -14,6 +14,7 @@ M.default_keymaps = {
 		L = { commands.load, "Load" },
 		M = { commands.chmod, "Change Permissions" },
 		O = { commands.chown, "Change Owner" },
+		P = { commands.print, "Print" },
 		R = { commands.rename, "Rename" },
 		S = { commands.symlink, "Symlink" },
 		T = { commands.touch, "Change Timestamp" },
