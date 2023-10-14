@@ -175,6 +175,22 @@ M.unmark_backward = command.basic(function()
 	end
 end)
 
+---[COMMAND - browse-url-of-dired-file]
+M.browse_url = function()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local path = command.cursor_path()
+
+	if path == nil then
+		vim.notify("No file on this line")
+		return
+	end
+
+	vim.notify(utils.command({ "open", vim.fn.shellescape(path) }))
+end
+
 ---[COMMAND - dired-diff]
 M.diff = function()
 	if not utils.is_vimed() then

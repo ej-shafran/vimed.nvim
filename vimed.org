@@ -111,7 +111,8 @@
     CLOSED: [2023-10-08 Sun 12:44]
 *** DONE U		dired-unmark-all-marks
     CLOSED: [2023-10-07 Sat 22:56]
-*** TODO W		browse-url-of-dired-file
+*** DONE W		browse-url-of-dired-file
+    CLOSED: [2023-10-15 Sun 02:21]
 *** DONE X		dired-do-shell-command
     CLOSED: [2023-10-08 Sun 02:23]
 *** DONE Y		dired-copy-filename-as-kill

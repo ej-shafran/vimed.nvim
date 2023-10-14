@@ -19,6 +19,7 @@ M.default_keymaps = {
 		S = { commands.symlink, "Symlink" },
 		T = { commands.touch, "Change Timestamp" },
 		U = { commands.unmark_all, "Unmark All" },
+		W = { commands.browse_url, "Browse URL Of File" },
 		Y = { commands.yank, "Yank File Name" },
 		Z = { commands.compress, "Compress Or Uncompress" },
 		a = { commands.enter, "Edit File" },

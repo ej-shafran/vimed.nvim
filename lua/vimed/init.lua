@@ -48,6 +48,7 @@ function M.setup(config)
 
 			cmd("VimedAsyncShellCommand", commands.async_shell_command)
 			cmd("VimedBack", commands.back)
+			cmd("VimedBrowseURL", commands.browse_url)
 			cmd("VimedChangeMarks", commands.change_marks)
 			cmd("VimedChmod", commands.chmod)
 			cmd("VimedChown", commands.chown)
