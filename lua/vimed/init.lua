@@ -46,6 +46,8 @@ function M.setup(config)
 				vim.cmd.setlocal("nonumber norelativenumber")
 			end
 
+			cmd("DiredToVimed", commands.from_dired)
+
 			cmd("VimedAsyncShellCommand", commands.async_shell_command)
 			cmd("VimedBack", commands.back)
 			cmd("VimedBrowseURL", commands.browse_url)

@@ -4,8 +4,11 @@ local state = require("vimed._state")
 
 local M = {}
 
+M.dired_command_map = {}
+
 ---[COMMAND - dired-do-redisplay]
 M.redisplay = command.redisplay
+M.dired_command_map["dired-do-redisplay"] = M.redisplay
 
 ---[COMMAND - +dired/quit-all]
 M.quit = command.basic(function()
@@ -18,6 +21,7 @@ M.quit = command.basic(function()
 
 	return false
 end)
+M.dired_command_map["+dired/quit-all"] = M.quit
 
 ---[COMMAND - dired-up-directory]
 M.back = command.basic(function()
@@ -25,6 +29,7 @@ M.back = command.basic(function()
 	local dir = vim.fs.dirname(cwd)
 	vim.api.nvim_set_current_dir(dir)
 end)
+M.dired_command_map["dired-up-directory"] = M.back
 
 ---[COMMAND - dired-find-file]
 M.enter = command.basic(function()
@@ -40,6 +45,7 @@ M.enter = command.basic(function()
 		vim.api.nvim_set_current_dir(path)
 	end
 end)
+M.dired_command_map["dired-find-file"] = M.enter
 
 ---[COMMAND - dired-create-directory]
 M.create_dir = command.basic(function()
@@ -49,6 +55,7 @@ M.create_dir = command.basic(function()
 
 	vim.fn.mkdir(dirname, "p")
 end)
+M.dired_command_map["dired-create-directory"] = M.create_dir
 
 ---[COMMAND - dired-unmark-all-marks]
 M.unmark_all = command.basic(function()
@@ -63,6 +70,7 @@ M.unmark_all = command.basic(function()
 
 	vim.notify(file_count .. " marks removed")
 end)
+M.dired_command_map["dired-unmark-all-marks"] = M.unmark_all
 
 ---[COMMAND - dired-toggle-marks]
 M.toggle_marks = command.basic(function()
@@ -75,6 +83,7 @@ M.toggle_marks = command.basic(function()
 		end
 	end
 end)
+M.dired_command_map["dired-toggle-marks"] = M.toggle_marks
 
 ---[COMMAND - dired-mark-subdir-files]
 M.mark_subdir_files = command.basic(function()
@@ -90,6 +99,7 @@ M.mark_subdir_files = command.basic(function()
 		end
 	end
 end)
+M.dired_command_map["dired-mark-subdir-files"] = M.mark_subdir_files
 
 ---[COMMAND - dired-goto-file]
 M.goto_file = command.basic(function()
@@ -114,6 +124,7 @@ M.goto_file = command.basic(function()
 
 	return false
 end)
+M.dired_command_map["dired-goto-file"] = M.goto_file
 
 ---[COMMAND - dired-flag-backup-files]
 M.flag_backup_files = command.basic(function()
@@ -124,6 +135,7 @@ M.flag_backup_files = command.basic(function()
 		end
 	end
 end)
+M.dired_command_map["dired-flag-backup-files"] = M.flag_backup_files
 
 ---[COMMAND - dired-change-marks]
 M.change_marks = command.basic(function()
@@ -145,6 +157,7 @@ M.change_marks = command.basic(function()
 		end
 	end
 end)
+M.dired_command_map["dired-change-marks"] = M.change_marks
 
 ---[COMMAND - dired-unmark-all-files]
 M.unmark_files = command.basic(function()
@@ -161,6 +174,7 @@ M.unmark_files = command.basic(function()
 		end
 	end
 end)
+M.dired_command_map["dired-unmark-all-files"] = M.unmark_files
 
 ---[COMMAND - dired-unmark-backward]
 M.unmark_backward = command.basic(function()
@@ -174,6 +188,7 @@ M.unmark_backward = command.basic(function()
 		return 1
 	end
 end)
+M.dired_command_map["dired-unmark-backward"] = M.unmark_backward
 
 ---[COMMAND - browse-url-of-dired-file]
 M.browse_url = function()
@@ -190,6 +205,7 @@ M.browse_url = function()
 
 	vim.notify(utils.command({ "open", vim.fn.shellescape(path) }))
 end
+M.dired_command_map["browse-url-of-dired-file"] = M.browse_url
 
 ---[COMMAND - dired-diff]
 M.diff = function()
@@ -220,16 +236,19 @@ M.diff = function()
 	vim.cmd.e(filename)
 	vim.cmd("vert diffsplit " .. target)
 end
+M.dired_command_map["dired-diff"] = M.diff
 
 ---[COMMAND - dired-next-marked-file]
 M.next_marked_file = command.cursor_to_marked_file(function(r)
 	return { r + 1, #state.lines }, { 1, r - 1 }
 end)
+M.dired_command_map["dired-next-marked-file"] = M.next_marked_file
 
 ---[COMMAND - dired-prev-marked-file]
 M.prev_marked_file = command.cursor_to_marked_file(function(r)
 	return { r - 1, 1, -1 }, { #state.lines, r + 1, -1 }
 end)
+M.dired_command_map["dired-prev-marked-file"] = M.prev_marked_file
 
 ---[COMMAND - dired-prev-dirline]
 M.prev_dirline = command.dirline(function(last, current, offset)
@@ -241,6 +260,7 @@ M.prev_dirline = command.dirline(function(last, current, offset)
 		return current - 1, false
 	end
 end)
+M.dired_command_map["dired-prev-dirline"] = M.prev_dirline
 
 ---[COMMAND - dired-next-dirline]
 M.next_dirline = command.dirline(function(last, current, offset)
@@ -255,21 +275,27 @@ end)
 
 ---[COMMAND]
 M.toggle_hidden = command.toggle("show_hidden")
+M.dired_command_map["dired-next-dirline"] = M.next_dirline
 
 ---[COMMAND - dired-sort-toggle-or-edit]
 M.toggle_sort = command.toggle("sort_by_time")
+M.dired_command_map["dired-sort-toggle-or-edit"] = M.toggle_sort
 
 ---[COMMAND - dired-hide-details-mode]
 M.toggle_hide_details = command.toggle("hide_details")
+M.dired_command_map["dired-hide-details-mode"] = M.toggle_hide_details
 
 ---[COMMAND - dired-unmark]
 M.unmark = command.mark(nil)
+M.dired_command_map["dired-unmark"] = M.unmark
 
 ---[COMMAND - dired-mark]
 M.mark = command.mark("*")
+M.dired_command_map["dired-mark"] = M.mark
 
 ---[COMMAND - dired-flag-file-deletion]
 M.flag_file_deletion = command.mark("D")
+M.dired_command_map["dired-flag-file-deletion"] = M.flag_file_deletion
 
 ---[COMMAND - dired-do-chmod]
 M.chmod = command.act_on_files(function(files, input)
@@ -285,6 +311,7 @@ end, {
 		operation = "Change mode of",
 	},
 })
+M.dired_command_map["dired-do-chmod"] = M.chmod
 
 ---[COMMAND - dired-do-compress]
 M.compress = command.act_on_files(function(files)
@@ -307,6 +334,7 @@ end, {
 		flag = "*",
 	},
 })
+M.dired_command_map["dired-do-compress"] = M.compress
 
 ---[COMMAND - dired-do-compress-to]
 M.compress_to = command.act_on_files(function(files)
@@ -339,6 +367,7 @@ M.compress_to = command.act_on_files(function(files)
 
 	vim.notify(utils.command(cmd))
 end, {})
+M.dired_command_map["dired-do-compress-to"] = M.compress_to
 
 ---[COMMAND - dired-do-chown]
 M.chown = command.act_on_files(function(files, input)
@@ -354,6 +383,7 @@ end, {
 		operation = "Change Owner of",
 	},
 }, "user")
+M.dired_command_map["dired-do-chown"] = M.chown
 
 ---[COMMAND - dired-do-load]
 M.load = command.act_on_files(function(files)
@@ -367,6 +397,7 @@ end, {
 		flag = "*",
 	},
 })
+M.dired_command_map["dired-do-load"] = M.load
 
 ---[COMMAND - dired-do-touch]
 M.touch = command.act_on_files(function(files, input)
@@ -385,6 +416,7 @@ end, {
 		suffix = " to (default now): ",
 	},
 }, "shellcmd")
+M.dired_command_map["dired-do-touch"] = M.touch
 
 ---[COMMAND - dired-do-print]
 M.print = command.act_on_files(function(files, input)
@@ -408,6 +440,7 @@ end, {
 		suffix = " with: ",
 	},
 }, "shellcmd", "lpr")
+M.dired_command_map["dired-do-print"] = M.print
 
 ---[COMMAND - dired-copy-filename-as-kill]
 M.yank = command.act_on_files(function(files)
@@ -415,12 +448,15 @@ M.yank = command.act_on_files(function(files)
 	vim.fn.setreg("+", files_str)
 	vim.notify(files_str)
 end, {})
+M.dired_command_map["dired-copy-filename-as-kill"] = M.yank
 
 ---[COMMAND - dired-upcase]
 M.upcase = command.confirm_each_file(string.upper, { action = "Rename upcase" })
+M.dired_command_map["dired-upcase"] = M.upcase
 
 ---[COMMAND - dired-downcase]
 M.downcase = command.confirm_each_file(string.lower, { action = "Rename downcase" })
+M.dired_command_map["dired-downcase"] = M.downcase
 
 ---[COMMAND - dired-do-rename-regexp]
 M.rename_regexp = command.with_regexp(function(file, target)
@@ -432,6 +468,7 @@ end, {
 	operation = "from",
 	replace = true,
 })
+M.dired_command_map["dired-do-rename-regexp"] = M.rename_regexp
 
 ---[COMMAND - dired-do-copy-regexp]
 M.copy_regexp = command.with_regexp(function(file, target)
@@ -442,16 +479,19 @@ end, {
 	operation = "from",
 	replace = true,
 })
+M.dired_command_map["dired-do-copy-regexp"] = M.copy_regexp
 
 ---[COMMAND - dired-do-symlink-regexp]
 M.symlink_regexp = command.with_regexp(function(file, target)
 	vim.notify(utils.command({ "ln", "-s", file, target }))
 end, { name = "SymLink", operation = "from", replace = true })
+M.dired_command_map["dired-do-symlink-regexp"] = M.symlink_regexp
 
 ---[COMMAND - dired-do-hardlink-regexp]
 M.hardlink_regexp = command.with_regexp(function(file, target)
 	vim.notify(utils.command({ "ln", file, target }))
 end, { name = "HardLink", operation = "from", replace = true })
+M.dired_command_map["dired-do-hardlink-regexp"] = M.hardlink_regexp
 
 ---[COMMAND - dired-do-rename]
 M.rename = command.create_files(utils.rename_file, {
@@ -461,6 +501,7 @@ M.rename = command.create_files(utils.rename_file, {
 		suffix = " to: ",
 	},
 })
+M.dired_command_map["dired-do-rename"] = M.rename
 
 ---[COMMAND - dired-do-copy]
 M.copy = command.create_files(utils.copy_file, {
@@ -470,6 +511,7 @@ M.copy = command.create_files(utils.copy_file, {
 	},
 	flag = "C",
 })
+M.dired_command_map["dired-do-copy"] = M.copy
 
 ---[COMMAND - dired-do-symlink]
 M.symlink = command.create_files(function(src, trg)
@@ -481,6 +523,7 @@ end, {
 	},
 	flag = "Y",
 })
+M.dired_command_map["dired-do-symlink"] = M.symlink
 
 ---[COMMAND - dired-do-hardlink]
 M.hardlink = command.create_files(function(src, trg)
@@ -492,6 +535,7 @@ end, {
 	},
 	flag = "H",
 })
+M.dired_command_map["dired-do-hardlink"] = M.hardlink
 
 ---[COMMAND - dired-do-shell-command]
 M.shell_command = command.execute(function(files, input)
@@ -508,6 +552,7 @@ end, {
 		operation = "! on",
 	},
 })
+M.dired_command_map["dired-do-shell-command"] = M.shell_command
 
 ---[COMMAND - dired-do-async-shell-command]
 M.async_shell_command = command.execute(function(files, input)
@@ -519,6 +564,7 @@ end, {
 		operation = "& on",
 	},
 })
+M.dired_command_map["dired-do-async-shell-command"] = M.async_shell_command
 
 ---[COMMAND - dired-do-flagged-delete]
 M.flagged_delete = command.delete_files(function()
@@ -534,24 +580,29 @@ M.flagged_delete = command.delete_files(function()
 		return vim.fs.dirname(value) == cwd
 	end, files)
 end, "(No deletions requested)")
+M.dired_command_map["dired-do-flagged-delete"] = M.flagged_delete
 
 ---[COMMAND - dired-do-delete]
 M.delete = command.delete_files(command.target_files, "No file on this line")
+M.dired_command_map["dired-do-delete"] = M.delete
 
 ---[COMMAND - dired-mark-executables]
 M.mark_executables = command.mark_via_filter(function(entry)
 	return not entry.permissions.is_dir and entry.permissions.user.execute
 end, { flag = "*", kind = "executable" })
+M.dired_command_map["dired-mark-executables"] = M.mark_executables
 
 ---[COMMAND - dired-mark-symlinks]
 M.mark_symlinks = command.mark_via_filter(function(entry)
 	return entry.link ~= nil
 end, { flag = "*", kind = "symbolic link" })
+M.dired_command_map["dired-mark-symlinks"] = M.mark_symlinks
 
 ---[COMMAND - dired-mark-directories]
 M.mark_directories = command.mark_via_filter(function(entry)
 	return entry.permissions.is_dir
 end, { flag = "*", kind = "directory file" })
+M.dired_command_map["dired-mark-directories"] = M.mark_directories
 
 ---[COMMAND - dired-mark-files-regexp]
 M.mark_regexp = command.mark_via_filter(utils.matches_input_regex, {
@@ -562,6 +613,7 @@ M.mark_regexp = command.mark_via_filter(utils.matches_input_regex, {
 		completion = "file",
 	},
 })
+M.dired_command_map["dired-mark-files-regexp"] = M.mark_regexp
 
 ---[COMMAND - dired-flag-files-regexp]
 M.flag_regexp = command.mark_via_filter(utils.matches_input_regex, {
@@ -572,6 +624,7 @@ M.flag_regexp = command.mark_via_filter(utils.matches_input_regex, {
 		completion = "file",
 	},
 })
+M.dired_command_map["dired-flag-files-regexp"] = M.flag_regexp
 
 ---[COMMAND - dired-mark-extension]
 M.mark_extension = command.mark_via_filter(function(entry, input)
@@ -592,6 +645,7 @@ end, {
 		end,
 	},
 })
+M.dired_command_map["dired-mark-extension"] = M.mark_extension
 
 ---[COMMAND - dired-mark-sexp]
 M.mark_lua_expression = command.mark_via_filter(function(entry, func)
@@ -619,12 +673,14 @@ end, {
 		end,
 	},
 })
+M.dired_command_map["dired-mark-sexp"] = M.mark_lua_expression
 
 ---[COMMAND - dired-flag-garbage-files]
 M.flag_garbage_files = command.mark_via_filter(function(entry)
 	local re = vim.regex(state.garbage_files_regex) --[[@as any]]
 	return re:match_str(vim.fs.basename(entry.path))
 end, { flag = "D", kind = "matching file" })
+M.dired_command_map["dired-flag-garbage-files"] = M.flag_garbage_files
 
 ---[COMMAND - dired-mark-files-containing-regexp]
 M.mark_files_containing_regexp = command.mark_via_filter(function(entry, input)
@@ -646,6 +702,7 @@ end, {
 		completion = "file",
 	},
 })
+M.dired_command_map["dired-mark-files-containing-regexp"] = M.mark_files_containing_regexp
 
 ---[COMMAND - dired-mark-omitted]
 M.mark_omitted = command.mark_via_filter(function(entry)
@@ -658,5 +715,74 @@ M.mark_omitted = command.mark_via_filter(function(entry)
 	local re = vim.regex(state.omit_files_regex) --[[@as any]]
 	return re:match_str(vim.fs.basename(entry.path))
 end, { flag = "*", kind = "matching files" })
+M.dired_command_map["dired-mark-omitted"] = M.mark_omitted
+
+---[COMMAND - dired-do-find-regexp]
+M.find_regexp = function()
+	vim.notify("TODO: dired-do-find-regexp", vim.log.levels.ERROR)
+end
+M.dired_command_map["dired-do-find-regexp"] = M.find_regexp
+
+---[COMMAND - dired-maybe-insert-subdir]
+M.maybe_insert_subdir = function()
+	vim.notify("TODO: dired-maybe-insert-subdir", vim.log.levels.ERROR)
+end
+M.dired_command_map["dired-maybe-insert-subdir"] = M.maybe_insert_subdir
+
+---[COMMAND - dired-do-find-regexp-and-replace]
+M.find_regexp_and_replace = function()
+	vim.notify("TODO: dired-do-find-regexp-and-replace", vim.log.levels.ERROR)
+end
+M.dired_command_map["dired-do-find-regexp-and-replace"] = M.find_regexp_and_replace
+
+M.dired_command_map["dired-flag-auto-save-files"] = "UNPLANNED"
+M.dired_command_map["dired-git-info-mode"] = "UNPLANNED"
+M.dired_command_map["dired-clean-directory"] = "UNPLANNED"
+M.dired_command_map["dired-do-byte-compile"] = "UNPLANNED"
+M.dired_command_map["dired-toggle-read-only"] = "UNPLANNED"
+M.dired_command_map["dired-toggle-read-only"] = "UNPLANNED"
+
+---Prompts for the name of a Dired command, and runs the Vimed alternative.
+---
+---TODO: enable running command with function pre-set, not through input
+M.from_dired = function()
+	if not utils.is_vimed() then
+		return
+	end
+
+	-- define a VimScript function for getting the completion of dired commands
+	vim.api.nvim_exec2([[
+	function! VimedDiredCommandCompletion(ArgLead, CmdLine, CursorPos)
+	        let allCommands = []] .. vim.fn.join(
+		vim.tbl_map(function(key)
+			return '"' .. key .. '"'
+		end, vim.tbl_keys(M.dired_command_map)),
+		", "
+	) .. [[]
+	        return filter(allCommands, 'v:val =~ "^'. a:ArgLead .'"')
+	endfunction
+	]], {})
+
+	local result = vim.fn.input({
+		prompt = "Enter a Dired command: ",
+		completion = "customlist,VimedDiredCommandCompletion",
+	})
+
+	if M.dired_command_map[result] == nil then
+		vim.notify("Not a recognized Dired command")
+		return
+	elseif M.dired_command_map[result] == "UNPLANNED" then
+		vim.notify(
+			"\n"
+				.. result
+				.. " is not planned as a feature of Vimed.\n"
+				.. "If you find yourself needing it, please file a GitHub Issue or, better yet, a Pull Request.",
+			vim.log.levels.ERROR
+		)
+		return
+	end
+
+	pcall(M.dired_command_map[result])
+end
 
 return M
