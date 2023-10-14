@@ -76,7 +76,8 @@
 *** UNPLANNED .		dired-clean-directory
 *** DONE <		dired-prev-dirline
     CLOSED: [2023-10-08 Sun 13:49]
-*** TODO =		dired-diff
+*** DONE =		dired-diff
+    CLOSED: [2023-10-15 Sun 01:59]
 *** DONE >		dired-next-dirline
     CLOSED: [2023-10-08 Sun 13:49]
 *** TODO A		dired-do-find-regexp

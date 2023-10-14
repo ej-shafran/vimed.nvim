@@ -32,6 +32,7 @@ M.default_keymaps = {
 		u = { commands.unmark, "Unmark" },
 		x = { commands.flagged_delete, "Delete Flagged Files" },
 		["!"] = { commands.shell_command, "Shell Command" },
+		["="] = { commands.diff, "Diff" },
 		["%&"] = { commands.flag_garbage_files, "Flag Garbage Files" },
 		["%C"] = { commands.copy_regexp, "Copy By Regex" },
 		["%H"] = { commands.hardlink_regexp, "Hardlink By Regex" },

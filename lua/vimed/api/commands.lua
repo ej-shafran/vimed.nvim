@@ -175,6 +175,36 @@ M.unmark_backward = command.basic(function()
 	end
 end)
 
+---[COMMAND - dired-diff]
+M.diff = function()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local path = command.cursor_path()
+
+	if path == nil then
+		vim.notify("No file under cursor")
+		return false
+	end
+
+	local filename = vim.fs.basename(path)
+	local target = vim.fn.input({
+		prompt = "Diff " .. filename .. " with: ",
+		completion = "file",
+	})
+
+	local target_file = io.open(target, "rb")
+	if target_file == nil then
+		vim.notify("No match")
+		return false
+	end
+	target_file:close()
+
+	vim.cmd.e(filename)
+	vim.cmd("vert diffsplit " .. target)
+end
+
 ---[COMMAND - dired-next-marked-file]
 M.next_marked_file = command.cursor_to_marked_file(function(r)
 	return { r + 1, #state.lines }, { 1, r - 1 }
