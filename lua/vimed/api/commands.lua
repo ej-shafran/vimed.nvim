@@ -162,6 +162,17 @@ M.unmark_files = command.basic(function()
 	end
 end)
 
+
+---[COMMAND - dired-next-marked-file]
+M.next_marked_file = command.cursor_to_marked_file(function(r)
+	return { r + 1, #state.lines }, { 1, r - 1 }
+end)
+
+---[COMMAND - dired-prev-marked-file]
+M.prev_marked_file = command.cursor_to_marked_file(function(r)
+	return { r - 1, 1, -1 }, { #state.lines, r + 1, -1 }
+end)
+
 ---[COMMAND - dired-prev-dirline]
 M.prev_dirline = command.dirline(function(last, current, offset)
 	if current > last then

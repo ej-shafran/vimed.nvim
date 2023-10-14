@@ -141,8 +141,10 @@
     CLOSED: [2023-10-07 Sat 22:56]
 *** DONE ~		dired-flag-backup-files
     CLOSED: [2023-10-08 Sun 14:13]
-*** TODO * C-n		dired-next-marked-file
-*** TODO * C-p		dired-prev-marked-file
+*** DONE * C-n		dired-next-marked-file
+    CLOSED: [2023-10-15 Sun 01:00]
+*** DONE * C-p		dired-prev-marked-file
+    CLOSED: [2023-10-15 Sun 01:00]
 *** DONE * !		dired-unmark-all-marks
     CLOSED: [2023-10-08 Sun 18:38]
 *** DONE * %		dired-mark-files-regexp

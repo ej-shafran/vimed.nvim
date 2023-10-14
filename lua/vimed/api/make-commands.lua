@@ -486,4 +486,36 @@ function M.with_regexp(logic, opts)
 	end
 end
 
+
+function M.cursor_to_marked_file(logic)
+	return function()
+		if not utils.is_vimed() then
+			return
+		end
+
+		local r = unpack(vim.api.nvim_win_get_cursor(0))
+		local header_lines = state.hide_details and 1 or 2
+		local direction, wrap = logic(r - header_lines)
+
+		for i = direction[1], direction[2], direction[3] or 1 do
+			local line = state.lines[i]
+			if state.flags[line.path] ~= nil then
+				vim.api.nvim_win_set_cursor(0, { i + header_lines, 0 })
+				return
+			end
+		end
+
+		for i = wrap[1], wrap[2], wrap[3] or 1 do
+			local line = state.lines[i]
+			if state.flags[line.path] ~= nil then
+				vim.notify("(Wraparound for next marked file)")
+				vim.api.nvim_win_set_cursor(0, { i + header_lines, 0 })
+				return
+			end
+		end
+
+		vim.notify("No next marked file")
+	end
+end
+
 return M
