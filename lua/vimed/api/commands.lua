@@ -305,7 +305,8 @@ M.compress_to = command.act_on_files(function(files)
 
 	local base_cmd = nil
 	for pattern, value in pairs(state.compress_files_alist) do
-		if target:match(pattern) ~= nil then
+		local re = vim.regex(pattern) --[[@as any]]
+		if re:match_str(target) ~= nil then
 			base_cmd = value
 			break
 		end

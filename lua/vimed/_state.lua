@@ -13,12 +13,13 @@ M.lines = {}
 ---@type table<string, "D"|"*"|"C"|"Y">
 M.flags = {}
 
+---@type table<string, string>
 M.default_compress_files_alist = {
-	["%.tar%.gz$"] = "tar -cf - %i | gzip -c9 > %o",
-	["%.tar%.bz2$"] = "tar -cf - %i | bzip2 -c9 > %o",
-	["%.tar%.xz$"] = "tar -cf - %i | xz -c9 > %o",
-	["%.tar%.zst$"] = "tar -cf - %i | zstd -19 -o %o",
-	["%.zip$"] = "zip %o -r --filesync %i",
+	["\\.tar\\.gz$"] = "tar -cf - %i | gzip -c9 > %o",
+	["\\.tar\\.bz2$"] = "tar -cf - %i | bzip2 -c9 > %o",
+	["\\.tar\\.xz$"] = "tar -cf - %i | xz -c9 > %o",
+	["\\.tar\\.zst$"] = "tar -cf - %i | zstd -19 -o %o",
+	["\\.zip$"] = "zip %o -r --filesync %i",
 }
 ---@type table<string, string>
 M.compress_files_alist = {}
