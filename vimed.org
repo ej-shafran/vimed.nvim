@@ -103,6 +103,7 @@
 *** DONE P		dired-do-print
     CLOSED: [2023-10-15 Sun 01:36]
 *** TODO Q		dired-do-find-regexp-and-replace
+    Requires integration with Telescope?
 *** DONE R		dired-do-rename
     CLOSED: [2023-10-08 Sun 00:27]
 *** DONE S		dired-do-symlink
