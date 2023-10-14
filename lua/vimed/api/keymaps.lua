@@ -59,6 +59,7 @@ M.default_keymaps = {
 		["*u"] = { commands.unmark, "Unmark" },
 		["*<C-n>"] = { commands.next_marked_file, "Next Marked File" },
 		["*<C-p>"] = { commands.prev_marked_file, "Previous Marked File" },
+		["*<Del>"] = { commands.unmark_backward, "Unmark Backwards" },
 		["+"] = { commands.create_dir, "Create Directory" },
 		["-"] = { commands.back, "Back" },
 		["."] = { commands.toggle_hidden, "Toggle Hidden" },

@@ -172,7 +172,8 @@
     CLOSED: [2023-10-08 Sun 18:36]
 *** DONE * u		dired-unmark
     CLOSED: [2023-10-08 Sun 18:35]
-*** TODO * <BS>		dired-unmark-backward
+*** DONE * <Del>	dired-unmark-backward
+    CLOSED: [2023-10-15 Sun 01:24]
 *** DONE % &		dired-flag-garbage-files
     CLOSED: [2023-10-09 Mon 23:59]
 *** DONE % C		dired-do-copy-regexp

@@ -12,7 +12,7 @@ local M = {}
 function M.cursor_path()
 	local r = unpack(vim.api.nvim_win_get_cursor(0))
 	local header_lines = state.hide_details and 1 or 2
-	if r < header_lines + 1 then
+	if r < header_lines + 1 or r > header_lines + #state.lines then
 		return nil, r
 	end
 
@@ -485,7 +485,6 @@ function M.with_regexp(logic, opts)
 		M.redisplay()
 	end
 end
-
 
 function M.cursor_to_marked_file(logic)
 	return function()

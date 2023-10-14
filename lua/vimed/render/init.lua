@@ -189,6 +189,8 @@ local function display()
 
 		table.insert(M.buffer, nline)
 	end
+
+	table.insert(M.buffer, NuiLine())
 end
 
 local function flush()

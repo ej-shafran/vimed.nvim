@@ -162,6 +162,18 @@ M.unmark_files = command.basic(function()
 	end
 end)
 
+---[COMMAND - dired-unmark-backward]
+M.unmark_backward = command.basic(function()
+	local r = unpack(vim.api.nvim_win_get_cursor(0))
+	local header_lines = state.hide_details and 1 or 2
+	if r - 1 > header_lines and r - 1 < #state.lines then
+		local line = state.lines[r - 1 - header_lines]
+		state.flags[line.path] = nil
+		return r - 1
+	else
+		return 1
+	end
+end)
 
 ---[COMMAND - dired-next-marked-file]
 M.next_marked_file = command.cursor_to_marked_file(function(r)
