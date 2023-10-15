@@ -33,4 +33,5 @@ jobs:
       - name: Run Tests
         run: |
           cd vimed.nvim
+          make setup-ci
           make test

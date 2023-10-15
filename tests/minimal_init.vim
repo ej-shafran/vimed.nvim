@@ -1,6 +1,9 @@
 " Grabbing refactoring code
 set rtp+=.
 
+set rtp+=../plenary.nvim
+set rtp+=../nui.nvim
+
 " If you use vim-plug if you got it locally
 set rtp+=~/.vim/plugged/plenary.nvim
 set rtp+=~/.vim/plugged/nui.nvim
