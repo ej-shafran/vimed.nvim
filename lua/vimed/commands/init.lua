@@ -1,5 +1,6 @@
-local command = require("vimed.api.make-commands")
-local utils = require("vimed.api.utils")
+local command = require("vimed.commands.make-commands")
+local command_utils = require("vimed.commands.command-utils")
+local utils = require("vimed.utils")
 local state = require("vimed._state")
 
 local M = {}
@@ -33,7 +34,7 @@ M.dired_command_map["dired-up-directory"] = M.back
 
 ---[COMMAND - dired-find-file]
 M.enter = command.basic(function()
-	local path = command.cursor_path()
+	local path = command_utils.cursor_path()
 	if path == nil then
 		return false
 	end
@@ -196,7 +197,7 @@ M.browse_url = function()
 		return
 	end
 
-	local path = command.cursor_path()
+	local path = command_utils.cursor_path()
 
 	if path == nil then
 		vim.notify("No file on this line")
@@ -213,7 +214,7 @@ M.diff = function()
 		return
 	end
 
-	local path = command.cursor_path()
+	local path = command_utils.cursor_path()
 
 	if path == nil then
 		vim.notify("No file under cursor")
@@ -583,7 +584,7 @@ end, "(No deletions requested)")
 M.dired_command_map["dired-do-flagged-delete"] = M.flagged_delete
 
 ---[COMMAND - dired-do-delete]
-M.delete = command.delete_files(command.target_files, "No file on this line")
+M.delete = command.delete_files(command_utils.target_files, "No file on this line")
 M.dired_command_map["dired-do-delete"] = M.delete
 
 ---[COMMAND - dired-mark-executables]

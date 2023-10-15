@@ -1,73 +1,11 @@
 ---@alias PromptOpts {operation: string, flag: string, suffix: string?, multi_operation: string?}
 
-local utils = require("vimed.api.utils")
+local utils = require("vimed.utils")
 local state = require("vimed._state")
 local render = require("vimed.render")
+local command_utils = require("vimed.commands.command-utils")
 
 local M = {}
-
----Get the path under the cursor, or `nil` if there isn't one.
----@return string|nil
----@return integer r current row in the buffer
-function M.cursor_path()
-	local r = unpack(vim.api.nvim_win_get_cursor(0))
-	local header_lines = state.hide_details and 1 or 2
-	if r < header_lines + 1 or r > header_lines + #state.lines then
-		return nil, r
-	end
-
-	return state.lines[r - header_lines].path, r
-end
-
----Get either the marked files or the file under the cursor if there aren't any.
----@return string[]|nil
-function M.target_files()
-	local files = {}
-	local cwd = vim.fn.getcwd()
-	for path, flag in pairs(state.flags) do
-		if flag == "*" and vim.fs.dirname(path) == cwd then
-			table.insert(files, path)
-		end
-	end
-
-	if #files == 0 then
-		local path = M.cursor_path()
-		if path == nil then
-			return
-		end
-
-		files = { path }
-	end
-	return files
-end
-
--- ---@alias PromptOpts {operation: string, flag: string, suffix: string?, multi_operation: string?}
-
----Create a prompt for an operation which can be done on marked files or the file under the cursor.
----@param files string[]
----@param opts PromptOpts
----@return string
-local function prompt_for_files(files, opts)
-	local prompt
-	if #files == 1 then
-		prompt = opts.operation .. " " .. vim.fs.basename(files[1])
-	else
-		local files_str = vim.fn.join(vim.tbl_map(vim.fs.basename, files), "\n") --[[@as string]]
-		prompt = files_str
-			.. "\n"
-			.. (opts.multi_operation or opts.operation)
-			.. " "
-			.. opts.flag
-			.. " ["
-			.. #files
-			.. " files]"
-	end
-
-	if opts.suffix ~= nil then
-		prompt = prompt .. opts.suffix
-	end
-	return prompt
-end
 
 ---@param r integer? the row to place the cursor at after rerendering
 function M.redisplay(r)
@@ -147,7 +85,7 @@ function M.mark(flag)
 
 			M.redisplay()
 		else
-			local path, r = M.cursor_path()
+			local path, r = command_utils.cursor_path()
 			if path == nil then
 				return
 			end
@@ -172,7 +110,7 @@ function M.act_on_files(logic, opts, completion, default)
 			return
 		end
 
-		local files = M.target_files()
+		local files = command_utils.target_files()
 		if files == nil then
 			vim.notify("No files specified")
 			return
@@ -181,14 +119,17 @@ function M.act_on_files(logic, opts, completion, default)
 		local input = nil
 		if opts.input ~= nil then
 			input = vim.fn.input({
-				prompt = prompt_for_files(files, vim.tbl_extend("force", { suffix = " to: ", flag = "*" }, opts.input)),
+				prompt = command_utils.prompt_for_files(
+					files,
+					vim.tbl_extend("force", { suffix = " to: ", flag = "*" }, opts.input)
+				),
 				completion = completion or "file",
 				default = default,
 			})
 		end
 
 		if opts.confirm ~= nil then
-			local choice = vim.fn.confirm(prompt_for_files(files, opts.confirm), "&Yes\n&No")
+			local choice = vim.fn.confirm(command_utils.prompt_for_files(files, opts.confirm), "&Yes\n&No")
 			if choice ~= 1 then
 				return
 			end
@@ -210,14 +151,14 @@ function M.create_files(logic, opts)
 			return
 		end
 
-		local files = M.target_files()
+		local files = command_utils.target_files()
 		if files == nil then
 			vim.notify("No files specified")
 			return
 		end
 
 		local target = vim.fn.input({
-			prompt = prompt_for_files(files, vim.tbl_extend("force", { flag = "*" }, opts.input)),
+			prompt = command_utils.prompt_for_files(files, vim.tbl_extend("force", { flag = "*" }, opts.input)),
 			completion = "file",
 		})
 		if target == "" then
@@ -255,14 +196,14 @@ function M.execute(parse, opts)
 			return
 		end
 
-		local files = M.target_files()
+		local files = command_utils.target_files()
 		if files == nil then
 			vim.notify("No files specified")
 			return
 		end
 
 		local input = vim.fn.input({
-			prompt = prompt_for_files(files, vim.tbl_extend("force", { flag = "*", suffix = ": " }, opts.input)),
+			prompt = command_utils.prompt_for_files(files, vim.tbl_extend("force", { flag = "*", suffix = ": " }, opts.input)),
 			completion = "shellcmd",
 		})
 		if input == "" then
@@ -304,7 +245,7 @@ function M.delete_files(get_files, if_none)
 		end
 
 		local choice = vim.fn.confirm(
-			prompt_for_files(files, {
+			command_utils.prompt_for_files(files, {
 				operation = "Delete",
 				flag = "D",
 			}),
@@ -362,7 +303,7 @@ function M.confirm_each_file(transform, opts)
 			return
 		end
 
-		local files = M.target_files()
+		local files = command_utils.target_files()
 		if files == nil then
 			vim.notify("No files specified")
 			return
@@ -440,7 +381,7 @@ function M.with_regexp(logic, opts)
 		end
 		local re = vim.regex(regex_raw) --[[@as any]]
 
-		local all_files = M.target_files() or {}
+		local all_files = command_utils.target_files() or {}
 		local files = vim.tbl_filter(function(file)
 			return re:match_str(file)
 		end, all_files)

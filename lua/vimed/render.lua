@@ -1,5 +1,5 @@
 local state = require("vimed._state")
-local hls = require("vimed.render.highlights")
+local hls = require("vimed.highlights")
 local NuiLine = require("nui.line")
 local NuiText = require("nui.text")
 

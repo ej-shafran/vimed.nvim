@@ -1,10 +1,10 @@
 ---@alias Config { styles: GroupStyles?, keymaps: VimedKeymaps?, hijack_netrw: boolean?, keep_line_numbers: boolean?, compress_files_alist: table<string, string>?, garbage_files_regex: string?, omit_files_regex: string?, omit_extensions: string[]?, which_key_support: boolean? }
 
-local commands = require("vimed.api.commands")
-local utils = require("vimed.api.utils")
+local commands = require("vimed.commands")
+local utils = require("vimed.utils")
 local render = require("vimed.render")
-local hls = require("vimed.render.highlights")
-local keymaps = require("vimed.api.keymaps")
+local hls = require("vimed.highlights")
+local keymaps = require("vimed.keymaps")
 local state = require("vimed._state")
 
 local M = {}

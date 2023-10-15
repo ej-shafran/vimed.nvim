@@ -1,4 +1,4 @@
-local utils = require("vimed.api.utils")
+local utils = require("vimed.utils")
 
 local M = {}
 
