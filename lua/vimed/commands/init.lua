@@ -8,7 +8,9 @@ local M = {}
 M.dired_command_map = {}
 
 ---[COMMAND - dired-do-redisplay]
-M.redisplay = command.redisplay
+M.redisplay = function()
+	command.redisplay()
+end
 M.dired_command_map["dired-do-redisplay"] = M.redisplay
 
 ---[COMMAND - +dired/quit-all]
