@@ -1,22 +1,41 @@
 local a = require("plenary.async")
 local tests = a.tests
 local describe = tests.describe
--- local it = tests.it
+local it = tests.it
 
+---Fix type issue
+---@type any
+local assert = assert
+
+local function script_path()
+	return debug.getinfo(2, "S").source:sub(2):match("(.*/)"):match("(.*/)")
+end
 describe("Vimed Commands", function()
-	-- local vimed = require("vimed")
+	local vimed = require("vimed")
 
 	tests.before_each(function()
-		local rand = math.random(1000)
-		vim.fn.mkdir("tests/workdir/" .. tostring(rand), "p")
-		vim.api.nvim_set_current_dir("tests/workdir/" .. tostring(rand))
+		vim.api.nvim_set_current_dir(vim.fs.dirname(script_path()))
+
+		local rand = math.random(10000)
+		vim.fn.mkdir("workdir/" .. tostring(rand), "p")
+		vim.api.nvim_set_current_dir("workdir/" .. tostring(rand))
 	end)
 
 	-- cmd("DiredToVimed", commands.from_dired)
 
 	describe("VimedAsyncShellCommand", function() end) -- TODO
 
-	describe("VimedBack", function() end)
+	describe("VimedBack", function()
+		it("should change the cwd", function()
+			vimed.setup({})
+			vimed.open_vimed()
+
+			local target = vim.fs.dirname(vim.fn.getcwd() --[[@as string]])
+
+			vim.cmd.VimedBack()
+			assert.are.same(target, vim.fn.getcwd())
+		end)
+	end)
 
 	describe("VimedBrowseURL", function() end) -- TODO
 
