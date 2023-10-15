@@ -1,3 +1,5 @@
+---@alias VimedFlag "D"|"*"|"C"|"Y"|"H"
+
 local utils = require("vimed.utils")
 
 local M = {}
@@ -10,7 +12,7 @@ M.sort_by_time = false
 M.hide_details = false
 ---@type FsEntry[]
 M.lines = {}
----@type table<string, "D"|"*"|"C"|"Y">
+---@type table<string, VimedFlag>
 M.flags = {}
 
 ---@type table<string, string>
