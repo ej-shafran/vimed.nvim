@@ -16,7 +16,7 @@ end)
 local function script_path()
 	return debug.getinfo(2, "S").source:sub(2):match("(.*/)"):match("(.*/)")
 end
-describe("Vimed Commands", function()
+describe("Vimed Command", function()
 	local vimed = require("vimed")
 
 	tests.before_each(function()
@@ -108,7 +108,35 @@ describe("Vimed Commands", function()
 
 	describe("VimedLoad", function() end) -- TODO
 
-	describe("VimedMark", function() end) -- TODO
+	describe("VimedMark", function()
+		tests.before_each(function()
+			vimed.setup({})
+			vim.cmd.e("temp")
+			vim.cmd.w()
+			vimed.open_vimed()
+			vim.cmd.VimedGotoFile("temp")
+		end)
+
+		it("should change the current line", function()
+			local expected = vim.api.nvim_get_current_line():gsub("^ ", "*")
+			vim.cmd.VimedMark()
+			-- move one line up - mark moves us down
+			vim.cmd.normal("k")
+
+			assert.are.same(expected, vim.api.nvim_get_current_line())
+		end)
+
+		it("should leave a marked file unchanged", function()
+			vim.cmd.VimedMark()
+			vim.cmd.normal("k")
+
+			local expected = vim.api.nvim_get_current_line()
+			vim.cmd.VimedMark()
+			vim.cmd.normal("k")
+
+			assert.are.same(expected, vim.api.nvim_get_current_line())
+		end)
+	end)
 
 	describe("VimedMarkDirectories", function() end) -- TODO
 
