@@ -112,7 +112,7 @@ describe("Vimed Command", function()
 	describe("VimedLoad", function() end) -- TODO
 
 	describe("VimedMark", function()
-		it("should change the current line", function()
+		it("should mark the current line", function()
 			vimed.setup()
 			os.execute("touch temp")
 			vimed.open_vimed()
@@ -124,6 +124,23 @@ describe("Vimed Command", function()
 			vim.cmd.normal("k")
 
 			assert.are.same(expected, vim.api.nvim_get_current_line())
+		end)
+
+		it("should mark a visual selection", function()
+			vimed.setup()
+			os.execute("touch temp1 temp2")
+			vimed.open_vimed()
+			local expected = vim.api.nvim_buf_get_lines(0, 2, -2, false)
+			for i = 1, #expected do
+				expected[i] = expected[i]:gsub("^ ", "*")
+			end
+
+			vim.cmd.normal("GkVk")
+			vim.cmd.VimedMark()
+			local recieved = vim.api.nvim_buf_get_lines(0, 2, -2, false)
+			for i = 1, #recieved do
+				assert.are.same(recieved[i], expected[i])
+			end
 		end)
 
 		it("should leave a marked file unchanged", function()
