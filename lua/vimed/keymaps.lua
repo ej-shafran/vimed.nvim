@@ -1,6 +1,6 @@
 ---@alias VimedKeymaps table<"n"|"x"|"v"|"V", table<string, "which_key_ignore"|false|{ [1]: string|function, [2]: string? }>>
 
-local commands = require("vimed.api.commands")
+local commands = require("vimed.commands")
 
 local M = {}
 

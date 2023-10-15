@@ -1,5 +1,6 @@
-local command = require("vimed.api.make-commands")
-local utils = require("vimed.api.utils")
+local command = require("vimed.commands.make-commands")
+local command_utils = require("vimed.commands.command-utils")
+local utils = require("vimed.utils")
 local state = require("vimed._state")
 
 local M = {}
@@ -33,7 +34,7 @@ M.dired_command_map["dired-up-directory"] = M.back
 
 ---[COMMAND - dired-find-file]
 M.enter = command.basic(function()
-	local path = command.cursor_path()
+	local path = command_utils.cursor_path()
 	if path == nil then
 		return false
 	end
@@ -48,8 +49,8 @@ end)
 M.dired_command_map["dired-find-file"] = M.enter
 
 ---[COMMAND - dired-create-directory]
-M.create_dir = command.basic(function()
-	local dirname = vim.fn.input({
+M.create_dir = command.basic(function(param)
+	local dirname = param.fargs and param.fargs[1] or vim.fn.input({
 		prompt = "Create directory: ",
 	})
 
@@ -102,9 +103,9 @@ end)
 M.dired_command_map["dired-mark-subdir-files"] = M.mark_subdir_files
 
 ---[COMMAND - dired-goto-file]
-M.goto_file = command.basic(function()
+M.goto_file = command.basic(function(param)
 	local cwd = vim.fn.getcwd()
-	local file = vim.fn.input({
+	local file = param.fargs and param.fargs[1] or vim.fn.input({
 		prompt = "Goto file: ",
 		completion = "file",
 	})
@@ -138,17 +139,23 @@ end)
 M.dired_command_map["dired-flag-backup-files"] = M.flag_backup_files
 
 ---[COMMAND - dired-change-marks]
-M.change_marks = command.basic(function()
-	vim.notify("Change (old mark): ")
-	local from = vim.fn.getcharstr()
-	if from == "" then
+M.change_marks = command.basic(function(param)
+	if not param.fargs then
+		vim.notify("Change (old mark): ")
+	end
+	local from = param.fargs and param.fargs[1] or vim.fn.getcharstr()
+	if from == "" or #from > 1 then
 		return false
 	end
 
-	vim.notify("Change " .. from .. " marks to (new mark): ")
-	local to = vim.fn.getcharstr()
+	if not param.fargs or not param.fargs[2] then
+		vim.notify("Change " .. from .. " marks to (new mark): ")
+	end
+	local to = param.fargs and param.fargs[2] or vim.fn.getcharstr()
 	if to == "" then
 		return false
+	elseif #to > 2 then
+		vim.notify("Cannot create a multi-character mark", vim.log.levels.ERROR)
 	end
 
 	for file, flag in pairs(state.flags) do
@@ -160,16 +167,18 @@ end)
 M.dired_command_map["dired-change-marks"] = M.change_marks
 
 ---[COMMAND - dired-unmark-all-files]
-M.unmark_files = command.basic(function()
-	vim.notify("Remove marks (<CR> means all): ")
-	local target = vim.fn.getchar()
+M.unmark_files = command.basic(function(param)
+	if not param.fargs then
+		vim.notify("Remove marks (<CR> means all): ")
+	end
+	local target = param.fargs and vim.fn.char2nr(param.fargs[1]) or vim.fn.getchar()
 	local target_str = vim.fn.nr2char(target)
 	if target_str == "" then
 		return false
 	end
 
 	for file, flag in pairs(state.flags) do
-		if target == vim.fn.char2nr("\n") or target == vim.fn.char2nr("\r") or target_str == flag then
+		if param.bang or target == vim.fn.char2nr("\n") or target == vim.fn.char2nr("\r") or target_str == flag then
 			state.flags[file] = nil
 		end
 	end
@@ -196,7 +205,7 @@ M.browse_url = function()
 		return
 	end
 
-	local path = command.cursor_path()
+	local path = command_utils.cursor_path()
 
 	if path == nil then
 		vim.notify("No file on this line")
@@ -208,12 +217,15 @@ end
 M.dired_command_map["browse-url-of-dired-file"] = M.browse_url
 
 ---[COMMAND - dired-diff]
-M.diff = function()
+---@param param CommandParam
+M.diff = function(param)
 	if not utils.is_vimed() then
 		return
 	end
 
-	local path = command.cursor_path()
+	param = param or {}
+
+	local path = command_utils.cursor_path()
 
 	if path == nil then
 		vim.notify("No file under cursor")
@@ -221,10 +233,11 @@ M.diff = function()
 	end
 
 	local filename = vim.fs.basename(path)
-	local target = vim.fn.input({
-		prompt = "Diff " .. filename .. " with: ",
-		completion = "file",
-	})
+	local target = param.fargs and param.fargs[1]
+		or vim.fn.input({
+			prompt = "Diff " .. filename .. " with: ",
+			completion = "file",
+		})
 
 	local target_file = io.open(target, "rb")
 	if target_file == nil then
@@ -308,7 +321,9 @@ M.chmod = command.act_on_files(function(files, input)
 	vim.notify(utils.command(cmd))
 end, {
 	input = {
-		operation = "Change mode of",
+		prompt = {
+			operation = "Change mode of",
+		},
 	},
 })
 M.dired_command_map["dired-do-chmod"] = M.chmod
@@ -337,8 +352,8 @@ end, {
 M.dired_command_map["dired-do-compress"] = M.compress
 
 ---[COMMAND - dired-do-compress-to]
-M.compress_to = command.act_on_files(function(files)
-	local target = vim.fn.input({
+M.compress_to = command.act_on_files(function(files, _, morearg)
+	local target = morearg or vim.fn.input({
 		prompt = "Compress to: ",
 		completion = "file",
 	})
@@ -380,9 +395,12 @@ M.chown = command.act_on_files(function(files, input)
 	utils.command(cmd)
 end, {
 	input = {
-		operation = "Change Owner of",
+		prompt = {
+			operation = "Change Owner of",
+		},
+		completion = "user",
 	},
-}, "user")
+})
 M.dired_command_map["dired-do-chown"] = M.chown
 
 ---[COMMAND - dired-do-load]
@@ -411,11 +429,14 @@ M.touch = command.act_on_files(function(files, input)
 	vim.notify(utils.command(cmd))
 end, {
 	input = {
-		flag = "*",
-		operation = "Change Timestamp of",
-		suffix = " to (default now): ",
+		prompt = {
+			flag = "*",
+			operation = "Change Timestamp of",
+			suffix = " to (default now): ",
+		},
+		completion = "shellcmd",
 	},
-}, "shellcmd")
+})
 M.dired_command_map["dired-do-touch"] = M.touch
 
 ---[COMMAND - dired-do-print]
@@ -435,11 +456,15 @@ M.print = command.act_on_files(function(files, input)
 	vim.notify(utils.command(cmd))
 end, {
 	input = {
-		flag = "*",
-		operation = "Print",
-		suffix = " with: ",
+		prompt = {
+			flag = "*",
+			operation = "Print",
+			suffix = " with: ",
+		},
+		completion = "shellcmd",
+		default = "lpr",
 	},
-}, "shellcmd", "lpr")
+})
 M.dired_command_map["dired-do-print"] = M.print
 
 ---[COMMAND - dired-copy-filename-as-kill]
@@ -583,7 +608,7 @@ end, "(No deletions requested)")
 M.dired_command_map["dired-do-flagged-delete"] = M.flagged_delete
 
 ---[COMMAND - dired-do-delete]
-M.delete = command.delete_files(command.target_files, "No file on this line")
+M.delete = command.delete_files(command_utils.target_files, "No file on this line")
 M.dired_command_map["dired-do-delete"] = M.delete
 
 ---[COMMAND - dired-mark-executables]
@@ -744,29 +769,17 @@ M.dired_command_map["dired-toggle-read-only"] = "UNPLANNED"
 
 ---Prompts for the name of a Dired command, and runs the Vimed alternative.
 ---
----TODO: enable running command with function pre-set, not through input
-M.from_dired = function()
+---@param param CommandParam
+M.from_dired = function(param)
 	if not utils.is_vimed() then
 		return
 	end
 
-	-- define a VimScript function for getting the completion of dired commands
-	vim.api.nvim_exec2([[
-	function! VimedDiredCommandCompletion(ArgLead, CmdLine, CursorPos)
-	        let allCommands = []] .. vim.fn.join(
-		vim.tbl_map(function(key)
-			return '"' .. key .. '"'
-		end, vim.tbl_keys(M.dired_command_map)),
-		", "
-	) .. [[]
-	        return filter(allCommands, 'v:val =~ "^'. a:ArgLead .'"')
-	endfunction
-	]], {})
-
-	local result = vim.fn.input({
-		prompt = "Enter a Dired command: ",
-		completion = "customlist,VimedDiredCommandCompletion",
-	})
+	local result = param.fargs and param.fargs[1]
+		or vim.fn.input({
+			prompt = "Enter a Dired command: ",
+			completion = "customlist,VimedDiredCommandCompletion",
+		})
 
 	if M.dired_command_map[result] == nil then
 		vim.notify("Not a recognized Dired command")
