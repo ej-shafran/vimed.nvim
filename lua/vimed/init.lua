@@ -21,8 +21,10 @@ function M.open_vimed()
 	end
 end
 
----@param config Config
+---@param config Config?
 function M.setup(config)
+	config = config or {}
+
 	state.compress_files_alist =
 		vim.tbl_extend("force", state.default_compress_files_alist, config.compress_files_alist or {})
 	if config.garbage_files_regex ~= nil then
