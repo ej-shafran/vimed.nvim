@@ -1,0 +1,22 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Plenary Busted Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Neovim
+        run: |
+          sudo apt-get update
+          sudo add-apt-repository ppa:neovim-ppa/unstable
+          sudo apt-get install neovim
+      - name: Run Tests
+        run: make test
