@@ -7,6 +7,12 @@ local it = tests.it
 ---@type any
 local assert = assert
 
+assert:register("assertion", "contains", function(_, arguments)
+	local container = arguments[1]
+	local containee = arguments[2]
+	return string.find(container, containee) ~= nil
+end)
+
 local function script_path()
 	return debug.getinfo(2, "S").source:sub(2):match("(.*/)"):match("(.*/)")
 end
@@ -73,7 +79,28 @@ describe("Vimed Commands", function()
 
 	describe("VimedFlaggedDelete", function() end) -- TODO
 
-	describe("VimedGotoFile", function() end) -- TODO
+	describe("VimedGotoFile", function()
+		it("should go to a file", function()
+			vimed.setup({})
+			vim.cmd.e("temp")
+			vim.cmd.w()
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp")
+
+			assert.contains(vim.api.nvim_get_current_line(), "temp")
+		end)
+
+		it("should stay in place if file does not exist", function()
+			vimed.setup({})
+			vimed.open_vimed()
+
+			local expected = vim.api.nvim_get_current_line()
+			vim.cmd.VimedGotoFile("noexist")
+
+			assert.are.same(expected, vim.api.nvim_get_current_line())
+		end)
+	end)
 
 	describe("VimedHardlink", function() end) -- TODO
 
