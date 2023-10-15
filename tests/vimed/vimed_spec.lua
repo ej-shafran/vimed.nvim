@@ -13,18 +13,21 @@ assert:register("assertion", "contains", function(_, arguments)
 	return string.find(container, containee) ~= nil
 end)
 
-local function script_path()
-	return debug.getinfo(2, "S").source:sub(2):match("(.*/)"):match("(.*/)")
-end
 describe("Vimed Command", function()
 	local vimed = require("vimed")
 
 	tests.before_each(function()
-		vim.api.nvim_set_current_dir(vim.fs.dirname(script_path()))
+		if vim.fn.isdirectory("workdir") == 0 then
+			vim.fn.mkdir("workdir")
+		end
+		print(vim.inspect(vim.fn.readdir("workdir")))
+		vim.cmd.cd("workdir")
+		vim.cmd("%bd")
+	end)
 
-		local rand = math.random(10000)
-		vim.fn.mkdir("workdir/" .. tostring(rand), "p")
-		vim.api.nvim_set_current_dir("workdir/" .. tostring(rand))
+	tests.after_each(function()
+		vim.cmd.cd("..")
+		vim.fn.delete("workdir", "rf")
 	end)
 
 	-- cmd("DiredToVimed", commands.from_dired)
@@ -33,7 +36,7 @@ describe("Vimed Command", function()
 
 	describe("VimedBack", function()
 		it("should change the cwd", function()
-			vimed.setup({})
+			vimed.setup()
 			vimed.open_vimed()
 
 			local target = vim.fs.dirname(vim.fn.getcwd() --[[@as string]])
@@ -81,7 +84,7 @@ describe("Vimed Command", function()
 
 	describe("VimedGotoFile", function()
 		it("should go to a file", function()
-			vimed.setup({})
+			vimed.setup()
 			vim.cmd.e("temp")
 			vim.cmd.w()
 			vimed.open_vimed()
@@ -92,7 +95,7 @@ describe("Vimed Command", function()
 		end)
 
 		it("should stay in place if file does not exist", function()
-			vimed.setup({})
+			vimed.setup()
 			vimed.open_vimed()
 
 			local expected = vim.api.nvim_get_current_line()
@@ -109,15 +112,12 @@ describe("Vimed Command", function()
 	describe("VimedLoad", function() end) -- TODO
 
 	describe("VimedMark", function()
-		tests.before_each(function()
-			vimed.setup({})
-			vim.cmd.e("temp")
-			vim.cmd.w()
+		it("should change the current line", function()
+			vimed.setup()
+			os.execute("touch temp")
 			vimed.open_vimed()
 			vim.cmd.VimedGotoFile("temp")
-		end)
 
-		it("should change the current line", function()
 			local expected = vim.api.nvim_get_current_line():gsub("^ ", "*")
 			vim.cmd.VimedMark()
 			-- move one line up - mark moves us down
@@ -127,6 +127,11 @@ describe("Vimed Command", function()
 		end)
 
 		it("should leave a marked file unchanged", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+			vim.cmd.VimedGotoFile("temp")
+
 			vim.cmd.VimedMark()
 			vim.cmd.normal("k")
 
@@ -168,7 +173,18 @@ describe("Vimed Command", function()
 
 	describe("VimedQuit", function() end) -- TODO
 
-	describe("VimedRedisplay", function() end) -- TODO
+	describe("VimedRedisplay", function()
+		it("should render any missing changes", function()
+			vimed.setup()
+			vimed.open_vimed()
+			os.execute("touch temp")
+
+			vim.cmd.normal("G")
+			assert.are.same(vim.api.nvim_get_current_line(), "")
+			vim.cmd.VimedRedisplay()
+			assert.contains(vim.api.nvim_get_current_line(), "temp")
+		end)
+	end)
 
 	describe("VimedRename", function() end) -- TODO
 
