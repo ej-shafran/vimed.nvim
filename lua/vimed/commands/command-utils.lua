@@ -65,5 +65,4 @@ function M.prompt_for_files(files, opts)
 	return prompt
 end
 
-
 return M

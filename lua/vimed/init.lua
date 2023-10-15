@@ -63,7 +63,11 @@ function M.setup(config)
 			endfunction
 			]], {})
 
-			cmd("DiredToVimed", commands.from_dired, { nargs = "?", complete = "customlist,VimedDiredCommandCompletion" })
+			cmd(
+				"DiredToVimed",
+				commands.from_dired,
+				{ nargs = "?", complete = "customlist,VimedDiredCommandCompletion" }
+			)
 
 			cmd("VimedAsyncShellCommand", commands.async_shell_command, { nargs = "*", complete = "shellcmd" })
 			cmd("VimedBack", commands.back)
