@@ -228,7 +228,27 @@ describe("Vimed Command", function()
 
 	describe("VimedShellCommand", function() end) -- TODO
 
-	describe("VimedSymlink", function() end) -- TODO
+	describe("VimedSymlink", function()
+		it("should create a symbolic link", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp")
+			vim.cmd.VimedSymlink("link")
+			vim.cmd.VimedGotoFile("link")
+
+			local line = vim.api.nvim_get_current_line()
+			assert.contains(line, "link")
+			assert.contains(line, " -> ")
+			assert.contains(line, "temp")
+
+			-- check that file is symbolic link
+			local stat = assert(vim.loop.fs_stat("link"))
+			local S_IFLNK = 40960 -- octal 0120000
+			assert.are_not.same(vim.fn["and"](stat.mode, S_IFLNK), 0)
+		end)
+	end)
 
 	describe("VimedSymlinkRegexp", function() end) -- TODO
 
