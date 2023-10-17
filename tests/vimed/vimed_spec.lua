@@ -22,12 +22,15 @@ describe("Vimed Command", function()
 		end
 		print(vim.inspect(vim.fn.readdir("workdir")))
 		vim.cmd.cd("workdir")
-		vim.cmd("%bd")
 	end)
 
 	tests.after_each(function()
 		vim.cmd.cd("..")
 		vim.fn.delete("workdir", "rf")
+		vim.cmd("%bd")
+
+		--TODO: maybe find some other way to do this?
+		require("vimed._state").flags = {}
 	end)
 
 	-- cmd("DiredToVimed", commands.from_dired)
@@ -231,7 +234,17 @@ describe("Vimed Command", function()
 
 	describe("VimedToggleHidden", function() end) -- TODO
 
-	describe("VimedToggleHideDetails", function() end) -- TODO
+	describe("VimedToggleHideDetails", function()
+		it("should show just the necessary details", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+
+			vim.cmd.VimedToggleHideDetails()
+			vim.cmd.VimedGotoFile("temp")
+			assert.are.same(vim.api.nvim_get_current_line(), "  temp")
+		end)
+	end) -- TODO
 
 	describe("VimedToggleMarks", function() end) -- TODO
 
