@@ -13,6 +13,14 @@ assert:register("assertion", "contains", function(_, arguments)
 	return string.find(container, containee) ~= nil
 end)
 
+---@param path string
+---@return boolean islink whether the file at `path` is a symbolic link
+local function is_symlink(path)
+	local stat = assert(vim.loop.fs_stat(path))
+	local S_IFLNK = 40960 -- octal 0120000
+	return vim.fn["and"](stat.mode, S_IFLNK) ~= 0
+end
+
 describe("Vimed Command", function()
 	local vimed = require("vimed")
 
@@ -244,9 +252,29 @@ describe("Vimed Command", function()
 			assert.contains(line, "temp")
 
 			-- check that file is symbolic link
-			local stat = assert(vim.loop.fs_stat("link"))
-			local S_IFLNK = 40960 -- octal 0120000
-			assert.are_not.same(vim.fn["and"](stat.mode, S_IFLNK), 0)
+			assert(is_symlink("link"))
+		end)
+
+		it("should place symlinks in directory for multiple files", function()
+			vimed.setup()
+			os.execute("touch temp1 temp2")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp1")
+			vim.cmd.normal("Vj")
+			vim.cmd.VimedMark()
+			vim.cmd("VimedSymlink! dir")
+			assert(vim.fn.isdirectory("dir"))
+
+			local files = {}
+			for name in vim.fs.dir("dir") do
+				assert(is_symlink(name))
+
+				table.insert(files, name)
+			end
+
+			assert(vim.list_contains(files, "temp1"))
+			assert(vim.list_contains(files, "temp2"))
 		end)
 	end)
 
@@ -264,7 +292,7 @@ describe("Vimed Command", function()
 			vim.cmd.VimedGotoFile("temp")
 			assert.are.same(vim.api.nvim_get_current_line(), "  temp")
 		end)
-	end) -- TODO
+	end)
 
 	describe("VimedToggleMarks", function() end) -- TODO
 
