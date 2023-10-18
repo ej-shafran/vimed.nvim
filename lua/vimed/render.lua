@@ -216,12 +216,20 @@ function M.init()
 	if vim.fn.isdirectory(path) == 0 then
 		path = vim.fs.dirname(path)
 	end
-	path = path:gsub("/$", "")
+	path = vim.fn.fnamemodify(path, ":~") --[[@as string]]
 
-	vim.api.nvim_buf_set_name(0, path)
+	local bufnr = vim.fn.bufnr(path --[[@as any]]) --[[@as integer]]
+	if bufnr < 0 then
+		vim.api.nvim_buf_set_name(0, path)
+	else
+		vim.api.nvim_set_current_buf(bufnr)
+		if vim.fn.bufname(bufnr) ~= path then
+			vim.api.nvim_buf_set_name(bufnr, path)
+		end
+	end
+
 	vim.bo.filetype = "vimed"
 	vim.bo.buftype = "acwrite"
-
 	vim.api.nvim_set_current_dir(path)
 	M.render()
 end
