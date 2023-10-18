@@ -37,6 +37,15 @@ function M.target_files()
 	return files
 end
 
+---Sets the cursor's line in the current window, clamping it to the last window available
+function M.set_line(r)
+	local last_line = vim.fn.line("w$") --[[@as number]]
+	if r > last_line then
+		r = last_line
+	end
+	vim.api.nvim_win_set_cursor(0, { r, 0 })
+end
+
 -- ---@alias PromptOpts {operation: string, flag: string, suffix: string?, multi_operation: string?}
 
 ---Create a prompt for an operation which can be done on marked files or the file under the cursor.
