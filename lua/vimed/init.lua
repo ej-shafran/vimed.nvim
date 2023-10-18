@@ -1,4 +1,4 @@
----@alias Config { styles: GroupStyles?, keymaps: VimedKeymaps?, hijack_netrw: boolean?, keep_line_numbers: boolean?, compress_files_alist: table<string, string>?, garbage_files_regex: string?, omit_files_regex: string?, omit_extensions: string[]?, which_key_support: boolean? }
+---@alias Config { styles: GroupStyles?, keymaps: VimedKeymaps?, hijack_netrw: boolean?, keep_line_numbers: boolean?, compress_files_alist: table<string, string>?, garbage_files_regex: string?, omit_files_regex: string?, omit_extensions: string[]?, which_key_support: boolean?, on_attach: fun() }
 
 local commands = require("vimed.commands")
 local utils = require("vimed.utils")
@@ -61,7 +61,11 @@ function M.setup(config)
 			endfunction
 			]], {})
 
-			cmd("DiredToVimed", commands.from_dired, { nargs = "?", complete = "customlist,VimedDiredCommandCompletion" })
+			cmd(
+				"DiredToVimed",
+				commands.from_dired,
+				{ nargs = "?", complete = "customlist,VimedDiredCommandCompletion" }
+			)
 
 			cmd("VimedAsyncShellCommand", commands.async_shell_command, { nargs = "*", complete = "shellcmd" })
 			cmd("VimedBack", commands.back)
@@ -135,6 +139,10 @@ function M.setup(config)
 				vim.tbl_deep_extend("force", keymaps.default_keymaps, config.keymaps or {}),
 				config.which_key_support
 			)
+
+			if config.on_attach then
+				config.on_attach()
+			end
 		end,
 	})
 
