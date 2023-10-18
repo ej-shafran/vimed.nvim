@@ -19,12 +19,7 @@ function M.redisplay(r)
 	end
 
 	render.render()
-
-	local last_line = vim.fn.line("w$") --[[@as number]]
-	if r > last_line then
-		r = last_line
-	end
-	vim.api.nvim_win_set_cursor(0, { r, 0 })
+	command_utils.set_line(r)
 end
 
 ---Creates a basic command, who's logic isn't necessarily shared with other commands.

@@ -51,7 +51,11 @@ M.enter = function()
 		return
 	end
 
+	local r = vim.api.nvim_win_get_cursor(0)[1]
+
 	vim.cmd.e(path)
+
+	command_utils.set_line(r)
 end
 M.dired_command_map["dired-find-file"] = M.enter
 
