@@ -212,15 +212,15 @@ function M.render()
 end
 
 function M.init()
-	local path = vim.fn.expand("%")
+	local path = vim.fn.expand("%:p")
 	if vim.fn.isdirectory(path) == 0 then
 		path = vim.fs.dirname(path)
 	end
+	path = path:gsub("/$", "")
 
-	vim.cmd.enew()
+	vim.api.nvim_buf_set_name(0, path)
 	vim.bo.filetype = "vimed"
 	vim.bo.buftype = "acwrite"
-	vim.bo.bufhidden = "wipe"
 
 	vim.api.nvim_set_current_dir(path)
 	M.render()
