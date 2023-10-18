@@ -14,40 +14,45 @@ end
 M.dired_command_map["dired-do-redisplay"] = M.redisplay
 
 ---[COMMAND - +dired/quit-all]
-M.quit = command.basic(function()
-	local bufcount = utils.count_buffers()
-	if bufcount > 0 then
-		vim.cmd.bp()
+M.quit = function()
+	if not utils.is_vimed() then
+		return
+	end
+
+	local buf_count = utils.count_buffers()
+	if buf_count > 0 then
+		vim.cmd.bd()
 	else
 		vim.cmd.q()
 	end
-
-	return false
-end)
+end
 M.dired_command_map["+dired/quit-all"] = M.quit
 
 ---[COMMAND - dired-up-directory]
-M.back = command.basic(function()
+M.back = function()
+	if not utils.is_vimed() then
+		return
+	end
+
 	local cwd = vim.fn.getcwd() --[[@as string]]
 	local dir = vim.fs.dirname(cwd)
-	vim.api.nvim_set_current_dir(dir)
-end)
+	vim.cmd.e(dir)
+end
 M.dired_command_map["dired-up-directory"] = M.back
 
 ---[COMMAND - dired-find-file]
-M.enter = command.basic(function()
-	local path = command_utils.cursor_path()
-	if path == nil then
-		return false
+M.enter = function()
+	if not utils.is_vimed() then
+		return
 	end
 
-	if vim.fn.isdirectory(path) == 0 then
-		vim.cmd.e(path)
-		return false
-	else
-		vim.api.nvim_set_current_dir(path)
+	local path = command_utils.cursor_path()
+	if path == nil then
+		return
 	end
-end)
+
+	vim.cmd.e(path)
+end
 M.dired_command_map["dired-find-file"] = M.enter
 
 ---[COMMAND - dired-create-directory]
