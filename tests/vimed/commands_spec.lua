@@ -73,7 +73,17 @@ describe("Vimed Command", function()
 
 	describe("VimedCopyRegexp", function() end) -- TODO
 
-	describe("VimedCreateDir", function() end) -- TODO
+	describe("VimedCreateDir", function()
+		it("should create a directory", function()
+			vimed.setup()
+			vimed.open_vimed()
+
+			vim.cmd.VimedCreateDir("dir")
+			vim.cmd.VimedGotoFile("dir")
+			assert.contains(vim.api.nvim_get_current_line(), "dir")
+			assert.are_not.same(vim.fn.isdirectory("dir"), 0)
+		end)
+	end)
 
 	describe("VimedDelete", function() end) -- TODO
 
