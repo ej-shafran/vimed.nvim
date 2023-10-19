@@ -16,13 +16,40 @@ end)
 ---@param path string
 ---@return boolean islink whether the file at `path` is a symbolic link
 local function is_symlink(path)
-	local stat = assert(vim.loop.fs_stat(path))
+	local S_IFMT = 61440 -- octal 00170000
 	local S_IFLNK = 40960 -- octal 0120000
-	return vim.fn["and"](stat.mode, S_IFLNK) ~= 0
+	local stat = assert(vim.loop.fs_lstat(path))
+	return vim.fn["and"](stat.mode, S_IFMT) == S_IFLNK
 end
 
 describe("Vimed Command", function()
 	local vimed = require("vimed")
+
+	local function place_in_dir(command, additional)
+		return function()
+			vimed.setup()
+			os.execute("touch temp1 temp2")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp1")
+			vim.cmd.normal("Vj")
+			vim.cmd.VimedMark()
+			vim.cmd(command .. "! dir")
+			assert(vim.fn.isdirectory("dir") ~= 0)
+
+			local files = {}
+			for name in vim.fs.dir("dir") do
+				if additional ~= nil then
+					assert(additional("dir/" .. name))
+				end
+
+				table.insert(files, name)
+			end
+
+			assert(vim.list_contains(files, "temp1"))
+			assert(vim.list_contains(files, "temp2"))
+		end
+	end
 
 	tests.before_each(function()
 		if vim.fn.isdirectory("workdir") == 0 then
@@ -69,7 +96,26 @@ describe("Vimed Command", function()
 
 	describe("VimedCompressTo", function() end) -- TODO
 
-	describe("VimedCopy", function() end) -- TODO
+	describe("VimedCopy", function()
+		it("should copy the file under the cursor", function()
+			vimed.setup()
+			os.execute("echo 'Hello world!' > temp")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp")
+			vim.cmd.VimedCopy("copy")
+			local temp = assert(io.open("temp", "rb"))
+			local copy = assert(io.open("copy", "rb"))
+			local temp_content = temp:read("*a")
+			local copy_content = copy:read("*a")
+			temp:close()
+			copy:close()
+
+			assert.are.same(temp_content, copy_content)
+		end)
+
+		it("should place copies in a directory", place_in_dir("VimedCopy"))
+	end)
 
 	describe("VimedCopyRegexp", function() end) -- TODO
 
@@ -265,27 +311,7 @@ describe("Vimed Command", function()
 			assert(is_symlink("link"))
 		end)
 
-		it("should place symlinks in directory for multiple files", function()
-			vimed.setup()
-			os.execute("touch temp1 temp2")
-			vimed.open_vimed()
-
-			vim.cmd.VimedGotoFile("temp1")
-			vim.cmd.normal("Vj")
-			vim.cmd.VimedMark()
-			vim.cmd("VimedSymlink! dir")
-			assert(vim.fn.isdirectory("dir"))
-
-			local files = {}
-			for name in vim.fs.dir("dir") do
-				assert(is_symlink(name))
-
-				table.insert(files, name)
-			end
-
-			assert(vim.list_contains(files, "temp1"))
-			assert(vim.list_contains(files, "temp2"))
-		end)
+		it("should place symlinks in directory for multiple files", place_in_dir("VimedSymlink", is_symlink))
 	end)
 
 	describe("VimedSymlinkRegexp", function() end) -- TODO
