@@ -172,7 +172,23 @@ describe("Vimed Command", function()
 		end)
 	end)
 
-	describe("VimedHardlink", function() end) -- TODO
+	describe("VimedHardlink", function()
+		it("should create a hard link", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp")
+			local stat = assert(vim.loop.fs_lstat("temp"))
+			assert(stat.nlink == 1)
+
+			vim.cmd.VimedHardlink("link")
+			stat = assert(vim.loop.fs_lstat("temp"))
+			assert(stat.nlink > 1)
+		end)
+
+		it("should place hard links in a directory", place_in_dir("VimedHardlink"))
+	end)
 
 	describe("VimedHardlinkRegexp", function() end) -- TODO
 
@@ -311,7 +327,7 @@ describe("Vimed Command", function()
 			assert(is_symlink("link"))
 		end)
 
-		it("should place symlinks in directory for multiple files", place_in_dir("VimedSymlink", is_symlink))
+		it("should place symlinks in directory", place_in_dir("VimedSymlink", is_symlink))
 	end)
 
 	describe("VimedSymlinkRegexp", function() end) -- TODO
