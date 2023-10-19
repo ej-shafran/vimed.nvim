@@ -304,7 +304,21 @@ describe("Vimed Command", function()
 		end)
 	end)
 
-	describe("VimedRename", function() end) -- TODO
+	describe("VimedRename", function()
+		it("should rename a file", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp")
+			vim.cmd.VimedRename("renamed")
+
+			assert.are.same(vim.fn.filereadable("temp"), 0)
+			assert.are_not.same(vim.fn.filereadable("renamed"), 0)
+		end)
+
+		it("should place files in a directory", place_in_dir("VimedRename"))
+	end)
 
 	describe("VimedShellCommand", function() end) -- TODO
 
