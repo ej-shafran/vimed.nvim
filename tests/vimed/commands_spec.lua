@@ -28,7 +28,6 @@ describe("Vimed Command", function()
 		if vim.fn.isdirectory("workdir") == 0 then
 			vim.fn.mkdir("workdir")
 		end
-		print(vim.inspect(vim.fn.readdir("workdir")))
 		vim.cmd.cd("workdir")
 	end)
 

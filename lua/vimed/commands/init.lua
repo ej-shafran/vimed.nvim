@@ -36,6 +36,7 @@ M.back = function()
 
 	local cwd = vim.fn.getcwd() --[[@as string]]
 	local dir = vim.fs.dirname(cwd)
+	vim.api.nvim_set_current_dir(dir)
 	vim.cmd.e(dir)
 end
 M.dired_command_map["dired-up-directory"] = M.back
