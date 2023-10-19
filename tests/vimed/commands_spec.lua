@@ -38,6 +38,7 @@ describe("Vimed Command", function()
 
 		--TODO: maybe find some other way to do this?
 		require("vimed._state").flags = {}
+		require("vimed._state").hide_details = false
 	end)
 
 	-- cmd("DiredToVimed", commands.from_dired)
@@ -293,7 +294,29 @@ describe("Vimed Command", function()
 		end)
 	end)
 
-	describe("VimedToggleMarks", function() end) -- TODO
+	describe("VimedToggleMarks", function()
+		it("should mark unmarked files and vice versa", function()
+			vimed.setup()
+			os.execute("touch file1 file2 file3")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("file1")
+			vim.cmd.VimedMark()
+
+			local expected = vim.tbl_map(function(line)
+				if line:match("^%*") then
+					return line:gsub("^%*", " ")
+				else
+					return line:gsub("^ ", "*")
+				end
+			end, vim.api.nvim_buf_get_lines(0, 2, -1, false))
+
+			vim.cmd.VimedToggleMarks()
+			for i, line in ipairs(vim.api.nvim_buf_get_lines(0, 2, -1, false)) do
+				assert.are.same(expected[i], line)
+			end
+		end)
+	end)
 
 	describe("VimedToggleSort", function() end) -- TODO
 
