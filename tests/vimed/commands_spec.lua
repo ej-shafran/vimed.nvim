@@ -386,7 +386,24 @@ describe("Vimed Command", function()
 
 	describe("VimedToggleSort", function() end) -- TODO
 
-	describe("VimedTouch", function() end) -- TODO
+	describe("VimedTouch", function()
+		it("updates the last modified time of a file", function()
+			vimed.setup()
+			os.execute("touch temp")
+			local stat = vim.loop.fs_stat("temp")
+			assert(stat)
+			local original_time = stat.atime.sec
+
+			-- vimed.open_vimed()
+			-- vim.cmd.VimedGotoFile("temp")
+			-- vim.cmd("VimedTouch ''")
+			os.execute("touch temp")
+			stat = vim.loop.fs_stat("temp")
+			assert(stat)
+
+			assert(stat.atime.sec > original_time)
+		end)
+	end)
 
 	describe("VimedUnmark", function() end) -- TODO
 
