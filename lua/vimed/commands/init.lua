@@ -33,7 +33,7 @@ M.dired_command_map["+dired/quit-all"] = M.quit
 
 ---[COMMAND - dired-up-directory]
 M.back = command.basic(function()
-	local cwd = vim.fn.expand("%")
+	local cwd = vim.fn.expand("%:p")
 	cwd = cwd:gsub("/$", "")
 
 	local dir = vim.fs.dirname(cwd)
