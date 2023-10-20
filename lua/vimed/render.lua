@@ -216,7 +216,8 @@ function M.init()
 	if vim.fn.isdirectory(path) == 0 then
 		path = vim.fs.dirname(path)
 	end
-	path = vim.fn.fnamemodify(path, ":~") --[[@as string]]
+	-- remove a trailing space
+	path = vim.fn.substitute(path, "\\(.\\)/$", "\\1", "") --[[@as string]]
 
 	local bufnr = vim.fn.bufnr(path --[[@as any]]) --[[@as integer]]
 	if bufnr < 0 then
