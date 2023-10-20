@@ -8,7 +8,9 @@ local M = {}
 M.dired_command_map = {}
 
 ---[COMMAND - dired-do-redisplay]
-M.redisplay = command.redisplay
+M.redisplay = function()
+	command_utils.redisplay()
+end
 M.dired_command_map["dired-do-redisplay"] = M.redisplay
 
 ---[COMMAND - +dired/quit-all]
@@ -31,7 +33,7 @@ M.dired_command_map["+dired/quit-all"] = M.quit
 
 ---[COMMAND - dired-up-directory]
 M.back = command.basic(function()
-	local cwd = vim.fn.expand("%")
+	local cwd = vim.fn.expand("%:p")
 	cwd = cwd:gsub("/$", "")
 
 	local dir = vim.fs.dirname(cwd)

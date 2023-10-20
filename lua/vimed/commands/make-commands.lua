@@ -3,24 +3,9 @@
 
 local utils = require("vimed.utils")
 local state = require("vimed._state")
-local render = require("vimed.render")
 local command_utils = require("vimed.commands.command-utils")
 
 local M = {}
-
----@param r integer? the row to place the cursor at after rerendering
-function M.redisplay(r)
-	if not utils.is_vimed() then
-		return
-	end
-
-	if r == nil then
-		r = unpack(vim.api.nvim_win_get_cursor(0))
-	end
-
-	render.render()
-	command_utils.set_line(r)
-end
 
 ---Creates a basic command, who's logic isn't necessarily shared with other commands.
 ---The callback function is only called in Vimed mode.
@@ -42,7 +27,7 @@ function M.basic(logic)
 		local r = logic(param)
 
 		if r ~= false then
-			M.redisplay(r)
+			command_utils.redisplay(r)
 		end
 	end
 end
@@ -58,7 +43,7 @@ function M.toggle(state_key)
 		end
 
 		state[state_key] = not state[state_key]
-		M.redisplay()
+		command_utils.redisplay()
 	end
 end
 
@@ -94,7 +79,7 @@ function M.mark(flag)
 				end
 			end
 
-			M.redisplay()
+			command_utils.redisplay()
 		else
 			local path, r = command_utils.cursor_path()
 			if path == nil then
@@ -105,7 +90,7 @@ function M.mark(flag)
 			if basename ~= "." and basename ~= ".." then
 				state.flags[path] = flag
 			end
-			M.redisplay(r + 1)
+			command_utils.redisplay(r + 1)
 		end
 	end
 end
@@ -160,7 +145,7 @@ function M.act_on_files(logic, opts)
 		local r = logic(files, input, param.fargs[2])
 
 		if r ~= false then
-			M.redisplay(r)
+			command_utils.redisplay(r)
 		end
 	end
 end
@@ -218,7 +203,7 @@ function M.create_files(logic, opts)
 			end
 		end
 
-		M.redisplay()
+		command_utils.redisplay()
 	end
 end
 
@@ -320,7 +305,7 @@ function M.delete_files(get_files, if_none)
 			state.flags[path] = nil
 		end
 
-		M.redisplay()
+		command_utils.redisplay()
 	end
 end
 
@@ -399,7 +384,7 @@ function M.confirm_each_file(transform, opts)
 			end
 		end
 
-		M.redisplay()
+		command_utils.redisplay()
 	end
 end
 
@@ -441,7 +426,7 @@ function M.mark_via_filter(filter, opts)
 		local suffix = count == 1 and "" or "s"
 		vim.notify(count .. " " .. opts.kind .. suffix .. " marked")
 
-		M.redisplay()
+		command_utils.redisplay()
 	end
 end
 
@@ -524,7 +509,7 @@ function M.with_regexp(logic, opts)
 			vim.notify(opts.name .. ": " .. #all_files - count .. " of " .. #all_files .. " files skipped")
 		end
 
-		M.redisplay()
+		command_utils.redisplay()
 	end
 end
 
