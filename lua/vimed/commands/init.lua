@@ -54,6 +54,7 @@ M.enter = command.basic(function()
 	vim.cmd.e(path)
 
 	if vim.fn.isdirectory(path) ~= 0 then
+		vim.api.nvim_set_current_dir(path)
 		return false
 	end
 
