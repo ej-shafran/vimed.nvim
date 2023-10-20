@@ -27,15 +27,13 @@ end
 M.dired_command_map["+dired/quit-all"] = M.quit
 
 ---[COMMAND - dired-up-directory]
-M.back = function()
-	if not utils.is_vimed() then
-		return
-	end
-
-	local cwd = vim.fn.getcwd() --[[@as string]]
+M.back = command.basic(function()
+	local cwd = vim.fn.expand("%")
+	-- cwd = vim.fn.fnamemodify(cwd, ":p") --[[@as string]]
+	cwd = cwd:gsub("/$", "")
 	local dir = vim.fs.dirname(cwd)
 	vim.cmd.e(dir)
-end
+end)
 M.dired_command_map["dired-up-directory"] = M.back
 
 ---[COMMAND - dired-find-file]
