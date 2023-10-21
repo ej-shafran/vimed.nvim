@@ -390,18 +390,17 @@ describe("Vimed Command", function()
 		it("updates the last modified time of a file", function()
 			vimed.setup()
 			os.execute("touch temp")
+			vimed.open_vimed()
+
 			local stat = vim.loop.fs_stat("temp")
 			assert(stat)
-			local original_time = stat.atime.sec
+			local original_time = stat.atime.nsec
 
-			-- vimed.open_vimed()
-			-- vim.cmd.VimedGotoFile("temp")
-			-- vim.cmd("VimedTouch ''")
-			os.execute("touch temp")
+			vim.cmd.VimedGotoFile("temp")
+			vim.cmd.VimedTouch("now")
 			stat = vim.loop.fs_stat("temp")
 			assert(stat)
-
-			assert(stat.atime.sec > original_time)
+			assert(stat.atime.nsec > original_time)
 		end)
 	end)
 
