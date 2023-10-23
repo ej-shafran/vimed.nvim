@@ -119,11 +119,11 @@ end
 ---@param date Date
 ---@param hlgroup string?
 local function display_date(nline, date, hlgroup)
-	nline:append(date.month, hlgroup or hls.groups.month)
+	nline:append(string.format("%3s", date.month), hlgroup or hls.groups.month)
 	nline:append(" ", hlgroup)
 	nline:append(string.format("%2s", date.day), hlgroup or hls.groups.day)
 	nline:append(" ", hlgroup)
-	nline:append(date.time, hlgroup or hls.groups.time)
+	nline:append(string.format("%5s", date.time), hlgroup or hls.groups.time)
 	nline:append(" ", hlgroup)
 end
 
