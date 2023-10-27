@@ -437,7 +437,32 @@ describe("Vimed Command", function()
 		end)
 	end)
 
-	describe("VimedUnmark", function() end) -- TODO
+	describe("VimedUnmark", function()
+		it("should remove any marks from a file", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp")
+			local expected = vim.api.nvim_get_current_line()
+
+			vim.cmd.VimedMark()
+			vim.cmd.normal("k")
+			assert.are_not.same(vim.api.nvim_get_current_line(), expected)
+
+			vim.cmd.VimedUnmark()
+			vim.cmd.normal("k")
+			assert.are.same(vim.api.nvim_get_current_line(), expected)
+
+			vim.cmd.VimedFlagFileDeletion()
+			vim.cmd.normal("k")
+			assert.are_not.same(vim.api.nvim_get_current_line(), expected)
+
+			vim.cmd.VimedUnmark()
+			vim.cmd.normal("k")
+			assert.are.same(vim.api.nvim_get_current_line(), expected)
+		end)
+	end)
 
 	describe("VimedUnmarkAll", function() end) -- TODO
 
