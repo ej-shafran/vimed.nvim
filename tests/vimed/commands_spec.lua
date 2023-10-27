@@ -500,7 +500,17 @@ describe("Vimed Command", function()
 
 	describe("VimedUnmarkFiles", function() end) -- TODO
 
-	describe("VimedUpcase", function() end) -- TODO
+	describe("VimedUpcase", function()
+		it("should rename files to lowercase", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp")
+			vim.cmd("VimedUpcase!")
+			assert.contains(vim.api.nvim_get_current_line(), "TEMP")
+		end)
+	end)
 
 	describe("VimedYank", function() end) -- TODO
 end)
