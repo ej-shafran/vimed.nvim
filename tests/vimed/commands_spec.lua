@@ -158,7 +158,17 @@ describe("Vimed Command", function()
 
 	describe("VimedDiff", function() end) -- TODO
 
-	describe("VimedDowncase", function() end) -- TODO
+	describe("VimedDowncase", function()
+		it("should rename files to lowercase", function()
+			vimed.setup()
+			os.execute("touch TEMP")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("TEMP")
+			vim.cmd("VimedDowncase!")
+			assert.contains(vim.api.nvim_get_current_line(), "temp")
+		end)
+	end)
 
 	describe("VimedEnter", function() end) -- TODO
 
