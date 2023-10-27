@@ -482,14 +482,14 @@ describe("Vimed Command", function()
 			vimed.open_vimed()
 
 			local stat = vim.loop.fs_stat("temp")
-			assert(stat)
+			assert(stat, "temp exists")
 			local original_time = stat.atime.nsec
 
 			vim.cmd.VimedGotoFile("temp")
 			vim.cmd.VimedTouch("now")
 			stat = vim.loop.fs_stat("temp")
-			assert(stat)
-			assert(stat.atime.nsec > original_time)
+			assert(stat, "temp exists")
+			assert(stat.atime.nsec > original_time, "time has increased")
 		end)
 	end)
 
