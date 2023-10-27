@@ -191,7 +191,20 @@ describe("Vimed Command", function()
 
 	describe("VimedFlagBackupFiles", function() end) -- TODO
 
-	describe("VimedFlagFileDeletion", function() end) -- TODO
+	-- TODO: add other marking tests, for test refactoring
+	describe("VimedFlagFileDeletion", function()
+		it("should mark a file with 'D'", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp")
+			local expected = vim.api.nvim_get_current_line():gsub("^ ", "D")
+			vim.cmd.VimedFlagFileDeletion()
+			vim.cmd.normal("k")
+			assert.are.same(vim.api.nvim_get_current_line(), expected)
+		end)
+	end)
 
 	describe("VimedFlagGarbageFiles", function() end) -- TODO
 
