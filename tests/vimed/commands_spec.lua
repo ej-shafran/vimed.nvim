@@ -131,7 +131,30 @@ describe("Vimed Command", function()
 		end)
 	end)
 
-	describe("VimedDelete", function() end) -- TODO
+	describe("VimedDelete", function()
+		it("should delete the file under cursor", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+
+			local expected_lines = #vim.api.nvim_buf_get_lines(0, 0, -1, false) - 1
+			vim.cmd.VimedGotoFile("temp")
+			vim.cmd("VimedDelete!")
+			assert.does_not.contains(vim.api.nvim_get_current_line(), "temp")
+			assert.are.same(#vim.api.nvim_buf_get_lines(0, 0, -1, false), expected_lines)
+		end)
+
+		it("should delete marked files", function()
+			vimed.setup()
+			os.execute("touch file1 file2")
+			vimed.open_vimed()
+
+			local expected_lines = #vim.api.nvim_buf_get_lines(0, 0, -1, false) - 2
+			vim.cmd.VimedToggleMarks()
+			vim.cmd("VimedDelete!")
+			assert.are.same(#vim.api.nvim_buf_get_lines(0, 0, -1, false), expected_lines)
+		end)
+	end)
 
 	describe("VimedDiff", function() end) -- TODO
 
