@@ -170,7 +170,24 @@ describe("Vimed Command", function()
 		end)
 	end)
 
-	describe("VimedEnter", function() end) -- TODO
+	describe("VimedEnter", function()
+		it("should edit the file under the cursor", function()
+			vimed.setup()
+			local workdir = vim.fn.getcwd()
+			os.execute("mkdir dir")
+			os.execute("touch dir/file")
+
+			vimed.open_vimed()
+			vim.cmd.VimedGotoFile("dir")
+			vim.cmd.VimedEnter()
+			assert.are.same(vim.fn.expand("%"), workdir .. "/dir")
+
+			vimed.open_vimed()
+			vim.cmd.VimedGotoFile("file")
+			vim.cmd.VimedEnter()
+			assert.are.same(vim.fn.expand("%"), workdir .. "/dir/file")
+		end)
+	end)
 
 	describe("VimedFlagBackupFiles", function() end) -- TODO
 
