@@ -54,10 +54,10 @@ M.enter = command.basic(function()
 
 	if vim.fn.isdirectory(path) ~= 0 then
 		vim.api.nvim_set_current_dir(path)
-		return false
+		return r
 	end
 
-	return r
+	return false
 end)
 M.dired_command_map["dired-find-file"] = M.enter
 
