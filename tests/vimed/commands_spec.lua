@@ -70,7 +70,33 @@ describe("Vimed Command", function()
 
 	-- cmd("DiredToVimed", commands.from_dired)
 
-	describe("VimedAsyncShellCommand", function() end) -- TODO
+	describe("VimedAsyncShellCommand", function()
+		it("should run a command and place it in a buffer", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp")
+
+			vim.cmd.VimedAsyncShellCommand("echo hi, ?")
+			assert.are.same(vim.api.nvim_buf_get_lines(0, 0, -1, false), { "hi, temp" })
+			vim.cmd("bd!") -- close the result buffer
+		end)
+
+		it("should work with special * syntax", function()
+			vimed.setup()
+			os.execute("touch file1 file2")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("file1")
+			vim.cmd.normal("Vj")
+			vim.cmd.VimedMark()
+
+			vim.cmd.VimedAsyncShellCommand("echo files: *")
+			assert.are.same(vim.api.nvim_buf_get_lines(0, 0, -1, false), { "files: file2 file1" })
+			vim.cmd("bd!") -- close the result buffer
+		end)
+	end)
 
 	describe("VimedBack", function()
 		it("should change the cwd", function()

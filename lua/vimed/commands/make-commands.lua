@@ -206,6 +206,31 @@ function M.create_files(logic, opts)
 		command_utils.redisplay()
 	end
 end
+---Taken from [compile-mode.nvim](https://github.com/ej-shafran/compile-mode.nvim/blob/8889a8b3768f35de6192a9f272a840b9f8e276b7/lua/compile-mode/init.lua#L59-L78)
+---
+---If `fname` has a window open, do nothing.
+---Otherwise, split a new window (and possibly buffer) open for that file, respecting `config.split_vertically`.
+---
+---@param fname string
+---@param vertical boolean
+---@return integer bufnr the identifier of the buffer for `fname`
+local function split_unless_open(fname, vertical)
+	local bufnum = vim.fn.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
+	local winnum = vim.fn.bufwinnr(bufnum)
+
+	if winnum == -1 then
+		if vertical then
+			vim.cmd.vsplit(fname)
+		else
+			vim.cmd.split(fname)
+		end
+	end
+
+	return vim.fn.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
+end
+
+---@diagnostic disable-next-line: undefined-field
+local buf_set_opt = vim.api.nvim_buf_set_option
 
 ---Creates a command which asks for user input (or joins the arguments passed to the command into a string) and runs it as a shell command.
 ---The `parse` callback is used to determine the way in which the command input should be parsed (allowing for Dired command syntax).
@@ -253,9 +278,19 @@ function M.execute(parse, opts)
 			for _, cmd in ipairs(commands) do
 				acc = acc .. utils.command(cmd)
 			end
-			vim.cmd.split()
-			vim.cmd.e("Async Shell Result")
-			vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(acc, "\n") --[[@as table]])
+
+			local bufnr = split_unless_open("Async Shell Result", param.smods and param.smods.vertical or false)
+
+			buf_set_opt(bufnr, "modifiable", true)
+			vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, vim.fn.split(acc, "\n") --[[@as table]])
+			buf_set_opt(bufnr, "modifiable", false)
+			buf_set_opt(bufnr, "filetype", "vimed-async-shell")
+			vim.api.nvim_create_autocmd("ExitPre", {
+				group = vim.api.nvim_create_augroup("vimed-async-shell", {}),
+				callback = function()
+					vim.api.nvim_buf_delete(bufnr, { force = true })
+				end,
+			})
 		else
 			for _, cmd in ipairs(commands) do
 				local result = utils.command(cmd)
