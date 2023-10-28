@@ -112,7 +112,21 @@ describe("Vimed Command", function()
 
 	describe("VimedBrowseURL", function() end) -- TODO
 
-	describe("VimedChangeMarks", function() end) -- TODO
+	describe("VimedChangeMarks", function()
+		it("should change one mark into another", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp")
+			vim.cmd.VimedMark()
+			vim.cmd.normal("k")
+			local expected = vim.api.nvim_get_current_line():gsub("^.", "D")
+
+			vim.cmd.VimedChangeMarks("*", "D")
+			assert.are.same(vim.api.nvim_get_current_line(), expected)
+		end)
+	end)
 
 	describe("VimedChmod", function() end) -- TODO
 
