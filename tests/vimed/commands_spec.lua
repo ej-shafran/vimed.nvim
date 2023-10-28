@@ -447,13 +447,13 @@ describe("Vimed Command", function()
 			os.execute("touch file1 file2")
 			vimed.open_vimed()
 
-			local expected = vim.api.nvim_buf_get_lines(0, 2, 3, false)
+			local expected = vim.api.nvim_buf_get_lines(0, 2, 4, false)
 			for i = 1, #expected do
 				expected[i] = expected[i]:gsub("^ ", "*")
 			end
 
 			vim.cmd.VimedMarkDirectories()
-			local recieved = vim.api.nvim_buf_get_lines(0, 2, 3, false)
+			local recieved = vim.api.nvim_buf_get_lines(0, 2, 4, false)
 			for i = 1, #recieved do
 				assert.are.same(recieved[i], expected[i])
 			end
