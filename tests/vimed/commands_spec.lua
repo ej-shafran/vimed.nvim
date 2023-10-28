@@ -128,7 +128,19 @@ describe("Vimed Command", function()
 		end)
 	end)
 
-	describe("VimedChmod", function() end) -- TODO
+	describe("VimedChmod", function()
+		it("should change the permissions of a file using chmod syntax", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp")
+			vim.cmd.VimedChmod("+x")
+			assert.are.same(vim.fn.executable(vim.fn.getcwd() .. "/temp"), 1)
+			vim.cmd.VimedChmod("-x")
+			assert.are.same(vim.fn.executable(vim.fn.getcwd() .. "/temp"), 0)
+		end)
+	end)
 
 	describe("VimedChown", function() end) -- TODO
 
