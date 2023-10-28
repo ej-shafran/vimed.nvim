@@ -71,7 +71,7 @@ describe("Vimed Command", function()
 		require("vimed._state").flags = {}
 		require("vimed._state").hide_details = false
 
-		vim.cmd("%bd")
+		vim.cmd("silent %bd")
 
 		if cwd == nil then
 			cwd = vim.fn.getcwd() --[[@as string]]
