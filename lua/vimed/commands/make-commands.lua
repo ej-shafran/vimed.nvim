@@ -142,7 +142,7 @@ function M.act_on_files(logic, opts)
 			end
 		end
 
-		local r = logic(files, input, param.fargs and param.fargs[2])
+		local r = logic(files, input, param.fargs and param.fargs[1])
 
 		if r ~= false then
 			command_utils.redisplay(r)

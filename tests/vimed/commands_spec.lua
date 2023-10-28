@@ -22,8 +22,17 @@ local function is_symlink(path)
 	return vim.fn["and"](stat.mode, S_IFMT) == S_IFLNK
 end
 
+---@param path string
+---@return boolean isgzip whether the file at `path` is a valid `.gz`
 local function is_gzip(path)
 	vim.fn.system("gzip -t " .. path)
+	return vim.api.nvim_get_vvar("shell_error") == 0
+end
+
+---@param path string
+---@return boolean iszip whether the file at `path` is a valid `.zip`
+local function is_zip(path)
+	vim.fn.system("unzip -t " .. path)
 	return vim.api.nvim_get_vvar("shell_error") == 0
 end
 
@@ -56,21 +65,24 @@ describe("Vimed Command", function()
 		end
 	end
 
+	local cwd = nil
 	tests.before_each(function()
-		if vim.fn.isdirectory("workdir") == 0 then
-			vim.fn.mkdir("workdir")
-		end
-		vim.cmd.cd("workdir")
-	end)
-
-	tests.after_each(function()
-		vim.cmd.cd("..")
-		vim.fn.delete("workdir", "rf")
-		vim.cmd("%bd")
-
 		--TODO: maybe find some other way to do this?
 		require("vimed._state").flags = {}
 		require("vimed._state").hide_details = false
+
+		vim.cmd("%bd")
+
+		if cwd == nil then
+			cwd = vim.fn.getcwd() --[[@as string]]
+		end
+		vim.api.nvim_set_current_dir(cwd)
+
+		if vim.fn.isdirectory("workdir") ~= 0 then
+			vim.fn.delete("workdir", "rf")
+		end
+		vim.fn.mkdir("workdir")
+		vim.cmd.cd("workdir")
 	end)
 
 	-- cmd("DiredToVimed", commands.from_dired)
@@ -167,7 +179,31 @@ describe("Vimed Command", function()
 		end)
 	end)
 
-	describe("VimedCompressTo", function() end) -- TODO
+	describe("VimedCompressTo", function()
+		it("should compress to .tar.gz", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+			vim.cmd.VimedGotoFile("temp")
+
+			vim.cmd.VimedCompressTo("temp.tar.gz")
+			vim.cmd.normal("j")
+			assert.contains(vim.api.nvim_get_current_line(), "temp.tar.gz$")
+			assert(is_gzip("temp.tar.gz"))
+		end)
+
+		it("should compress to .zip", function()
+			vimed.setup()
+			os.execute("touch temp")
+			vimed.open_vimed()
+			vim.cmd.VimedGotoFile("temp")
+
+			vim.cmd.VimedCompressTo("temp.zip")
+			vim.cmd.normal("j")
+			assert.contains(vim.api.nvim_get_current_line(), "temp.zip$")
+			assert(is_zip("temp.zip"))
+		end)
+	end)
 
 	describe("VimedCopy", function()
 		it("should copy the file under the cursor", function()
