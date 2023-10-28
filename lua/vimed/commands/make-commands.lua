@@ -87,7 +87,7 @@ function M.mark(flag)
 			end
 
 			local basename = vim.fs.basename(path)
-			if basename ~= "." and basename ~= ".." then
+			if flag == nil or basename ~= "." and basename ~= ".." then
 				state.flags[path] = flag
 			end
 			command_utils.redisplay(r + 1)

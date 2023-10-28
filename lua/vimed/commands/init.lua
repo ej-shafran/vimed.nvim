@@ -83,7 +83,7 @@ M.unmark_all = command.basic(function()
 		end
 	end
 
-	vim.notify(file_count .. " marks removed")
+	vim.notify(file_count .. " mark" .. (file_count == 1 and "" or "s") .. " removed")
 end)
 M.dired_command_map["dired-unmark-all-marks"] = M.unmark_all
 
@@ -639,7 +639,8 @@ M.dired_command_map["dired-mark-symlinks"] = M.mark_symlinks
 
 ---[COMMAND - dired-mark-directories]
 M.mark_directories = command.mark_via_filter(function(entry)
-	return entry.permissions.is_dir
+	local filename = vim.fs.basename(entry.path)
+	return filename ~= "." and filename ~= ".." and entry.permissions.is_dir
 end, { flag = "*", kind = "directory file" })
 M.dired_command_map["dired-mark-directories"] = M.mark_directories
 
