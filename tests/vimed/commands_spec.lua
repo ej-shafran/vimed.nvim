@@ -22,6 +22,11 @@ local function is_symlink(path)
 	return vim.fn["and"](stat.mode, S_IFMT) == S_IFLNK
 end
 
+local function is_gzip(path)
+	vim.fn.system("gzip -t " .. path)
+	return vim.api.nvim_get_vvar("shell_error") == 0
+end
+
 describe("Vimed Command", function()
 	local vimed = require("vimed")
 
@@ -144,7 +149,23 @@ describe("Vimed Command", function()
 
 	describe("VimedChown", function() end) -- TODO
 
-	describe("VimedCompress", function() end) -- TODO
+	describe("VimedCompress", function()
+		it("should compress and uncompress files", function()
+			vimed.setup()
+			os.execute("touch temp")
+
+			vimed.open_vimed()
+			vim.cmd.VimedGotoFile("temp")
+
+			vim.cmd("VimedCompress!")
+			assert.contains(vim.api.nvim_get_current_line(), "temp.gz$")
+			assert(is_gzip("temp.gz"))
+
+			vim.cmd("VimedCompress!")
+			assert.contains(vim.api.nvim_get_current_line(), "temp$")
+			assert(not is_gzip("temp"))
+		end)
+	end)
 
 	describe("VimedCompressTo", function() end) -- TODO
 
