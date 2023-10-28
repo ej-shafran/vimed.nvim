@@ -21,8 +21,10 @@ function M.open_vimed()
 	end
 end
 
----@param config Config
+---@param config Config?
 function M.setup(config)
+	config = config or {}
+
 	state.compress_files_alist =
 		vim.tbl_extend("force", state.default_compress_files_alist, config.compress_files_alist or {})
 	if config.garbage_files_regex ~= nil then
@@ -78,7 +80,7 @@ function M.setup(config)
 			})
 			cmd("VimedChmod", commands.chmod, { nargs = "?", complete = "file" })
 			cmd("VimedChown", commands.chown, { nargs = "?", complete = "file" })
-			cmd("VimedCompress", commands.compress, { nargs = "?", complete = "file" })
+			cmd("VimedCompress", commands.compress, { nargs = "?", complete = "file", bang = true })
 			cmd("VimedCompressTo", commands.compress_to, { nargs = "*", complete = "file" })
 			cmd("VimedCopy", commands.copy, { nargs = "?", bang = true, complete = "file" })
 			cmd("VimedCopyRegexp", commands.copy_regexp, { nargs = "*", bang = true })

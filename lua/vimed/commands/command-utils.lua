@@ -1,4 +1,6 @@
 local state = require("vimed._state")
+local utils = require("vimed.utils")
+local render = require("vimed.render")
 
 local M = {}
 
@@ -74,5 +76,23 @@ function M.prompt_for_files(files, opts)
 	return prompt
 end
 
+---@param r integer? the row to place the cursor at after rerendering
+function M.redisplay(r)
+	if not utils.is_vimed() then
+		return
+	end
+
+	if r == nil then
+		r = unpack(vim.api.nvim_win_get_cursor(0))
+	end
+
+	render.render()
+
+	local last_line = vim.fn.line("w$") --[[@as number]]
+	if r > last_line then
+		r = last_line
+	end
+	vim.api.nvim_win_set_cursor(0, { r, 0 })
+end
 
 return M

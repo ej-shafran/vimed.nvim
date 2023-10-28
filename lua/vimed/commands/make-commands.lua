@@ -3,24 +3,9 @@
 
 local utils = require("vimed.utils")
 local state = require("vimed._state")
-local render = require("vimed.render")
 local command_utils = require("vimed.commands.command-utils")
 
 local M = {}
-
----@param r integer? the row to place the cursor at after rerendering
-function M.redisplay(r)
-	if not utils.is_vimed() then
-		return
-	end
-
-	if r == nil then
-		r = unpack(vim.api.nvim_win_get_cursor(0))
-	end
-
-	render.render()
-	command_utils.set_line(r)
-end
 
 ---Creates a basic command, who's logic isn't necessarily shared with other commands.
 ---The callback function is only called in Vimed mode.
@@ -42,7 +27,7 @@ function M.basic(logic)
 		local r = logic(param)
 
 		if r ~= false then
-			M.redisplay(r)
+			command_utils.redisplay(r)
 		end
 	end
 end
@@ -58,7 +43,7 @@ function M.toggle(state_key)
 		end
 
 		state[state_key] = not state[state_key]
-		M.redisplay()
+		command_utils.redisplay()
 	end
 end
 
@@ -94,7 +79,7 @@ function M.mark(flag)
 				end
 			end
 
-			M.redisplay()
+			command_utils.redisplay()
 		else
 			local path, r = command_utils.cursor_path()
 			if path == nil then
@@ -102,10 +87,10 @@ function M.mark(flag)
 			end
 
 			local basename = vim.fs.basename(path)
-			if basename ~= "." and basename ~= ".." then
+			if flag == nil or basename ~= "." and basename ~= ".." then
 				state.flags[path] = flag
 			end
-			M.redisplay(r + 1)
+			command_utils.redisplay(r + 1)
 		end
 	end
 end
@@ -157,10 +142,10 @@ function M.act_on_files(logic, opts)
 			end
 		end
 
-		local r = logic(files, input, param.fargs[2])
+		local r = logic(files, input, param.fargs and param.fargs[1])
 
 		if r ~= false then
-			M.redisplay(r)
+			command_utils.redisplay(r)
 		end
 	end
 end
@@ -218,9 +203,34 @@ function M.create_files(logic, opts)
 			end
 		end
 
-		M.redisplay()
+		command_utils.redisplay()
 	end
 end
+---Taken from [compile-mode.nvim](https://github.com/ej-shafran/compile-mode.nvim/blob/8889a8b3768f35de6192a9f272a840b9f8e276b7/lua/compile-mode/init.lua#L59-L78)
+---
+---If `fname` has a window open, do nothing.
+---Otherwise, split a new window (and possibly buffer) open for that file, respecting `config.split_vertically`.
+---
+---@param fname string
+---@param vertical boolean
+---@return integer bufnr the identifier of the buffer for `fname`
+local function split_unless_open(fname, vertical)
+	local bufnum = vim.fn.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
+	local winnum = vim.fn.bufwinnr(bufnum)
+
+	if winnum == -1 then
+		if vertical then
+			vim.cmd.vsplit(fname)
+		else
+			vim.cmd.split(fname)
+		end
+	end
+
+	return vim.fn.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
+end
+
+---@diagnostic disable-next-line: undefined-field
+local buf_set_opt = vim.api.nvim_buf_set_option
 
 ---Creates a command which asks for user input (or joins the arguments passed to the command into a string) and runs it as a shell command.
 ---The `parse` callback is used to determine the way in which the command input should be parsed (allowing for Dired command syntax).
@@ -268,9 +278,19 @@ function M.execute(parse, opts)
 			for _, cmd in ipairs(commands) do
 				acc = acc .. utils.command(cmd)
 			end
-			vim.cmd.split()
-			vim.cmd.e("Async Shell Result")
-			vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(acc, "\n") --[[@as table]])
+
+			local bufnr = split_unless_open("Async Shell Result", param.smods and param.smods.vertical or false)
+
+			buf_set_opt(bufnr, "modifiable", true)
+			vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, vim.fn.split(acc, "\n") --[[@as table]])
+			buf_set_opt(bufnr, "modifiable", false)
+			buf_set_opt(bufnr, "filetype", "vimed-async-shell")
+			vim.api.nvim_create_autocmd("ExitPre", {
+				group = vim.api.nvim_create_augroup("vimed-async-shell", {}),
+				callback = function()
+					vim.api.nvim_buf_delete(bufnr, { force = true })
+				end,
+			})
 		else
 			for _, cmd in ipairs(commands) do
 				local result = utils.command(cmd)
@@ -320,7 +340,7 @@ function M.delete_files(get_files, if_none)
 			state.flags[path] = nil
 		end
 
-		M.redisplay()
+		command_utils.redisplay()
 	end
 end
 
@@ -399,7 +419,7 @@ function M.confirm_each_file(transform, opts)
 			end
 		end
 
-		M.redisplay()
+		command_utils.redisplay()
 	end
 end
 
@@ -441,7 +461,7 @@ function M.mark_via_filter(filter, opts)
 		local suffix = count == 1 and "" or "s"
 		vim.notify(count .. " " .. opts.kind .. suffix .. " marked")
 
-		M.redisplay()
+		command_utils.redisplay()
 	end
 end
 
@@ -524,7 +544,7 @@ function M.with_regexp(logic, opts)
 			vim.notify(opts.name .. ": " .. #all_files - count .. " of " .. #all_files .. " files skipped")
 		end
 
-		M.redisplay()
+		command_utils.redisplay()
 	end
 end
 
