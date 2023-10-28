@@ -354,7 +354,23 @@ describe("Vimed Command", function()
 
 	describe("VimedMarkExecutables", function() end) -- TODO
 
-	describe("VimedMarkExtension", function() end) -- TODO
+	describe("VimedMarkExtension", function()
+		it("should mark only a specific extension", function()
+			vimed.setup()
+			os.execute("touch file1 file2.c file3.ts")
+			vimed.open_vimed()
+
+			local lines = vim.api.nvim_buf_get_lines(0, 2, -1, false)
+			for i, line in ipairs(lines) do
+				if string.find(line, "file3.ts") ~= nil then
+					lines[i] = line:gsub("^ ", "*")
+				end
+			end
+
+			vim.cmd.VimedMarkExtension("ts")
+			assert.are.same(lines, vim.api.nvim_buf_get_lines(0, 2, -1, false))
+		end)
+	end)
 
 	describe("VimedMarkFilesContainingRegexp", function() end) -- TODO
 
