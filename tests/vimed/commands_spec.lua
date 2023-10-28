@@ -377,7 +377,19 @@ describe("Vimed Command", function()
 
 	describe("VimedHardlinkRegexp", function() end) -- TODO
 
-	describe("VimedLoad", function() end) -- TODO
+	describe("VimedLoad", function()
+		it("should load a Lua file", function()
+			vimed.setup()
+			os.execute("echo '_SOME_GLOBAL = true' > temp.lua")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("temp.lua")
+			vim.cmd("VimedLoad!")
+
+			---@diagnostic disable-next-line: undefined-global
+			assert(_SOME_GLOBAL)
+		end)
+	end)
 
 	describe("VimedMark", function()
 		it("should mark the current line", function()
