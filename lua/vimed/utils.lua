@@ -16,6 +16,8 @@ function M.is_vimed()
 	return vim.bo.filetype == "vimed"
 end
 
+---TODO: use jobstart where we actually want the result along with async behavior
+---TODO: use vim.fn.system and log this out on our own, don't return a string
 ---Run a shell command and get its output as a string.
 ---@param cmd string|table either a full string of the command or a table to be joined with spaces
 ---@return string
