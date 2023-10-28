@@ -460,7 +460,27 @@ describe("Vimed Command", function()
 		end)
 	end)
 
-	describe("VimedMarkExecutables", function() end) -- TODO
+	describe("VimedMarkExecutables", function()
+		it("should mark executables", function()
+			vimed.setup()
+			os.execute("touch file1 file2")
+			os.execute("chmod +x file1")
+			vimed.open_vimed()
+
+			local expected = vim.api.nvim_buf_get_lines(0, 2, -1, false)
+			for i, line in ipairs(expected) do
+				if string.find(line, "file1") ~= nil then
+					expected[i] = line:gsub("^ ", "*")
+				end
+			end
+
+			vim.cmd.VimedMarkExecutables()
+			local recieved = vim.api.nvim_buf_get_lines(0, 2, -1, false)
+			for i, line in ipairs(recieved) do
+				assert.are.same(line, expected[i])
+			end
+		end)
+	end)
 
 	describe("VimedMarkExtension", function()
 		it("should mark only a specific extension", function()
