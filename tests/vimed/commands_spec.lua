@@ -265,7 +265,20 @@ describe("Vimed Command", function()
 		end)
 	end)
 
-	describe("VimedDiff", function() end) -- TODO
+	describe("VimedDiff", function()
+		it("should diff two files", function()
+			vimed.setup()
+			os.execute("echo 'Hello, world!' > file1")
+			os.execute("echo 'Goodbye, blue sky!' > file2")
+			vimed.open_vimed()
+
+			vim.cmd.VimedGotoFile("file1")
+			vim.cmd.VimedDiff("file2")
+
+			---@diagnostic disable-next-line: undefined-field
+			assert(vim.api.nvim_win_get_option(0, "diff"))
+		end)
+	end)
 
 	describe("VimedDowncase", function()
 		it("should rename files to lowercase", function()
